@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Comercial 2026 — DEMO Executiva</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#070d1c;--bg2:#0c1530;--card:#111c38;--card2:#172648;--card3:#1d2e54;
+    --border:#26365d;--border2:#324871;
+    --text:#eef3fb;--muted:#90a5c8;--mute2:#6b7fa3;
+    --gold:#f4cf7a;--gold2:#e6b756;--gold-dim:#8a6b2e;
+    --blue:#5da9ff;--blue2:#3b82f6;--blue-dim:#1e3a6e;
+    --green:#2ecf75;--green-dim:#0e4f2d;
+    --red:#ff5b6c;--red-dim:#54151d;
+    --orange:#ffa033;--orange-dim:#5a3611;
+    --cyan:#22d3ee;--purple:#b794ff;--pink:#ff7ab8;
+    --shadow:0 10px 30px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.03) inset;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:radial-gradient(1200px 700px at 10% -10%, #14224a 0%, transparent 60%), radial-gradient(900px 600px at 90% 110%, #1a2855 0%, transparent 55%), linear-gradient(170deg,#060b1a 0%,#0a1330 100%);color:var(--text);font-family:'Segoe UI','Inter',Arial,sans-serif;min-height:100vh;letter-spacing:.1px}
+  .wrap{padding:20px 28px 28px;max-width:1920px;margin:0 auto}
+
+  /* ===== TOP BAR ===== */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dim) 100%);display:grid;place-items:center;font-weight:800;color:#1a1304;box-shadow:var(--shadow);font-size:18px;letter-spacing:0}
+  .brand h1{margin:0;font-size:18px;letter-spacing:1.5px;color:#fff;font-weight:700;text-transform:uppercase}
+  .brand h1 .accent{color:var(--gold)}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:11px;letter-spacing:.5px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .filter{display:flex;flex-direction:column;gap:5px}
+  .filter label{font-size:9.5px;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+  .filter select{background:var(--card);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:12.5px;min-width:140px;outline:none;cursor:pointer;font-weight:500;transition:all .15s ease}
+  .filter select:hover{border-color:var(--gold);background:var(--card2)}
+  .filter select:focus{border-color:var(--gold)}
+  .reset-btn{background:transparent;color:var(--gold);border:1px solid var(--gold-dim);border-radius:8px;padding:8px 16px;font-size:11px;cursor:pointer;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all .15s ease}
+  .reset-btn:hover{background:var(--gold);color:#1a1304}
+
+  /* ===== TABS ===== */
+  .tabs{display:flex;gap:4px;padding:6px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;overflow-x:auto}
+  .tab{flex:1;min-width:140px;padding:11px 14px;background:transparent;color:var(--muted);border:none;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;border-radius:8px;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+  .tab:hover{color:var(--text);background:var(--card2)}
+  .tab.active{background:linear-gradient(180deg,var(--gold) 0%,var(--gold2) 100%);color:#1a1304;box-shadow:0 4px 14px rgba(244,207,122,.25)}
+  .tab .ic{font-size:14px;line-height:1}
+
+  /* ===== PAGES ===== */
+  .page{display:none;animation:fade .3s ease}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* ===== KPI CARDS ===== */
+  .kpi-row{display:grid;gap:14px;margin-bottom:16px}
+  .kpi{background:linear-gradient(180deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s ease, border-color .15s ease}
+  .kpi:hover{transform:translateY(-2px);border-color:var(--border2)}
+  .kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold)}
+  .kpi.b1::before{background:var(--gold)}
+  .kpi.b2::before{background:var(--blue)}
+  .kpi.b3::before{background:var(--orange)}
+  .kpi.b4::before{background:var(--green)}
+  .kpi.b5::before{background:var(--purple)}
+  .kpi.b6::before{background:var(--red)}
+  .kpi.b7::before{background:var(--cyan)}
+  .kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.6px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .kpi .label small{font-weight:500;letter-spacing:.5px;color:var(--mute2);text-transform:none}
+  .kpi .value{font-size:26px;font-weight:800;margin-top:8px;color:#fff;line-height:1.1;font-variant-numeric:tabular-nums}
+  .kpi .value.sm{font-size:20px}
+  .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:6px}
+  .kpi .sub .pos{color:var(--green);font-weight:700}
+  .kpi .sub .neg{color:var(--red);font-weight:700}
+  .kpi .sub .mut{color:var(--mute2)}
+  .kpi .pillk{display:inline-block;padding:2px 8px;border-radius:8px;font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
+  .kpi .pillk.up{background:rgba(46,207,117,.15);color:var(--green)}
+  .kpi .pillk.dn{background:rgba(255,91,108,.15);color:var(--red)}
+  .kpi .pillk.nu{background:rgba(144,165,200,.12);color:var(--muted)}
+
+  /* ===== HERO HUGE KPI ===== */
+  .hero-kpi{background:linear-gradient(135deg,var(--card) 0%,var(--card3) 100%);border:1px solid var(--gold-dim);border-radius:16px;padding:24px 28px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  .hero-kpi::after{content:'';position:absolute;top:-40%;right:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(244,207,122,.12) 0%,transparent 70%);pointer-events:none}
+  .hero-kpi .label{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;font-weight:700}
+  .hero-kpi .value{font-size:46px;font-weight:800;margin-top:10px;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+  .hero-kpi .sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .hero-kpi .gauge{margin-top:14px}
+
+  /* ===== GRID ===== */
+  .grid{display:grid;gap:14px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);position:relative}
+  .card h3{margin:0 0 12px 0;font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;border-bottom:1px solid var(--border);padding-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .card h3 small{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mute2);font-size:11px;margin-left:6px}
+  .card h3 .tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:9.5px;background:var(--card2);color:var(--muted);border:1px solid var(--border)}
+  .card .chart-wrap{position:relative;height:280px}
+  .card .chart-wrap.short{height:220px}
+  .card .chart-wrap.tall{height:360px}
+  .card .chart-wrap.xtall{height:420px}
+
+  /* ===== BARS / PROGRESS ===== */
+  .progress{position:relative;height:8px;background:var(--card2);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+  .progress > span{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 100%);border-radius:6px;transition:width .4s ease}
+  .progress.green > span{background:linear-gradient(90deg,#10b981 0%,#22c55e 100%)}
+  .progress.red > span{background:linear-gradient(90deg,#b91c1c 0%,#ef4444 100%)}
+  .progress.blue > span{background:linear-gradient(90deg,#2563eb 0%,#5da9ff 100%)}
+  .progress.purple > span{background:linear-gradient(90deg,#7c3aed 0%,#b794ff 100%)}
+  .progress.thick{height:14px;border-radius:8px}
+  .progress.thick > span{border-radius:8px}
+
+  /* ===== TABLE ===== */
+  .tbl-wrap{overflow:auto;max-height:420px;border-radius:8px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:var(--card2);color:var(--gold);text-align:left;padding:10px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+  td{padding:9px 10px;border-bottom:1px solid #1c2a47;color:var(--text);font-variant-numeric:tabular-nums}
+  tr:hover td{background:#192747}
+  td.num{text-align:right}
+  td.b{font-weight:700;color:#fff}
+  td .mini{display:inline-block;width:60px;height:5px;background:var(--card3);border-radius:3px;overflow:hidden;vertical-align:middle;margin-left:6px}
+  td .mini > i{display:block;height:100%;background:var(--gold)}
+  td .mini.green > i{background:var(--green)}
+  td .mini.red > i{background:var(--red)}
+
+  /* ===== PILLS / BADGES ===== */
+  .pill{display:inline-block;padding:3px 9px;border-radius:10px;font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .pill.q{background:rgba(255,91,108,.15);color:var(--red);border:1px solid rgba(255,91,108,.3)}
+  .pill.m{background:rgba(255,160,51,.15);color:var(--orange);border:1px solid rgba(255,160,51,.3)}
+  .pill.f{background:rgba(34,211,238,.15);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
+  .pill.n{background:rgba(144,165,200,.12);color:var(--muted);border:1px solid var(--border)}
+  .pill.ok{background:rgba(46,207,117,.15);color:var(--green);border:1px solid rgba(46,207,117,.3)}
+  .pill.warn{background:rgba(244,207,122,.15);color:var(--gold);border:1px solid var(--gold-dim)}
+
+  /* ===== SECTION DIVIDER ===== */
+  .section{margin:6px 0 14px;display:flex;align-items:center;gap:12px}
+  .section h2{margin:0;font-size:13px;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;font-weight:800}
+  .section .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--border) 0%,transparent 100%)}
+  .section .meta-tag{padding:3px 10px;border-radius:8px;font-size:10px;color:var(--muted);background:var(--card);border:1px solid var(--border);letter-spacing:.5px;font-weight:600}
+
+  /* ===== HUNTER CARD ===== */
+  .hunter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .hunter-card{background:linear-gradient(180deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);position:relative}
+  .hunter-card .h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .hunter-card .h .name{font-size:13.5px;font-weight:700;color:#fff;letter-spacing:.5px}
+  .hunter-card .h .rank{font-size:11px;font-weight:700;color:var(--gold);background:rgba(244,207,122,.12);padding:3px 9px;border-radius:8px}
+  .hunter-card .row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:5px 0}
+  .hunter-card .row b{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+  .hunter-card .pct{font-size:18px;font-weight:800;color:var(--gold);margin-top:8px;font-variant-numeric:tabular-nums}
+
+  /* ===== FUNNEL ===== */
+  .funnel{display:flex;flex-direction:column;gap:8px;padding:8px 0}
+  .funnel-stage{position:relative;margin:0 auto;padding:14px 18px;background:linear-gradient(180deg,var(--card2) 0%,var(--card3) 100%);border:1px solid var(--border2);border-radius:8px;text-align:center;transition:transform .15s ease}
+  .funnel-stage:hover{transform:scale(1.01)}
+  .funnel-stage .name{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .funnel-stage .val{font-size:18px;font-weight:800;color:#fff;margin-top:3px;font-variant-numeric:tabular-nums}
+  .funnel-stage .v2{font-size:10.5px;color:var(--gold);margin-top:2px;font-weight:600}
+  .funnel-stage.s1{width:100%;border-left:4px solid var(--blue)}
+  .funnel-stage.s2{width:85%;border-left:4px solid var(--cyan)}
+  .funnel-stage.s3{width:70%;border-left:4px solid var(--orange)}
+  .funnel-stage.s4{width:55%;border-left:4px solid var(--gold)}
+  .funnel-stage.s5{width:40%;border-left:4px solid var(--green)}
+
+  /* ===== HEAT ===== */
+  .heat{display:grid;gap:2px;font-size:11px}
+  .heat .h{padding:6px 8px;text-align:center;font-weight:700;color:var(--muted);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase}
+  .heat .l{padding:8px;color:var(--text);font-weight:600;font-size:11px}
+  .heat .c{padding:8px;text-align:center;font-weight:700;border-radius:4px;font-variant-numeric:tabular-nums}
+
+  /* ===== UTILS / GRID HELPERS ===== */
+  .g5{grid-template-columns:repeat(5,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g23{grid-template-columns:2fr 1fr}
+  .g32{grid-template-columns:1fr 2fr}
+  .g123{grid-template-columns:1fr 1fr 2fr}
+  .full{grid-column:1/-1}
+  .footer{margin-top:24px;padding-top:14px;border-top:1px solid var(--border);color:var(--mute2);font-size:11px;text-align:center;letter-spacing:.5px}
+  .footer b{color:var(--muted)}
+  .badge-demo{position:fixed;top:14px;right:14px;background:var(--red);color:#fff;font-weight:800;font-size:10px;padding:5px 11px;border-radius:6px;letter-spacing:1.5px;z-index:99;box-shadow:0 4px 14px rgba(255,91,108,.4)}
+  .help{font-size:10.5px;color:var(--mute2);line-height:1.45;margin-top:6px}
+
+  @media (max-width:1280px){.g5{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(2,1fr)} .g3,.g23,.g32,.g123{grid-template-columns:1fr}}
+  @media (max-width:760px){.g5,.g4,.g3,.g2{grid-template-columns:1fr} .topbar{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+
+<div class="badge-demo">DEMO · v1</div>
+
+<div class="wrap">
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">SC</div>
+      <div>
+        <h1>DASHBOARD <span class="accent">COMERCIAL</span> · 2026</h1>
+        <p>Inteligência de Vendas · Conversão · Produtividade · Pipeline</p>
+      </div>
+    </div>
+    <div class="filters">
+      <div class="filter"><label>Competência</label><select id="f-mes"></select></div>
+      <div class="filter"><label>Hunter</label><select id="f-hunter"></select></div>
+      <div class="filter"><label>UF</label><select id="f-uf"></select></div>
+      <div class="filter"><label>Tipo</label><select id="f-contrato"></select></div>
+      <button class="reset-btn" id="reset">Limpar</button>
+    </div>
+  </div>
+
+  <!-- ===== TABS ===== -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-page="exec"><span class="ic">▲</span>Executiva</button>
+    <button class="tab" data-page="conv"><span class="ic">▼</span>Conversão</button>
+    <button class="tab" data-page="hunt"><span class="ic">●</span>Hunters</button>
+    <button class="tab" data-page="proc"><span class="ic">◆</span>Procurações</button>
+    <button class="tab" data-page="meta"><span class="ic">★</span>Metas</button>
+    <button class="tab" data-page="pipe"><span class="ic">⬢</span>Pipeline</button>
+  </nav>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 1 — EXECUTIVA                                         -->
+  <!-- ========================================================== -->
+  <section class="page active" id="page-exec">
+
+    <div class="grid g123">
+      <div class="hero-kpi">
+        <div class="label">Receita Fechada · Acumulado 2026</div>
+        <div class="value" id="hero-receita">—</div>
+        <div class="sub" id="hero-receita-sub">—</div>
+        <div class="gauge"><div class="progress thick"><span id="hero-receita-bar" style="width:0%"></span></div></div>
+        <div class="help" id="hero-receita-help">Benchmark Meta Global: R$ 34.000.000 (Diretoria)</div>
+      </div>
+      <div class="hero-kpi">
+        <div class="label">Atingimento da Meta · Acumulado</div>
+        <div class="value" id="hero-ating">—</div>
+        <div class="sub" id="hero-ating-sub">—</div>
+        <div class="gauge"><div class="progress thick green"><span id="hero-ating-bar" style="width:0%"></span></div></div>
+        <div class="help" id="hero-ating-help">Meta YTD considera a soma das metas mensais dos hunters ativos.</div>
+      </div>
+      <div class="hero-kpi">
+        <div class="label">Saúde do Funil</div>
+        <div class="value sm" id="hero-funil">—</div>
+        <div class="sub" id="hero-funil-sub">—</div>
+        <div class="gauge"><div class="progress thick blue"><span id="hero-funil-bar" style="width:0%"></span></div></div>
+        <div class="help" id="hero-funil-help">Pipeline Quente vs Total — quanto maior, melhor a previsibilidade.</div>
+      </div>
+    </div>
+
+    <div class="kpi-row g5">
+      <div class="kpi b1"><div class="label">Conversão Geral <small>(competência)</small></div><div class="value" id="x-conv">—</div><div class="sub" id="x-conv-sub">—</div></div>
+      <div class="kpi b3"><div class="label">Pipeline Total <small>(base + em assinatura)</small></div><div class="value" id="x-pipe">—</div><div class="sub" id="x-pipe-sub">—</div></div>
+      <div class="kpi b5"><div class="label">Ticket Médio</div><div class="value" id="x-ticket">—</div><div class="sub" id="x-ticket-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Hunters Ativos</div><div class="value" id="x-hunters">—</div><div class="sub" id="x-hunters-sub">—</div></div>
+      <div class="kpi b2"><div class="label">Procurações no Mês</div><div class="value" id="x-procs">—</div><div class="sub" id="x-procs-sub">—</div></div>
+    </div>
+
+    <div class="grid g23">
+      <div class="card">
+        <h3>Receita Fechada × Meta × Pipeline <small>(mês a mês)</small><span class="tag">SÉRIE TEMPORAL</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-exec-timeline"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Mix Novo × Upsell <small>(fechado)</small><span class="tag">RECEITA</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-exec-mix"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Top 8 Hunters · Realizado vs Meta YTD<span class="tag">RANKING</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-exec-ranking"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Pipeline por Temperatura <small>(somente Base + Em Assinatura)</small><span class="tag">QUALIDADE</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-exec-temp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Alertas &amp; Insights Executivos<span class="tag">AUTO-GERADO</span></h3>
+      <div id="exec-insights" style="display:grid;gap:8px;font-size:12.5px;line-height:1.55"></div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 2 — CONVERSÃO                                         -->
+  <!-- ========================================================== -->
+  <section class="page" id="page-conv">
+
+    <div class="kpi-row g5">
+      <div class="kpi b1"><div class="label">Pipeline do Mês <small>(competência selecionada)</small></div><div class="value" id="c-pipe">—</div><div class="sub" id="c-pipe-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Fechado na Competência</div><div class="value" id="c-fech-comp">—</div><div class="sub" id="c-fech-comp-sub">—</div></div>
+      <div class="kpi b5"><div class="label">Fechado Fora da Competência <small>(atraso)</small></div><div class="value" id="c-fech-fora">—</div><div class="sub" id="c-fech-fora-sub">—</div></div>
+      <div class="kpi b6"><div class="label">Em Standby <small>(risco)</small></div><div class="value" id="c-sb">—</div><div class="sub" id="c-sb-sub">—</div></div>
+      <div class="kpi b2"><div class="label">Taxa de Fechamento <small>(R$ assinado / R$ pipeline)</small></div><div class="value" id="c-tx">—</div><div class="sub" id="c-tx-sub">—</div></div>
+    </div>
+
+    <div class="grid g23">
+      <div class="card">
+        <h3>Funil de Conversão · Competência Selecionada<span class="tag">FLUXO</span></h3>
+        <div class="funnel" id="funnel"></div>
+        <div class="help">Pipeline = todas as oportunidades com mês de entrada igual à competência. Conversão considera fechamento dentro da mesma competência.</div>
+      </div>
+      <div class="card">
+        <h3>Pipeline vs Convertido · Mês a Mês<span class="tag">COMPETÊNCIA</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-conv-comp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Conversão Dentro × Fora da Competência<span class="tag">RASTREABILIDADE</span></h3>
+        <div class="chart-wrap"><canvas id="ch-conv-split"></canvas></div>
+        <div class="help">Quanto maior a barra <b>dentro da competência</b>, mais saudável o ciclo. Atrasos elevam custo de oportunidade e distorcem o forecast.</div>
+      </div>
+      <div class="card">
+        <h3>Tempo Médio de Fechamento <small>(em meses)</small><span class="tag">CICLO</span></h3>
+        <div class="chart-wrap"><canvas id="ch-conv-tempo"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Conversão por Hunter · Competência Selecionada<span class="tag">DETALHE</span></h3>
+      <div class="tbl-wrap"><table id="tb-conv-hunter">
+        <thead><tr><th>Hunter</th><th class="num">Contas Entradas</th><th class="num">Fechadas (mês)</th><th class="num">Fechadas (fora)</th><th class="num">Standby</th><th class="num">Conv. % (qtd)</th><th class="num">Conv. % (R$)</th><th class="num">R$ Fechado</th><th class="num">Ticket Médio</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 3 — HUNTERS                                           -->
+  <!-- ========================================================== -->
+  <section class="page" id="page-hunt">
+
+    <div class="kpi-row g5">
+      <div class="kpi b1"><div class="label">Hunter Top Receita</div><div class="value sm" id="h-top1">—</div><div class="sub" id="h-top1-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Hunter Top Conversão</div><div class="value sm" id="h-top2">—</div><div class="sub" id="h-top2-sub">—</div></div>
+      <div class="kpi b5"><div class="label">Hunter Top Procurações</div><div class="value sm" id="h-top3">—</div><div class="sub" id="h-top3-sub">—</div></div>
+      <div class="kpi b3"><div class="label">Hunter mais Eficiente <small>(R$ / procuração)</small></div><div class="value sm" id="h-top4">—</div><div class="sub" id="h-top4-sub">—</div></div>
+      <div class="kpi b6"><div class="label">Hunter em Atenção <small>(menor atingimento)</small></div><div class="value sm" id="h-top5">—</div><div class="sub" id="h-top5-sub">—</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Ranking de Atingimento de Meta · YTD<span class="tag">RANKING</span></h3>
+        <div class="chart-wrap xtall"><canvas id="ch-hunt-rank"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Matriz de Performance · Volume × Conversão<span class="tag">QUADRANTES</span></h3>
+        <div class="chart-wrap xtall"><canvas id="ch-hunt-scatter"></canvas></div>
+        <div class="help">Eixo X = receita fechada (R$) · Eixo Y = taxa de conversão (%). Os quadrantes superiores-direitos são os hunters estrela.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cards Individuais · Hunters<span class="tag">DRILL-DOWN</span></h3>
+      <div class="hunter-grid" id="hunter-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3>Detalhamento por Hunter <small>(receita, meta, atingimento, pipeline)</small><span class="tag">TABELA</span></h3>
+      <div class="tbl-wrap"><table id="tb-hunt">
+        <thead><tr><th>#</th><th>Hunter</th><th class="num">Meta YTD</th><th class="num">Realizado</th><th class="num">Atingimento</th><th class="num">Pipeline</th><th class="num">Contas Fechadas</th><th class="num">Ticket Médio</th><th class="num">Procurações</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 4 — PROCURAÇÕES                                       -->
+  <!-- ========================================================== -->
+  <section class="page" id="page-proc">
+
+    <div class="kpi-row g4">
+      <div class="kpi b1"><div class="label">Procurações · Total YTD</div><div class="value" id="p-tot">—</div><div class="sub" id="p-tot-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Novas</div><div class="value" id="p-novas">—</div><div class="sub" id="p-novas-sub">—</div></div>
+      <div class="kpi b5"><div class="label">Renovações</div><div class="value" id="p-reno">—</div><div class="sub" id="p-reno-sub">—</div></div>
+      <div class="kpi b3"><div class="label">% Renovação <small>(retenção)</small></div><div class="value" id="p-pct">—</div><div class="sub" id="p-pct-sub">—</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Evolução Mensal · Novas vs Renovações<span class="tag">SÉRIE</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-proc-mes"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Produção por Hunter<span class="tag">DISTRIBUIÇÃO</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-proc-hunter"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Mapa de Calor · Hunter × Mês<span class="tag">HEATMAP</span></h3>
+        <div class="heat" id="proc-heat"></div>
+      </div>
+      <div class="card">
+        <h3>Top Hunters · Procurações<span class="tag">RANKING</span></h3>
+        <div class="tbl-wrap" style="max-height:380px"><table id="tb-proc">
+          <thead><tr><th>#</th><th>Hunter</th><th class="num">Novas</th><th class="num">Renovações</th><th class="num">Total</th><th class="num">% Renov.</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 5 — METAS                                             -->
+  <!-- ========================================================== -->
+  <section class="page" id="page-meta">
+
+    <div class="grid g3">
+      <div class="hero-kpi">
+        <div class="label">Meta Global da Diretoria · 2026</div>
+        <div class="value" id="m-target">R$ 34,0 Mi</div>
+        <div class="sub" id="m-target-sub">Receita NOVA · Até 34 MM = meta padrão · Acima = excedente</div>
+        <div class="gauge"><div class="progress thick"><span id="m-target-bar" style="width:0%"></span></div></div>
+      </div>
+      <div class="hero-kpi">
+        <div class="label">Realizado Acumulado</div>
+        <div class="value" id="m-real">—</div>
+        <div class="sub" id="m-real-sub">—</div>
+        <div class="gauge"><div class="progress thick green"><span id="m-real-bar" style="width:0%"></span></div></div>
+      </div>
+      <div class="hero-kpi">
+        <div class="label">Excedente <small>(acima de R$ 34 Mi)</small></div>
+        <div class="value" id="m-exc">—</div>
+        <div class="sub" id="m-exc-sub">—</div>
+        <div class="gauge"><div class="progress thick purple"><span id="m-exc-bar" style="width:0%"></span></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-row g4">
+      <div class="kpi b2"><div class="label">Faltante para 34 Mi</div><div class="value" id="m-falt">—</div><div class="sub" id="m-falt-sub">—</div></div>
+      <div class="kpi b3"><div class="label">Run-Rate Mensal Necessário</div><div class="value" id="m-rr">—</div><div class="sub" id="m-rr-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Projeção Linear (fim do ano)</div><div class="value" id="m-proj">—</div><div class="sub" id="m-proj-sub">—</div></div>
+      <div class="kpi b5"><div class="label">Pipeline Necessário <small>(conv. atual)</small></div><div class="value" id="m-pn">—</div><div class="sub" id="m-pn-sub">—</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Acumulado vs Meta · Curva 34 Mi<span class="tag">PROJEÇÃO</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-meta-curva"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Atingimento por Hunter <small>(barras horizontais)</small><span class="tag">RANKING</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-meta-hunter"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Eficiência por Hunter <small>(meta · realizado · excedente · % atingimento)</small><span class="tag">TABELA</span></h3>
+      <div class="tbl-wrap"><table id="tb-meta">
+        <thead><tr><th>#</th><th>Hunter</th><th class="num">Meta YTD</th><th class="num">Realizado</th><th class="num">Atingimento</th><th class="num">Excedente</th><th>Progresso</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- PÁGINA 6 — PIPELINE                                          -->
+  <!-- ========================================================== -->
+  <section class="page" id="page-pipe">
+
+    <div class="kpi-row g5">
+      <div class="kpi b1"><div class="label">Pipeline Total</div><div class="value" id="pp-tot">—</div><div class="sub" id="pp-tot-sub">—</div></div>
+      <div class="kpi b4"><div class="label">Quente <small>(alta prob.)</small></div><div class="value" id="pp-q">—</div><div class="sub" id="pp-q-sub">—</div></div>
+      <div class="kpi b3"><div class="label">Morno</div><div class="value" id="pp-m">—</div><div class="sub" id="pp-m-sub">—</div></div>
+      <div class="kpi b2"><div class="label">Frio</div><div class="value" id="pp-f">—</div><div class="sub" id="pp-f-sub">—</div></div>
+      <div class="kpi b6"><div class="label">Standby <small>(parado)</small></div><div class="value" id="pp-sb">—</div><div class="sub" id="pp-sb-sub">—</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Distribuição por Status<span class="tag">STATUS</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-pipe-status"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Pipeline por Temperatura<span class="tag">QUALIDADE</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-pipe-temp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Pipeline por Praça (UF)<span class="tag">GEOGRAFIA</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-pipe-uf"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Mix por Produto<span class="tag">SOLUÇÃO</span></h3>
+        <div class="chart-wrap tall"><canvas id="ch-pipe-produto"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Top 15 Oportunidades · Pipeline em Aberto<span class="tag">DRILL-DOWN</span></h3>
+      <div class="tbl-wrap"><table id="tb-pipe">
+        <thead><tr><th>#</th><th>Empresa</th><th>Hunter</th><th>UF</th><th>Produto</th><th class="num">Faturamento</th><th>Status</th><th>Temp.</th><th>Compet.</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+
+  </section>
+
+  <div class="footer">
+    Atualizado em <b>__DATE__</b> · Fonte: <i>forescast atualizado 2026.xlsx</i> · Versão <b>DEMO 1.0</b> ·
+    Conversa-mãe: análise de conversão, produtividade e metas reais · Time Comercial / Strategicos
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DADOS EMBUTIDOS
+   ========================================================= */
+const RAW    = __RECORDS__;
+const META   = __META__;
+const PROCS  = __PROCS__;
+
+const MONTHS_ALL = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const META_GLOBAL = 34_000_000;
+const TODAY_MONTH_IDX = 4; // MAI = 5º mês (0-indexed = 4). Em produção, calcular dinamicamente.
+
+/* =========================================================
+   FORMATTERS
+   ========================================================= */
+const fmtBRL = v => 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtBRLk = v => { v=v||0; if(Math.abs(v)>=1e6) return 'R$ '+(v/1e6).toFixed(1).replace('.',',')+' Mi'; if(Math.abs(v)>=1e3) return 'R$ '+(v/1e3).toFixed(0)+' Mil'; return 'R$ '+v.toFixed(0); };
+const pct = v => ((v||0)*100).toFixed(1).replace('.',',')+'%';
+
+const HAS_CHART = (typeof Chart !== 'undefined');
+if (HAS_CHART) {
+  try {
+    Chart.defaults.color = '#90a5c8';
+    Chart.defaults.borderColor = '#26365d';
+    Chart.defaults.font.family = "'Segoe UI','Inter',Arial,sans-serif";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  } catch (e) { console.warn('Chart defaults config failed:', e); }
+} else {
+  console.warn('[DEMO] Chart.js não carregou — gráficos ficarão ocultos, mas KPIs em texto continuam funcionando.');
+}
+
+// Wrapper seguro: cria Chart se disponível; caso contrário mostra placeholder
+function safeChart(canvasId, config){
+  if (!HAS_CHART) {
+    const el = document.getElementById(canvasId);
+    if (el && el.parentElement) {
+      el.style.display = 'none';
+      if (!el.parentElement.querySelector('.chart-fallback')) {
+        const fb = document.createElement('div');
+        fb.className = 'chart-fallback';
+        fb.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:#90a5c8;font-size:12px;text-align:center;padding:20px;';
+        fb.innerHTML = '<div>Gráfico indisponível<br><small style="opacity:.7">Chart.js não carregou (sem internet?)</small></div>';
+        el.parentElement.appendChild(fb);
+      }
+    }
+    return null;
+  }
+  try {
+    const el = document.getElementById(canvasId);
+    if (!el) return null;
+    return new Chart(el, config);
+  } catch(e){ console.error('Chart error ('+canvasId+'):', e); return null; }
+}
+
+const C = {gold:'#f4cf7a',gold2:'#e6b756',blue:'#5da9ff',blue2:'#3b82f6',green:'#2ecf75',red:'#ff5b6c',orange:'#ffa033',cyan:'#22d3ee',purple:'#b794ff',pink:'#ff7ab8',muted:'#90a5c8'};
+const PAL = [C.gold,C.blue,C.green,C.orange,C.purple,C.cyan,C.pink,C.red,'#a3e635','#f87171','#34d399','#fbbf24',C.muted,'#94a3b8'];
+
+/* =========================================================
+   ESTADO + FILTROS
+   ========================================================= */
+const state = { mes:'MAI', hunter:'TODOS', uf:'TODOS', contrato:'TODOS', page:'exec' };
+
+function unique(arr,key){ const s=new Set(); arr.forEach(x=>{if(x[key]!=null && x[key]!=='') s.add(x[key]);}); return [...s].sort(); }
+function uniqueEmpresas(arr){ return new Set(arr.filter(r=>r.empresa).map(r=>r.empresa)).size; }
+
+function applyFilters(rs, opts){
+  opts = opts || {};
+  return rs.filter(r=>{
+    if(!opts.skipMes && state.mes!=='TODOS'){
+      // por padrão, filtra por mês de entrada (competência)
+      if((r.mes||'') !== state.mes) return false;
+    }
+    if(state.hunter!=='TODOS' && r.hunter!==state.hunter) return false;
+    if(state.uf!=='TODOS' && r.uf!==state.uf) return false;
+    if(state.contrato!=='TODOS' && r.contrato!==state.contrato) return false;
+    return true;
+  });
+}
+function applyFiltersProcs(){
+  return PROCS.filter(p=>{
+    if(state.mes!=='TODOS' && p.mes!==state.mes) return false;
+    if(state.hunter!=='TODOS' && p.hunter!==state.hunter) return false;
+    return true;
+  });
+}
+
+/* =========================================================
+   POPULAR FILTROS
+   ========================================================= */
+function populateFilters(){
+  const fmes = document.getElementById('f-mes');
+  const monthsPres = MONTHS_ALL.filter(m => RAW.some(r=>r.mes===m));
+  fmes.innerHTML = '<option value="TODOS">TODOS</option>' + monthsPres.map(m=>`<option value="${m}">${m}</option>`).join('');
+  fmes.value = monthsPres.includes('MAI') ? 'MAI' : (monthsPres.slice(-1)[0]||'TODOS');
+  state.mes = fmes.value;
+
+  const fh = document.getElementById('f-hunter');
+  const hunters = unique(RAW,'hunter');
+  fh.innerHTML = '<option value="TODOS">TODOS</option>' + hunters.map(h=>`<option value="${h}">${h}</option>`).join('');
+
+  const fu = document.getElementById('f-uf');
+  const ufs = unique(RAW,'uf').filter(u=>u && u!=='N/D');
+  fu.innerHTML = '<option value="TODOS">TODOS</option>' + ufs.map(u=>`<option value="${u}">${u}</option>`).join('');
+
+  const fc = document.getElementById('f-contrato');
+  const cs = unique(RAW,'contrato');
+  fc.innerHTML = '<option value="TODOS">TODOS</option>' + cs.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+  ['f-mes','f-hunter','f-uf','f-contrato'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', e=>{
+      state[id.replace('f-','')] = e.target.value;
+      renderAll();
+    });
+  });
+  document.getElementById('reset').addEventListener('click', ()=>{
+    state.hunter='TODOS'; state.uf='TODOS'; state.contrato='TODOS';
+    ['f-hunter','f-uf','f-contrato'].forEach(id=>{document.getElementById(id).value='TODOS';});
+    renderAll();
+  });
+}
+
+/* =========================================================
+   TABS / NAVEGAÇÃO
+   ========================================================= */
+function setupTabs(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const p = t.dataset.page;
+      state.page = p;
+      document.getElementById('page-'+p).classList.add('active');
+      renderAll();
+    });
+  });
+}
+
+/* =========================================================
+   AGREGAÇÕES (KPIs)
+   ========================================================= */
+function agg(rs){
+  const fechados = rs.filter(r=>r.status==='ASSINADO' || r.status==='EM ASSINATURA');
+  const standby = rs.filter(r=>r.status==='STANDBY');
+  const base = rs.filter(r=>r.status==='BASE');
+  const receita = fechados.reduce((s,r)=>s+r.faturamento,0);
+  const receitaStandby = standby.reduce((s,r)=>s+r.faturamento,0);
+  const receitaBase = base.reduce((s,r)=>s+r.faturamento,0);
+  const total = rs.reduce((s,r)=>s+r.faturamento,0);
+  const empresas = uniqueEmpresas(rs);
+  const empresasFech = uniqueEmpresas(fechados);
+  return {
+    rs, fechados, standby, base, receita, receitaStandby, receitaBase, total,
+    pipeline: receitaBase + fechados.filter(r=>r.status==='EM ASSINATURA').reduce((s,r)=>s+r.faturamento,0),
+    pipelineAll: receitaBase, // só base
+    empresas, empresasFech,
+    convCount: empresas>0 ? empresasFech/empresas : 0,
+    convValue: total>0 ? receita/total : 0,
+    ticket: empresasFech>0 ? receita/empresasFech : 0,
+  };
+}
+function metaYTD(hunter, uptoMonthIdx){
+  let total=0;
+  META.forEach(m=>{
+    if(hunter && m.hunter!==hunter) return;
+    MONTHS_ALL.slice(0, uptoMonthIdx+1).forEach(mo=>{
+      total += (m.meta[mo]||0);
+    });
+  });
+  return total;
+}
+function metaMonth(hunter, mo){
+  let total=0;
+  META.forEach(m=>{
+    if(hunter && m.hunter!==hunter) return;
+    total += (m.meta[mo]||0);
+  });
+  return total;
+}
+function metaTotalYTD(){ return metaYTD(null, TODAY_MONTH_IDX); }
+
+/* =========================================================
+   RENDER · PÁGINA EXECUTIVA
+   ========================================================= */
+let chCache = {};
+function destroy(name){ if(chCache[name]){ chCache[name].destroy(); delete chCache[name]; } }
+
+function renderExec(){
+  // Acumulado YTD = todos os meses até hoje, ignorando filtro de mês para hero
+  const ytdRows = RAW.filter(r=>{
+    if(state.hunter!=='TODOS' && r.hunter!==state.hunter) return false;
+    if(state.uf!=='TODOS' && r.uf!==state.uf) return false;
+    if(state.contrato!=='TODOS' && r.contrato!==state.contrato) return false;
+    return true;
+  });
+  const ytdFech = ytdRows.filter(r=>r.status==='ASSINADO' || r.status==='EM ASSINATURA');
+  const receitaYTD = ytdFech.reduce((s,r)=>s+r.faturamento,0);
+  const metaY = metaTotalYTD();
+  const ating = metaY>0 ? receitaYTD/metaY : 0;
+  const pipelineYTD = ytdRows.filter(r=>r.status==='BASE').reduce((s,r)=>s+r.faturamento,0);
+  const total = ytdRows.reduce((s,r)=>s+r.faturamento,0);
+  const saudeFunil = total>0 ? (receitaYTD+pipelineYTD)/total : 0;
+
+  document.getElementById('hero-receita').textContent = fmtBRLk(receitaYTD);
+  document.getElementById('hero-receita-sub').innerHTML = `<span class="${receitaYTD>=metaY?'pos':'neg'}">${pct(receitaYTD/META_GLOBAL)}</span> da meta global · ${ytdFech.length} negócios`;
+  document.getElementById('hero-receita-bar').style.width = Math.min(100, (receitaYTD/META_GLOBAL)*100)+'%';
+
+  document.getElementById('hero-ating').textContent = pct(ating);
+  document.getElementById('hero-ating-sub').innerHTML = `<span class="mut">Meta YTD: ${fmtBRLk(metaY)}</span> · Realizado: ${fmtBRLk(receitaYTD)}`;
+  document.getElementById('hero-ating-bar').style.width = Math.min(100, ating*100)+'%';
+
+  document.getElementById('hero-funil').textContent = pct(saudeFunil);
+  document.getElementById('hero-funil-sub').innerHTML = `Pipeline ativo: ${fmtBRLk(pipelineYTD)} · Standby: ${fmtBRLk(ytdRows.filter(r=>r.status==='STANDBY').reduce((s,r)=>s+r.faturamento,0))}`;
+  document.getElementById('hero-funil-bar').style.width = Math.min(100, saudeFunil*100)+'%';
+
+  // KPIs secundários — usando filtro de mês
+  const a = agg(applyFilters(RAW));
+  document.getElementById('x-conv').textContent = pct(a.convValue);
+  document.getElementById('x-conv-sub').innerHTML = `${pct(a.convCount)} por contas · ${a.empresasFech}/${a.empresas} empresas`;
+  document.getElementById('x-pipe').textContent = fmtBRLk(a.pipeline);
+  document.getElementById('x-pipe-sub').innerHTML = `Base: ${fmtBRLk(a.pipelineAll)}`;
+  document.getElementById('x-ticket').textContent = fmtBRLk(a.ticket);
+  document.getElementById('x-ticket-sub').innerHTML = `Em ${a.empresasFech} clientes`;
+  const huntersAtivos = new Set(a.fechados.map(r=>r.hunter)).size;
+  document.getElementById('x-hunters').textContent = huntersAtivos;
+  document.getElementById('x-hunters-sub').innerHTML = `Total no time: ${new Set(RAW.map(r=>r.hunter)).size}`;
+  const procsMes = applyFiltersProcs();
+  document.getElementById('x-procs').textContent = procsMes.length;
+  const novas = procsMes.filter(p=>p.tipo==='NOVO').length;
+  document.getElementById('x-procs-sub').innerHTML = `${novas} novas · ${procsMes.length-novas} renovações`;
+
+  // Timeline: receita vs meta vs pipeline por mês
+  const monthsLabel = ['DEZ','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV'];
+  const receitaPorMes = monthsLabel.map(m =>
+    RAW.filter(r=> (r.mes_assinado===m) && (r.status==='ASSINADO' || r.status==='EM ASSINATURA')
+      && (state.hunter==='TODOS'||r.hunter===state.hunter)
+      && (state.uf==='TODOS'||r.uf===state.uf)
+      && (state.contrato==='TODOS'||r.contrato===state.contrato)
+    ).reduce((s,r)=>s+r.faturamento,0)
+  );
+  const pipelinePorMes = monthsLabel.map(m =>
+    RAW.filter(r=> (r.mes===m) && (r.status==='BASE')
+      && (state.hunter==='TODOS'||r.hunter===state.hunter)
+      && (state.uf==='TODOS'||r.uf===state.uf)
+      && (state.contrato==='TODOS'||r.contrato===state.contrato)
+    ).reduce((s,r)=>s+r.faturamento,0)
+  );
+  const metaPorMes = monthsLabel.map(m => metaMonth(state.hunter!=='TODOS'?state.hunter:null, m));
+
+  destroy('ch-exec-timeline');
+  chCache['ch-exec-timeline'] = safeChart('ch-exec-timeline', {
+    type:'bar',
+    data:{ labels:monthsLabel, datasets:[
+      { type:'bar', label:'Receita Fechada', data:receitaPorMes, backgroundColor:C.gold, borderRadius:6, order:2 },
+      { type:'bar', label:'Pipeline (Base)', data:pipelinePorMes, backgroundColor:'rgba(93,169,255,.45)', borderRadius:6, order:3 },
+      { type:'line', label:'Meta', data:metaPorMes, borderColor:C.green, backgroundColor:'rgba(46,207,117,.15)', borderWidth:2.5, tension:.25, pointRadius:4, pointBackgroundColor:C.green, fill:false, order:1 },
+    ]},
+    options:{ maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRLk(c.parsed.y)}} },
+      scales:{ x:{ grid:{color:'rgba(38,54,93,.4)'} }, y:{ grid:{color:'rgba(38,54,93,.4)'}, ticks:{ callback:v=>fmtBRLk(v) } } }
+    }
+  });
+
+  // Mix Novo/Upsell
+  const novoVal = ytdFech.filter(r=>r.contrato==='NOVO').reduce((s,r)=>s+r.faturamento,0);
+  const upsVal = ytdFech.filter(r=>r.contrato==='UPSELL').reduce((s,r)=>s+r.faturamento,0);
+  destroy('ch-exec-mix');
+  chCache['ch-exec-mix'] = safeChart('ch-exec-mix', {
+    type:'doughnut',
+    data:{ labels:['NOVO','UPSELL'], datasets:[{ data:[novoVal,upsVal], backgroundColor:[C.gold,C.purple], borderColor:'#0a1330', borderWidth:3 }]},
+    options:{ maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.label+': '+fmtBRLk(c.parsed)+' ('+pct(c.parsed/(novoVal+upsVal||1))+')'}} } }
+  });
+
+  // Ranking top 8
+  const byHunter = {};
+  ytdFech.forEach(r=>{ byHunter[r.hunter]=(byHunter[r.hunter]||0)+r.faturamento; });
+  const top = Object.entries(byHunter).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const metasH = top.map(([h])=> metaYTD(h, TODAY_MONTH_IDX));
+  destroy('ch-exec-ranking');
+  chCache['ch-exec-ranking'] = safeChart('ch-exec-ranking', {
+    type:'bar',
+    data:{ labels: top.map(t=>t[0]),
+      datasets:[
+        { label:'Realizado', data:top.map(t=>t[1]), backgroundColor:C.gold, borderRadius:6 },
+        { label:'Meta YTD', data:metasH, backgroundColor:'rgba(93,169,255,.35)', borderRadius:6 }
+      ]
+    },
+    options:{ maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRLk(c.parsed.x)}} },
+      scales:{ x:{ ticks:{ callback:v=>fmtBRLk(v) }}, y:{ grid:{display:false} } }
+    }
+  });
+
+  // Temperatura pipeline
+  const tempData = {QUENTE:0,MORNO:0,FRIO:0,INDEFINIDA:0};
+  ytdRows.filter(r=>r.status==='BASE' || r.status==='EM ASSINATURA').forEach(r=>{ tempData[r.temperatura||'INDEFINIDA']=(tempData[r.temperatura||'INDEFINIDA']||0)+r.faturamento;});
+  destroy('ch-exec-temp');
+  chCache['ch-exec-temp'] = safeChart('ch-exec-temp', {
+    type:'polarArea',
+    data:{ labels:Object.keys(tempData), datasets:[{ data:Object.values(tempData), backgroundColor:[ 'rgba(255,91,108,.6)','rgba(255,160,51,.6)','rgba(34,211,238,.55)','rgba(144,165,200,.4)']}]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.label+': '+fmtBRLk(c.parsed.r)}} },
+      scales:{ r:{ grid:{color:'rgba(38,54,93,.5)'}, ticks:{ callback:v=>fmtBRLk(v), color:'#6b7fa3' } } } }
+  });
+
+  // Insights automáticos
+  const insights = [];
+  if(ating >= 1) insights.push({c:'ok', t:`META BATIDA — Atingimento de ${pct(ating)} (R$ ${fmtBRLk(receitaYTD)} vs ${fmtBRLk(metaY)} esperado).`});
+  else if(ating >= 0.85) insights.push({c:'warn', t:`No ritmo — Atingimento de ${pct(ating)}. Faltam ${fmtBRLk(metaY-receitaYTD)} para fechar a meta YTD.`});
+  else insights.push({c:'q', t:`Atenção — Atingimento de apenas ${pct(ating)}. Lacuna de ${fmtBRLk(metaY-receitaYTD)} vs meta YTD.`});
+
+  if(saudeFunil < 0.6) insights.push({c:'warn', t:`Funil enfraquecendo — apenas ${pct(saudeFunil)} do volume é "saudável" (fechado + base). Veja Standby na página Pipeline.`});
+
+  const topHunter = top[0];
+  if(topHunter) insights.push({c:'ok', t:`Top performer: <b>${topHunter[0]}</b> com ${fmtBRLk(topHunter[1])} fechados — ${pct(topHunter[1]/metaYTD(topHunter[0], TODAY_MONTH_IDX))} da meta individual.`});
+
+  const sbVal = ytdRows.filter(r=>r.status==='STANDBY').reduce((s,r)=>s+r.faturamento,0);
+  if(sbVal > receitaYTD*0.2) insights.push({c:'q', t:`Risco em Standby — R$ ${fmtBRLk(sbVal)} parados (>20% da receita fechada). Priorizar reaproveitamento.`});
+
+  document.getElementById('exec-insights').innerHTML = insights.map(i=>`<div><span class="pill ${i.c}">${i.c==='ok'?'POSITIVO':(i.c==='warn'?'ATENÇÃO':'CRÍTICO')}</span> ${i.t}</div>`).join('');
+}
+
+/* =========================================================
+   RENDER · CONVERSÃO
+   ========================================================= */
+function renderConv(){
+  const compM = state.mes==='TODOS' ? 'MAI' : state.mes;
+  const compRows = RAW.filter(r=> r.mes===compM
+    && (state.hunter==='TODOS'||r.hunter===state.hunter)
+    && (state.uf==='TODOS'||r.uf===state.uf)
+    && (state.contrato==='TODOS'||r.contrato===state.contrato));
+  const fechCompMes = compRows.filter(r=> (r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado===compM);
+  const fechCompFora = compRows.filter(r=> (r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado!==compM && r.mes_assinado);
+  const sb = compRows.filter(r=>r.status==='STANDBY');
+  const pipelineV = compRows.reduce((s,r)=>s+r.faturamento,0);
+  const fechMesV = fechCompMes.reduce((s,r)=>s+r.faturamento,0);
+  const fechForaV = fechCompFora.reduce((s,r)=>s+r.faturamento,0);
+  const sbV = sb.reduce((s,r)=>s+r.faturamento,0);
+  const tx = pipelineV>0 ? (fechMesV+fechForaV)/pipelineV : 0;
+
+  document.getElementById('c-pipe').textContent = fmtBRLk(pipelineV);
+  document.getElementById('c-pipe-sub').innerHTML = `${uniqueEmpresas(compRows)} contas entradas em ${compM}`;
+  document.getElementById('c-fech-comp').textContent = fmtBRLk(fechMesV);
+  document.getElementById('c-fech-comp-sub').innerHTML = `${uniqueEmpresas(fechCompMes)} contas · ${pct(pipelineV>0?fechMesV/pipelineV:0)} do pipeline`;
+  document.getElementById('c-fech-fora').textContent = fmtBRLk(fechForaV);
+  document.getElementById('c-fech-fora-sub').innerHTML = `${uniqueEmpresas(fechCompFora)} contas (fechadas em outras competências)`;
+  document.getElementById('c-sb').textContent = fmtBRLk(sbV);
+  document.getElementById('c-sb-sub').innerHTML = `${uniqueEmpresas(sb)} contas paradas`;
+  document.getElementById('c-tx').textContent = pct(tx);
+  document.getElementById('c-tx-sub').innerHTML = `Total fechado (dentro+fora) / Pipeline`;
+
+  // Funil
+  const f1 = uniqueEmpresas(compRows);
+  const f2 = uniqueEmpresas(compRows.filter(r=>r.status!=='STANDBY'));
+  const f3 = uniqueEmpresas(compRows.filter(r=>r.status==='BASE' || r.status==='EM ASSINATURA' || r.status==='ASSINADO'));
+  const f4 = uniqueEmpresas(compRows.filter(r=>r.status==='EM ASSINATURA' || r.status==='ASSINADO'));
+  const f5 = uniqueEmpresas(compRows.filter(r=>r.status==='ASSINADO'));
+  const fn = document.getElementById('funnel');
+  fn.innerHTML = `
+    <div class="funnel-stage s1"><div class="name">Pipeline Total (Competência ${compM})</div><div class="val">${f1} contas</div><div class="v2">${fmtBRLk(pipelineV)} · 100%</div></div>
+    <div class="funnel-stage s2"><div class="name">Ativas (não-standby)</div><div class="val">${f2} contas</div><div class="v2">${pct(f1?f2/f1:0)} do total</div></div>
+    <div class="funnel-stage s3"><div class="name">Em Negociação</div><div class="val">${f3} contas</div><div class="v2">${pct(f1?f3/f1:0)}</div></div>
+    <div class="funnel-stage s4"><div class="name">Em Assinatura + Assinadas</div><div class="val">${f4} contas</div><div class="v2">${pct(f1?f4/f1:0)}</div></div>
+    <div class="funnel-stage s5"><div class="name">Assinadas (Conversão Final)</div><div class="val">${f5} contas</div><div class="v2">${pct(f1?f5/f1:0)}</div></div>`;
+
+  // Pipeline vs Convertido mês a mês
+  const months = ['JAN','FEV','MAR','ABR','MAI'];
+  const pipeArr = months.map(m=> RAW.filter(r=>r.mes===m && (state.hunter==='TODOS'||r.hunter===state.hunter) && (state.uf==='TODOS'||r.uf===state.uf)).reduce((s,r)=>s+r.faturamento,0));
+  const convDentro = months.map(m=> RAW.filter(r=>r.mes===m && (r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado===m && (state.hunter==='TODOS'||r.hunter===state.hunter) && (state.uf==='TODOS'||r.uf===state.uf)).reduce((s,r)=>s+r.faturamento,0));
+  const convFora = months.map(m=> RAW.filter(r=>r.mes===m && (r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado!==m && r.mes_assinado && (state.hunter==='TODOS'||r.hunter===state.hunter) && (state.uf==='TODOS'||r.uf===state.uf)).reduce((s,r)=>s+r.faturamento,0));
+
+  destroy('ch-conv-comp');
+  chCache['ch-conv-comp'] = safeChart('ch-conv-comp', {
+    type:'bar',
+    data:{ labels:months, datasets:[
+      { label:'Pipeline', data:pipeArr, backgroundColor:'rgba(93,169,255,.35)', borderRadius:6 },
+      { label:'Convertido (dentro)', data:convDentro, backgroundColor:C.green, borderRadius:6 },
+      { label:'Convertido (fora)', data:convFora, backgroundColor:C.gold, borderRadius:6 },
+    ]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRLk(c.parsed.y)}} },
+      scales:{ x:{ stacked:false }, y:{ ticks:{ callback:v=>fmtBRLk(v) } } } }
+  });
+
+  // Split dentro vs fora
+  destroy('ch-conv-split');
+  chCache['ch-conv-split'] = safeChart('ch-conv-split', {
+    type:'doughnut',
+    data:{ labels:['Dentro da Competência','Fora da Competência'], datasets:[{ data:[fechMesV,fechForaV], backgroundColor:[C.green,C.gold], borderColor:'#0a1330', borderWidth:3 }]},
+    options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.label+': '+fmtBRLk(c.parsed)}} } }
+  });
+
+  // Tempo médio (em meses)
+  const tempoData = months.map(m=>{
+    const rs = RAW.filter(r=>r.mes===m && r.mes_assinado && (r.status==='ASSINADO'||r.status==='EM ASSINATURA')
+      && (state.hunter==='TODOS'||r.hunter===state.hunter));
+    if(rs.length===0) return 0;
+    const idx = (mo)=> MONTHS_ALL.indexOf(mo);
+    const diffs = rs.map(r=>{
+      let d = idx(r.mes_assinado) - idx(r.mes);
+      if(d<0) d+=12; return d;
+    });
+    return diffs.reduce((a,b)=>a+b,0)/diffs.length;
+  });
+  destroy('ch-conv-tempo');
+  chCache['ch-conv-tempo'] = safeChart('ch-conv-tempo', {
+    type:'line',
+    data:{ labels:months, datasets:[{ label:'Meses', data:tempoData, borderColor:C.gold, backgroundColor:'rgba(244,207,122,.18)', borderWidth:2.5, tension:.3, pointRadius:5, pointBackgroundColor:C.gold, fill:true}]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>v.toFixed(1)+' m' } } } }
+  });
+
+  // Tabela conversão por hunter
+  const huntersCompet = [...new Set(compRows.map(r=>r.hunter))].sort();
+  const tbody = document.querySelector('#tb-conv-hunter tbody');
+  tbody.innerHTML = huntersCompet.map(h=>{
+    const rs = compRows.filter(r=>r.hunter===h);
+    const fM = rs.filter(r=>(r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado===compM);
+    const fF = rs.filter(r=>(r.status==='ASSINADO'||r.status==='EM ASSINATURA') && r.mes_assinado!==compM && r.mes_assinado);
+    const sb = rs.filter(r=>r.status==='STANDBY');
+    const ent = uniqueEmpresas(rs);
+    const fec = uniqueEmpresas([...fM,...fF]);
+    const recM = fM.reduce((s,r)=>s+r.faturamento,0);
+    const pipV = rs.reduce((s,r)=>s+r.faturamento,0);
+    const cQ = ent>0?fec/ent:0;
+    const cV = pipV>0?(recM+fF.reduce((s,r)=>s+r.faturamento,0))/pipV:0;
+    return `<tr>
+      <td class="b">${h}</td>
+      <td class="num">${ent}</td>
+      <td class="num">${uniqueEmpresas(fM)}</td>
+      <td class="num">${uniqueEmpresas(fF)}</td>
+      <td class="num">${uniqueEmpresas(sb)}</td>
+      <td class="num">${pct(cQ)}<span class="mini ${cQ>=0.5?'green':(cQ>=0.25?'':'red')}"><i style="width:${Math.min(100,cQ*100)}%"></i></span></td>
+      <td class="num">${pct(cV)}</td>
+      <td class="num b">${fmtBRLk(recM)}</td>
+      <td class="num">${fec>0?fmtBRLk(recM/fec):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER · HUNTERS
+   ========================================================= */
+function renderHunt(){
+  const rs = applyFilters(RAW, {skipMes:true});
+  const hunters = [...new Set(rs.map(r=>r.hunter))].filter(h=>h);
+  const data = hunters.map(h=>{
+    const own = rs.filter(r=>r.hunter===h);
+    const fech = own.filter(r=>r.status==='ASSINADO' || r.status==='EM ASSINATURA');
+    const receita = fech.reduce((s,r)=>s+r.faturamento,0);
+    const meta = metaYTD(h, TODAY_MONTH_IDX);
+    const pipeline = own.filter(r=>r.status==='BASE').reduce((s,r)=>s+r.faturamento,0);
+    const ating = meta>0 ? receita/meta : 0;
+    const procsH = PROCS.filter(p=>p.hunter===h).length;
+    const empresas = uniqueEmpresas(own);
+    const empresasF = uniqueEmpresas(fech);
+    const conv = empresas>0 ? empresasF/empresas : 0;
+    return {h, receita, meta, ating, pipeline, procsH, conv, empresasF, ticket: empresasF>0?receita/empresasF:0, ranking:0};
+  }).sort((a,b)=> b.receita - a.receita);
+  data.forEach((d,i)=> d.ranking=i+1);
+
+  // KPIs topo
+  const top1 = data[0]; if(top1){ document.getElementById('h-top1').textContent = top1.h; document.getElementById('h-top1-sub').innerHTML = `<b>${fmtBRLk(top1.receita)}</b> fechados`; }
+  const top2 = [...data].filter(d=>d.empresasF>0).sort((a,b)=>b.conv-a.conv)[0]; if(top2){ document.getElementById('h-top2').textContent = top2.h; document.getElementById('h-top2-sub').innerHTML = `Conversão: <b>${pct(top2.conv)}</b>`; }
+  const top3 = [...data].sort((a,b)=>b.procsH-a.procsH)[0]; if(top3){ document.getElementById('h-top3').textContent = top3.h; document.getElementById('h-top3-sub').innerHTML = `<b>${top3.procsH}</b> procurações`; }
+  const top4 = [...data].filter(d=>d.procsH>0).sort((a,b)=> (b.receita/b.procsH) - (a.receita/a.procsH))[0]; if(top4){ document.getElementById('h-top4').textContent = top4.h; document.getElementById('h-top4-sub').innerHTML = `<b>${fmtBRLk(top4.receita/top4.procsH)}</b> por procuração`; }
+  const top5 = [...data].filter(d=>d.meta>0).sort((a,b)=>a.ating-b.ating)[0]; if(top5){ document.getElementById('h-top5').textContent = top5.h; document.getElementById('h-top5-sub').innerHTML = `Atingimento: <b>${pct(top5.ating)}</b>`; }
+
+  // Ranking
+  destroy('ch-hunt-rank');
+  chCache['ch-hunt-rank'] = safeChart('ch-hunt-rank', {
+    type:'bar',
+    data:{ labels:data.map(d=>d.h), datasets:[
+      { label:'Realizado', data:data.map(d=>d.receita), backgroundColor:C.gold, borderRadius:5 },
+      { label:'Meta YTD', data:data.map(d=>d.meta), backgroundColor:'rgba(93,169,255,.3)', borderRadius:5 }
+    ]},
+    options:{ maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRLk(c.parsed.x)}} },
+      scales:{ x:{ ticks:{ callback:v=>fmtBRLk(v) } }, y:{ grid:{display:false} } } }
+  });
+
+  // Matriz (scatter)
+  destroy('ch-hunt-scatter');
+  chCache['ch-hunt-scatter'] = safeChart('ch-hunt-scatter', {
+    type:'scatter',
+    data:{ datasets:[{ label:'Hunters', data:data.map(d=>({x:d.receita,y:d.conv*100,h:d.h,r:Math.max(6, Math.min(20, d.procsH/3 + 6))})),
+      pointRadius:c=> c.raw?.r||8, pointHoverRadius:c=> (c.raw?.r||8)+2, backgroundColor:'rgba(244,207,122,.55)', borderColor:C.gold, borderWidth:1.5 }]},
+    options:{ maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.raw.h}: ${fmtBRLk(c.raw.x)} · ${c.raw.y.toFixed(1)}%`}} },
+      scales:{ x:{ title:{display:true,text:'Receita Fechada (R$)', color:'#90a5c8'}, ticks:{ callback:v=>fmtBRLk(v) } },
+               y:{ title:{display:true,text:'Conversão (%)', color:'#90a5c8'}, ticks:{ callback:v=>v.toFixed(0)+'%' } } } }
+  });
+
+  // Cards individuais
+  const grid = document.getElementById('hunter-grid');
+  grid.innerHTML = data.map(d=>{
+    const cls = d.ating>=1?'green':(d.ating>=0.5?'':'red');
+    return `<div class="hunter-card">
+      <div class="h"><div class="name">${d.h}</div><div class="rank">#${d.ranking}</div></div>
+      <div class="row"><span>Realizado</span><b>${fmtBRLk(d.receita)}</b></div>
+      <div class="row"><span>Meta YTD</span><b>${fmtBRLk(d.meta)}</b></div>
+      <div class="row"><span>Pipeline</span><b>${fmtBRLk(d.pipeline)}</b></div>
+      <div class="row"><span>Procurações</span><b>${d.procsH}</b></div>
+      <div class="row"><span>Conversão</span><b>${pct(d.conv)}</b></div>
+      <div class="pct">${pct(d.ating)}</div>
+      <div class="progress ${cls}" style="margin-top:6px"><span style="width:${Math.min(100,d.ating*100)}%"></span></div>
+    </div>`;
+  }).join('');
+
+  // Tabela detalhada
+  const tbody = document.querySelector('#tb-hunt tbody');
+  tbody.innerHTML = data.map(d=>{
+    const stat = d.ating>=1?'<span class="pill ok">META BATIDA</span>': d.ating>=0.7?'<span class="pill warn">NO RITMO</span>': d.ating>=0.3?'<span class="pill m">ATENÇÃO</span>':'<span class="pill q">CRÍTICO</span>';
+    return `<tr><td>${d.ranking}</td><td class="b">${d.h}</td>
+      <td class="num">${fmtBRLk(d.meta)}</td>
+      <td class="num b">${fmtBRLk(d.receita)}</td>
+      <td class="num">${pct(d.ating)}<span class="mini ${d.ating>=1?'green':d.ating>=.5?'':'red'}"><i style="width:${Math.min(100,d.ating*100)}%"></i></span></td>
+      <td class="num">${fmtBRLk(d.pipeline)}</td>
+      <td class="num">${d.empresasF}</td>
+      <td class="num">${d.empresasF>0?fmtBRLk(d.ticket):'—'}</td>
+      <td class="num">${d.procsH}</td>
+      <td>${stat}</td></tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER · PROCURAÇÕES
+   ========================================================= */
+function renderProc(){
+  const rs = PROCS.filter(p=> (state.hunter==='TODOS'||p.hunter===state.hunter));
+  const total = rs.length;
+  const novas = rs.filter(p=>p.tipo==='NOVO').length;
+  const reno = rs.filter(p=>p.tipo==='RENOVAÇÃO').length;
+  const pctR = total>0 ? reno/total : 0;
+  document.getElementById('p-tot').textContent = total;
+  document.getElementById('p-tot-sub').innerHTML = `Em ${[...new Set(rs.map(p=>p.hunter))].length} hunters`;
+  document.getElementById('p-novas').textContent = novas;
+  document.getElementById('p-novas-sub').innerHTML = `<span class="pos">${pct(total?novas/total:0)}</span> do total`;
+  document.getElementById('p-reno').textContent = reno;
+  document.getElementById('p-reno-sub').innerHTML = `<span class="pos">${pct(pctR)}</span> do total · retenção`;
+  document.getElementById('p-pct').textContent = pct(pctR);
+  document.getElementById('p-pct-sub').innerHTML = `Quanto maior, maior a base ativa de clientes`;
+
+  // Evolução mensal
+  const months = ['JAN','FEV','MAR','ABR','MAI'];
+  const arrN = months.map(m=> rs.filter(p=>p.mes===m && p.tipo==='NOVO').length);
+  const arrR = months.map(m=> rs.filter(p=>p.mes===m && p.tipo==='RENOVAÇÃO').length);
+  destroy('ch-proc-mes');
+  chCache['ch-proc-mes'] = safeChart('ch-proc-mes', {
+    type:'bar',
+    data:{ labels:months, datasets:[
+      { label:'Novas', data:arrN, backgroundColor:C.green, borderRadius:5 },
+      { label:'Renovações', data:arrR, backgroundColor:C.gold, borderRadius:5 }
+    ]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{position:'bottom'} },
+      scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } } }
+  });
+
+  // Por hunter (barras horizontais empilhadas)
+  const huntersP = [...new Set(rs.map(p=>p.hunter))].filter(h=>h && h!=='N/D');
+  const byH = huntersP.map(h=> ({h, n:rs.filter(p=>p.hunter===h && p.tipo==='NOVO').length, r:rs.filter(p=>p.hunter===h && p.tipo==='RENOVAÇÃO').length}))
+    .sort((a,b)=> (b.n+b.r) - (a.n+a.r));
+  destroy('ch-proc-hunter');
+  chCache['ch-proc-hunter'] = safeChart('ch-proc-hunter', {
+    type:'bar',
+    data:{ labels:byH.map(d=>d.h), datasets:[
+      { label:'Novas', data:byH.map(d=>d.n), backgroundColor:C.green, borderRadius:4, stack:'a' },
+      { label:'Renovações', data:byH.map(d=>d.r), backgroundColor:C.gold, borderRadius:4, stack:'a' }
+    ]},
+    options:{ maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{position:'bottom'} },
+      scales:{ x:{ stacked:true, beginAtZero:true }, y:{ stacked:true, grid:{display:false} } } }
+  });
+
+  // Heatmap
+  const h2 = document.getElementById('proc-heat');
+  const huntersTop = byH.slice(0,12).map(d=>d.h);
+  const cells = [];
+  cells.push('<div class="h"></div>'); months.forEach(m=> cells.push(`<div class="h">${m}</div>`)); cells.push('<div class="h">TOTAL</div>');
+  const max = Math.max(...huntersTop.map(h => months.reduce((s,m)=> s + rs.filter(p=>p.hunter===h&&p.mes===m).length, 0)), 1);
+  huntersTop.forEach(h=>{
+    cells.push(`<div class="l">${h}</div>`);
+    let totH = 0;
+    months.forEach(m=>{
+      const v = rs.filter(p=>p.hunter===h&&p.mes===m).length;
+      totH+=v;
+      const alpha = max>0 ? Math.min(.95, .15 + 0.85*(v/max)) : 0;
+      cells.push(`<div class="c" style="background:rgba(244,207,122,${alpha});color:${alpha>.55?'#1a1304':'#eef3fb'}">${v||'—'}</div>`);
+    });
+    cells.push(`<div class="c" style="background:#1d2e54;color:#fff;border:1px solid #324871">${totH}</div>`);
+  });
+  h2.style.gridTemplateColumns = `1.2fr repeat(${months.length},1fr) 0.8fr`;
+  h2.innerHTML = cells.join('');
+
+  // Tabela
+  const tbody = document.querySelector('#tb-proc tbody');
+  tbody.innerHTML = byH.map((d,i)=>{
+    const t = d.n+d.r;
+    return `<tr><td>${i+1}</td><td class="b">${d.h}</td>
+      <td class="num">${d.n}</td><td class="num">${d.r}</td><td class="num b">${t}</td>
+      <td class="num">${pct(t?d.r/t:0)}</td></tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER · METAS
+   ========================================================= */
+function renderMeta(){
+  const ytdFech = RAW.filter(r=>{
+    if(state.hunter!=='TODOS' && r.hunter!==state.hunter) return false;
+    if(state.uf!=='TODOS' && r.uf!==state.uf) return false;
+    return (r.status==='ASSINADO' || r.status==='EM ASSINATURA');
+  });
+  const novoYTD = ytdFech.filter(r=>r.contrato==='NOVO').reduce((s,r)=>s+r.faturamento,0);
+  const totalYTD = ytdFech.reduce((s,r)=>s+r.faturamento,0);
+  const exc = Math.max(0, totalYTD - META_GLOBAL);
+  const falt = Math.max(0, META_GLOBAL - totalYTD);
+  const monthsElapsed = TODAY_MONTH_IDX + 1; // 5 (JAN-MAI)
+  const rrNec = monthsElapsed<12 ? falt/(12 - monthsElapsed) : 0;
+  const proj = (totalYTD / monthsElapsed) * 12;
+  const convV = (function(){ const a = agg(applyFilters(RAW,{skipMes:true})); return a.convValue||0.5; })();
+  const pipeNec = falt > 0 ? falt/Math.max(convV,0.1) : 0;
+
+  document.getElementById('m-target').textContent = fmtBRLk(META_GLOBAL);
+  document.getElementById('m-target-bar').style.width = Math.min(100, (totalYTD/META_GLOBAL)*100)+'%';
+  document.getElementById('m-real').textContent = fmtBRLk(totalYTD);
+  document.getElementById('m-real-sub').innerHTML = `<span class="pos">${pct(totalYTD/META_GLOBAL)}</span> da meta global · ${ytdFech.length} negócios`;
+  document.getElementById('m-real-bar').style.width = Math.min(100, (totalYTD/META_GLOBAL)*100)+'%';
+  document.getElementById('m-exc').textContent = fmtBRLk(exc);
+  document.getElementById('m-exc-sub').innerHTML = exc>0?`Receita ADICIONAL acima dos 34 Mi`:`Não há excedente ainda`;
+  document.getElementById('m-exc-bar').style.width = Math.min(100, (exc/META_GLOBAL)*100)+'%';
+
+  document.getElementById('m-falt').textContent = fmtBRLk(falt);
+  document.getElementById('m-falt-sub').innerHTML = falt>0?`Faltam ${monthsElapsed<12?12-monthsElapsed:0} meses para o ano fechar`:`Meta já batida`;
+  document.getElementById('m-rr').textContent = fmtBRLk(rrNec);
+  document.getElementById('m-rr-sub').innerHTML = `Por mês até DEZ`;
+  document.getElementById('m-proj').textContent = fmtBRLk(proj);
+  document.getElementById('m-proj-sub').innerHTML = proj>=META_GLOBAL ? `<span class="pos">Acima da meta</span>` : `<span class="neg">Abaixo da meta</span>`;
+  document.getElementById('m-pn').textContent = fmtBRLk(pipeNec);
+  document.getElementById('m-pn-sub').innerHTML = `Com conversão atual de ${pct(convV)}`;
+
+  // Curva acumulada vs meta linear
+  const acumReal = []; let acc=0;
+  MONTHS_ALL.forEach(m=>{ acc += RAW.filter(r=>r.mes_assinado===m && (r.status==='ASSINADO'||r.status==='EM ASSINATURA') && (state.hunter==='TODOS'||r.hunter===state.hunter)).reduce((s,r)=>s+r.faturamento,0); acumReal.push(acc); });
+  const linearMeta = MONTHS_ALL.map((_,i)=> META_GLOBAL*(i+1)/12);
+  destroy('ch-meta-curva');
+  chCache['ch-meta-curva'] = safeChart('ch-meta-curva', {
+    type:'line',
+    data:{ labels:MONTHS_ALL, datasets:[
+      { label:'Realizado Acumulado', data:acumReal, borderColor:C.gold, backgroundColor:'rgba(244,207,122,.18)', borderWidth:3, tension:.2, pointRadius:4, fill:true },
+      { label:'Curva 34 Mi (linear)', data:linearMeta, borderColor:C.green, borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false },
+    ]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRLk(c.parsed.y)}} },
+      scales:{ y:{ ticks:{ callback:v=>fmtBRLk(v) } } } }
+  });
+
+  // Atingimento por hunter
+  const hunters = [...new Set(RAW.map(r=>r.hunter))].filter(h=>h);
+  const dataH = hunters.map(h=>{
+    const real = RAW.filter(r=>r.hunter===h && (r.status==='ASSINADO'||r.status==='EM ASSINATURA')).reduce((s,r)=>s+r.faturamento,0);
+    const meta = metaYTD(h, TODAY_MONTH_IDX);
+    return {h, real, meta, ating: meta>0?real/meta:0};
+  }).sort((a,b)=>b.ating-a.ating);
+
+  destroy('ch-meta-hunter');
+  chCache['ch-meta-hunter'] = safeChart('ch-meta-hunter', {
+    type:'bar',
+    data:{ labels: dataH.map(d=>d.h), datasets:[{ label:'Atingimento %', data: dataH.map(d=>(d.ating*100).toFixed(1)),
+      backgroundColor: dataH.map(d=> d.ating>=1?C.green : d.ating>=.7?C.gold : d.ating>=.3?C.orange : C.red),
+      borderRadius:5 }] },
+    options:{ maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed.x}%`}} },
+      scales:{ x:{ beginAtZero:true, ticks:{ callback:v=>v+'%' } }, y:{ grid:{display:false} } } }
+  });
+
+  // Tabela
+  const tbody = document.querySelector('#tb-meta tbody');
+  tbody.innerHTML = dataH.map((d,i)=>{
+    const exc = Math.max(0, d.real-d.meta);
+    return `<tr><td>${i+1}</td><td class="b">${d.h}</td>
+      <td class="num">${fmtBRLk(d.meta)}</td>
+      <td class="num b">${fmtBRLk(d.real)}</td>
+      <td class="num">${pct(d.ating)}</td>
+      <td class="num">${exc>0?'<span class="pos">'+fmtBRLk(exc)+'</span>':'—'}</td>
+      <td><div class="progress ${d.ating>=1?'green':d.ating>=.5?'':'red'}"><span style="width:${Math.min(100,d.ating*100)}%"></span></div></td></tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER · PIPELINE
+   ========================================================= */
+function renderPipe(){
+  const rs = applyFilters(RAW, {skipMes:true});
+  const base = rs.filter(r=>r.status==='BASE');
+  const ema = rs.filter(r=>r.status==='EM ASSINATURA');
+  const sb = rs.filter(r=>r.status==='STANDBY');
+  const ass = rs.filter(r=>r.status==='ASSINADO');
+  const tot = base.reduce((s,r)=>s+r.faturamento,0) + ema.reduce((s,r)=>s+r.faturamento,0);
+
+  const q = rs.filter(r=>r.temperatura==='QUENTE' && (r.status==='BASE'||r.status==='EM ASSINATURA')).reduce((s,r)=>s+r.faturamento,0);
+  const m = rs.filter(r=>r.temperatura==='MORNO' && (r.status==='BASE'||r.status==='EM ASSINATURA')).reduce((s,r)=>s+r.faturamento,0);
+  const f = rs.filter(r=>r.temperatura==='FRIO' && (r.status==='BASE'||r.status==='EM ASSINATURA')).reduce((s,r)=>s+r.faturamento,0);
+  const sbV = sb.reduce((s,r)=>s+r.faturamento,0);
+
+  document.getElementById('pp-tot').textContent = fmtBRLk(tot);
+  document.getElementById('pp-tot-sub').innerHTML = `${uniqueEmpresas([...base,...ema])} oportunidades`;
+  document.getElementById('pp-q').textContent = fmtBRLk(q);
+  document.getElementById('pp-q-sub').innerHTML = `<span class="pos">${pct(tot?q/tot:0)}</span> do pipeline`;
+  document.getElementById('pp-m').textContent = fmtBRLk(m);
+  document.getElementById('pp-m-sub').innerHTML = `${pct(tot?m/tot:0)} do pipeline`;
+  document.getElementById('pp-f').textContent = fmtBRLk(f);
+  document.getElementById('pp-f-sub').innerHTML = `<span class="neg">${pct(tot?f/tot:0)}</span> do pipeline`;
+  document.getElementById('pp-sb').textContent = fmtBRLk(sbV);
+  document.getElementById('pp-sb-sub').innerHTML = `${uniqueEmpresas(sb)} contas paradas`;
+
+  // Status
+  destroy('ch-pipe-status');
+  chCache['ch-pipe-status'] = safeChart('ch-pipe-status', {
+    type:'bar',
+    data:{ labels:['BASE','EM ASSINATURA','ASSINADO','STANDBY'],
+      datasets:[{ label:'Faturamento (R$)', data:[base.reduce((s,r)=>s+r.faturamento,0), ema.reduce((s,r)=>s+r.faturamento,0), ass.reduce((s,r)=>s+r.faturamento,0), sbV],
+        backgroundColor:[C.blue,C.cyan,C.green,C.red], borderRadius:6 }]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBRLk(c.parsed.y)}} },
+      scales:{ y:{ ticks:{ callback:v=>fmtBRLk(v) } } } }
+  });
+
+  // Temperatura
+  destroy('ch-pipe-temp');
+  chCache['ch-pipe-temp'] = safeChart('ch-pipe-temp', {
+    type:'doughnut',
+    data:{ labels:['QUENTE','MORNO','FRIO'], datasets:[{ data:[q,m,f], backgroundColor:[C.red,C.orange,C.cyan], borderColor:'#0a1330', borderWidth:3 }]},
+    options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>c.label+': '+fmtBRLk(c.parsed)}} } }
+  });
+
+  // UF
+  const ufMap = {};
+  [...base,...ema].forEach(r=>{ ufMap[r.uf]=(ufMap[r.uf]||0)+r.faturamento; });
+  const ufList = Object.entries(ufMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  destroy('ch-pipe-uf');
+  chCache['ch-pipe-uf'] = safeChart('ch-pipe-uf', {
+    type:'bar',
+    data:{ labels:ufList.map(u=>u[0]), datasets:[{ label:'Pipeline', data:ufList.map(u=>u[1]), backgroundColor:C.purple, borderRadius:5 }]},
+    options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBRLk(c.parsed.y)}} },
+      scales:{ y:{ ticks:{ callback:v=>fmtBRLk(v) } } } }
+  });
+
+  // Produto
+  const prodMap = {};
+  rs.forEach(r=>{ prodMap[r.produto]=(prodMap[r.produto]||0)+r.faturamento; });
+  const prodList = Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  destroy('ch-pipe-produto');
+  chCache['ch-pipe-produto'] = safeChart('ch-pipe-produto', {
+    type:'bar',
+    data:{ labels:prodList.map(p=>p[0].substring(0,22)), datasets:[{ data:prodList.map(p=>p[1]), backgroundColor:PAL, borderRadius:5 }]},
+    options:{ maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBRLk(c.parsed.x)}} },
+      scales:{ x:{ ticks:{ callback:v=>fmtBRLk(v) } }, y:{ grid:{display:false} } } }
+  });
+
+  // Top oportunidades em aberto
+  const open = [...base,...ema].sort((a,b)=>b.faturamento-a.faturamento).slice(0,15);
+  const tbody = document.querySelector('#tb-pipe tbody');
+  tbody.innerHTML = open.map((r,i)=>{
+    const cls = r.temperatura==='QUENTE'?'q':r.temperatura==='MORNO'?'m':r.temperatura==='FRIO'?'f':'n';
+    const ps = r.status==='BASE'?'<span class="pill n">BASE</span>':r.status==='EM ASSINATURA'?'<span class="pill warn">EM ASSINATURA</span>':r.status;
+    return `<tr><td>${i+1}</td><td class="b">${r.empresa}</td><td>${r.hunter}</td><td>${r.uf}</td>
+      <td>${(r.produto||'').substring(0,22)}</td>
+      <td class="num b">${fmtBRLk(r.faturamento)}</td>
+      <td>${ps}</td>
+      <td><span class="pill ${cls}">${r.temperatura||'—'}</span></td>
+      <td>${r.mes||'—'}</td></tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   ERROR DISPLAY
+   ========================================================= */
+function showError(where, err){
+  console.error('[DEMO erro]', where, err);
+  let bar = document.getElementById('err-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'err-bar';
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff5b6c;color:#fff;padding:10px 16px;font-size:12px;z-index:9999;font-family:Segoe UI,Arial,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.4)';
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+  bar.innerHTML = `<b>Erro no render (${where}):</b> ${err && err.message ? err.message : err} — abra o DevTools (F12 → Console) para ver detalhes`;
+}
+
+/* =========================================================
+   RENDER ALL
+   ========================================================= */
+function renderAll(){
+  const renders = { exec:renderExec, conv:renderConv, hunt:renderHunt, proc:renderProc, meta:renderMeta, pipe:renderPipe };
+  const fn = renders[state.page];
+  if (!fn) return;
+  try { fn(); }
+  catch(e){ showError(state.page, e); }
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+function boot(){
+  try {
+    if (!Array.isArray(RAW) || RAW.length === 0) {
+      showError('boot', new Error('Dados não carregaram (RAW vazio). Verifique se o HTML não está corrompido.'));
+      return;
+    }
+    populateFilters();
+    setupTabs();
+    renderAll();
+    console.log('[DEMO] Boot OK — RAW:', RAW.length, '| META:', META.length, '| PROCS:', PROCS.length, '| Chart.js:', HAS_CHART ? 'OK' : 'FALHOU');
+  } catch(e){ showError('boot', e); }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+</script>
+</body>
+</html>

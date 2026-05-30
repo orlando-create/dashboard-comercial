@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>QR Code · One Page Comercial</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<style>
+  *{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+  body{margin:0;padding:24px;background:linear-gradient(160deg,#0a1020,#0f1a30);min-height:100vh;color:#e7edf7}
+  .wrap{max-width:760px;margin:0 auto}
+  h1{color:#f1c878;font-size:22px;letter-spacing:1px;margin:0 0 4px}
+  .sub{color:#8aa0c2;font-size:13px;margin-bottom:18px}
+  .card{background:#152038;border:1px solid #243558;border-radius:10px;padding:18px;margin-bottom:14px}
+  .card h3{margin:0 0 10px;color:#f1c878;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid #243558;padding-bottom:8px}
+  ol{padding-left:20px;line-height:1.8;color:#e7edf7}
+  ol b{color:#5da9ff}
+  .step-link{display:inline-block;background:#3b82f6;color:#fff;text-decoration:none;padding:8px 14px;border-radius:6px;font-weight:600;font-size:13px;margin-top:6px}
+  .step-link:hover{background:#5da9ff}
+  input[type=text]{width:100%;padding:11px 14px;background:#0b1220;border:1px solid #243558;border-radius:6px;color:#e7edf7;font-size:14px;outline:none}
+  input[type=text]:focus{border-color:#f1c878}
+  button{background:#f1c878;color:#0b1220;border:none;border-radius:6px;padding:11px 22px;font-size:14px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-top:10px}
+  button:hover{background:#e8b659}
+  button.alt{background:transparent;border:1px solid #243558;color:#e7edf7}
+  button.alt:hover{background:#1a2747}
+  #qrcode{display:flex;justify-content:center;background:#fff;padding:20px;border-radius:8px;margin-top:16px}
+  #qrcode:empty{display:none}
+  .url-display{background:#0b1220;border:1px solid #243558;border-radius:6px;padding:10px 14px;font-family:'Consolas',monospace;font-size:12px;color:#5da9ff;word-break:break-all;margin-top:12px}
+  .url-display:empty{display:none}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  @media print{body{background:#fff;color:#000}.no-print{display:none}.card{border:1px solid #ddd;background:#fff}h1{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📱 Gerar QR Code do Dashboard Comercial</h1>
+  <div class="sub">Suba o HTML no Netlify Drop, cole a URL aqui e gere o QR Code para distribuir ao time.</div>
+
+  <div class="card no-print">
+    <h3>Passo 1 · Subir o dashboard no Netlify Drop</h3>
+    <ol>
+      <li>Abra o <a class="step-link" href="https://app.netlify.com/drop" target="_blank" rel="noopener">app.netlify.com/drop</a></li>
+      <li>Arraste o arquivo <b>One_Page_Comercial_2026.html</b> para a área de upload</li>
+      <li>Aguarde o deploy terminar (≈ 10 segundos)</li>
+      <li>Copie a URL que aparece (ex: <code style="color:#5da9ff">https://nome-aleatorio.netlify.app</code>)</li>
+      <li>Cole a URL no campo abaixo</li>
+    </ol>
+    <p style="color:#8aa0c2;font-size:12px;margin-top:10px">💡 Sem cadastro: o link expira em algumas horas. Crie conta grátis para link permanente.</p>
+  </div>
+
+  <div class="card no-print">
+    <h3>Passo 2 · Cole a URL e gere o QR</h3>
+    <input type="text" id="url" placeholder="https://seu-dashboard.netlify.app" />
+    <div class="actions">
+      <button onclick="gerar()">🎯 Gerar QR Code</button>
+      <button class="alt" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="alt" onclick="baixar()">⬇️ Baixar PNG</button>
+    </div>
+  </div>
+
+  <div class="card" id="cardResult" style="display:none">
+    <h3>📲 QR Code · Aponte a câmera do celular</h3>
+    <div id="qrcode"></div>
+    <div class="url-display" id="urlDisplay"></div>
+    <p style="color:#8aa0c2;font-size:12px;margin-top:10px;text-align:center">
+      Distribua este QR pelo Teams, e-mail ou imprima e cole na sala do time comercial.
+    </p>
+  </div>
+</div>
+
+<script>
+let qrInstance = null;
+function gerar(){
+  const url = document.getElementById('url').value.trim();
+  if (!url) { alert('Cole a URL do Netlify primeiro'); return; }
+  if (!url.startsWith('http')) { alert('URL inválida — precisa começar com http:// ou https://'); return; }
+  document.getElementById('cardResult').style.display='block';
+  document.getElementById('qrcode').innerHTML='';
+  qrInstance = new QRCode(document.getElementById('qrcode'),{
+    text:url, width:280, height:280,
+    colorDark:'#0b1220', colorLight:'#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  document.getElementById('urlDisplay').textContent = url;
+}
+function baixar(){
+  const img = document.querySelector('#qrcode img') || document.querySelector('#qrcode canvas');
+  if (!img) { alert('Gere o QR primeiro'); return; }
+  const a = document.createElement('a');
+  a.href = img.tagName==='IMG' ? img.src : img.toDataURL();
+  a.download = 'QRCode_Dashboard_Comercial.png';
+  a.click();
+}
+document.getElementById('url').addEventListener('keypress', e=>{ if(e.key==='Enter') gerar(); });
+</script>
+</body>
+</html>

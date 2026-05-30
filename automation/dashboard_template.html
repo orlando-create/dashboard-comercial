@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Page Comercial — 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0b1220;--bg2:#101a2e;--card:#152038;--card2:#1a2747;--border:#243558;--text:#e7edf7;--muted:#8aa0c2;--gold:#f1c878;--gold2:#e8b659;--blue:#5da9ff;--blue2:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--purple:#a78bfa}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:linear-gradient(160deg,#0a1020 0%,#0f1a30 100%);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+  .wrap{padding:18px 22px;max-width:1880px;margin:0 auto}
+  .header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+  .brand h1{margin:0;font-size:22px;letter-spacing:1px;color:var(--gold)}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .filter{display:flex;flex-direction:column;gap:4px}
+  .filter label{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1.2px;font-weight:600}
+  .filter select{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;min-width:150px;outline:none;cursor:pointer}
+  .filter select:hover{border-color:var(--gold)}
+  .reset-btn{background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;font-weight:600;letter-spacing:.5px}
+  .reset-btn:hover{background:var(--card2);border-color:var(--gold)}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:linear-gradient(180deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+  .kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold)}
+  .kpi.b1::before{background:var(--gold)} .kpi.b2::before{background:var(--blue)} .kpi.b3::before{background:var(--orange)} .kpi.b4::before{background:var(--green)} .kpi.b5::before{background:var(--purple)} .kpi.b6::before{background:var(--red)} .kpi.b7::before{background:var(--cyan)}
+  .kpi .label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+  .kpi .value{font-size:22px;font-weight:700;margin-top:6px;color:var(--text)}
+  .kpi .sub{font-size:11px;color:var(--muted);margin-top:3px}
+  .kpi .sub .pos{color:var(--green);font-weight:600}
+  .kpi .sub .neg{color:var(--red);font-weight:600}
+  .grid{display:grid;gap:12px}
+  .row1{grid-template-columns:1.2fr 1fr 1fr;margin-bottom:12px}
+  .row2{grid-template-columns:1.4fr 1fr;margin-bottom:12px}
+  .row3{grid-template-columns:1fr 1fr 1fr;margin-bottom:12px}
+  .rowProc{grid-template-columns:1fr 1.4fr;margin-bottom:12px}
+  .rowCiclo{grid-template-columns:1.2fr 1.4fr;margin-bottom:12px}
+  .rowUps{grid-template-columns:1.4fr 1fr;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .card h3{margin:0 0 10px 0;font-size:12.5px;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:8px}
+  .card h3 small{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:11px;margin-left:6px}
+  .card .chart-wrap{position:relative;height:260px}
+  .card .chart-wrap.tall{height:340px}
+  .card .chart-wrap.short{height:220px}
+  .section-divider{margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px}
+  .section-divider h2{margin:0;font-size:14px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-weight:700}
+  .section-divider .line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:var(--card2);color:var(--gold);text-align:left;padding:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;border-bottom:1px solid var(--border)}
+  td{padding:7px 8px;border-bottom:1px solid #1c2a47;color:var(--text)}
+  tr:hover td{background:#192747}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.5px}
+  .pill.q{background:#3b1212;color:#ff6b6b} .pill.m{background:#3a2811;color:#ffb259} .pill.f{background:#0c2e3e;color:#5dd0ff} .pill.n{background:#1b2a44;color:var(--muted)}
+  .bar{height:6px;background:#1b2a44;border-radius:4px;overflow:hidden;margin-top:3px}
+  .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 100%)}
+  .bar.green > span{background:linear-gradient(90deg,#16a34a,#22c55e)}
+  .bar.blue > span{background:linear-gradient(90deg,#2563eb,#5da9ff)}
+  .bar.red > span{background:linear-gradient(90deg,#b91c1c,#ef4444)}
+  .bar.purple > span{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+  .small{font-size:11px;color:var(--muted)}
+  .footer{margin-top:14px;padding-top:10px;border-top:1px solid var(--border);color:var(--muted);font-size:11px;text-align:center}
+
+  /* ── PAGE NAVIGATION ── */
+  .apas-nav-btn{background:linear-gradient(135deg,#1a3060,#0f2040);color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:8px 18px;font-size:12px;cursor:pointer;font-weight:700;letter-spacing:1px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+  .apas-nav-btn:hover{background:linear-gradient(135deg,#1f3870,#142850);box-shadow:0 0 16px rgba(241,200,120,.25)}
+  .apas-nav-btn.back{background:var(--card);color:var(--text);border-color:var(--border)}
+  .apas-nav-btn.back:hover{border-color:var(--gold);color:var(--gold);background:var(--card2)}
+  #page-apas{display:none}
+  .apas-company-table{overflow-x:auto}
+  .apas-badge{background:linear-gradient(135deg,#1a3a5c,#1e2f50);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--muted);letter-spacing:1px}
+  @media (max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr)} .row1,.row2,.row3,.rowProc,.rowCiclo,.rowUps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap" id="page-main">
+
+  <div class="header">
+    <div class="brand">
+      <h1>ONE PAGE COMERCIAL · 2026</h1>
+      <p>Visão executiva · Faturamento, Pipeline, Performance, Procurações e Ciclo de Vendas</p>
+    </div>
+    <button class="apas-nav-btn" id="btnGoApas">APAS SHOW &#9654;</button>
+    <button class="apas-nav-btn back" id="btnGoMain" style="display:none">&#8592; DASHBOARD</button>
+    <div class="filters">
+      <div class="filter"><label>Mês</label><select id="f-mes"></select></div>
+      <div class="filter"><label>Hunter</label><select id="f-hunter"></select></div>
+      <div class="filter"><label>UF</label><select id="f-uf"></select></div>
+      <div class="filter"><label>Origem</label><select id="f-origem"></select></div>
+      <button class="reset-btn" id="reset">LIMPAR</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi b1"><div class="label">Faturamento Fechado</div><div class="value" id="kpi-fechado">—</div><div class="sub" id="kpi-fechado-sub">—</div></div>
+    <div class="kpi b4"><div class="label">Conversão</div><div class="value" id="kpi-conv">—</div><div class="sub" id="kpi-conv-sub">—</div></div>
+    <div class="kpi b3"><div class="label">Potencial (Base)</div><div class="value" id="kpi-potencial">—</div><div class="sub" id="kpi-potencial-sub">—</div></div>
+    <div class="kpi b2"><div class="label">Meta do Mês <small style="font-weight:400">(Novo + Upsell)</small></div><div class="value" id="kpi-meta">—</div><div class="sub" id="kpi-meta-sub">—</div></div>
+    <div class="kpi b5"><div class="label">Atingimento</div><div class="value" id="kpi-atingido">—</div><div class="sub" id="kpi-atingido-sub">—</div></div>
+  </div>
+
+  <div class="grid row1">
+    <div class="card"><h3>Fechado × Meta — Mês a Mês <small>(Novo + Upsell)</small></h3><div class="chart-wrap"><canvas id="chartTime"></canvas></div></div>
+    <div class="card"><h3>Origem do Faturamento <small>(fechados)</small></h3><div class="chart-wrap"><canvas id="chartOrigem"></canvas></div></div>
+    <div class="card"><h3>Mix por Status <small>(pipeline)</small></h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
+  </div>
+
+  <div class="grid row2">
+    <div class="card"><h3>Resultado × Meta por Hunter <small>(Novo + Upsell empilhados)</small></h3><div class="chart-wrap tall"><canvas id="chartMeta"></canvas></div></div>
+    <div class="card"><h3>Potencial de Assinatura por Hunter <small>(Base · sem standby)</small></h3><div class="chart-wrap tall"><canvas id="chartPotencial"></canvas></div></div>
+  </div>
+
+  <div class="section-divider"><h2>VISÃO UPSELL</h2><div class="line"></div></div>
+
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi b5"><div class="label">Meta Upsell <small>(mês)</small></div><div class="value" id="kpu-meta">—</div><div class="sub" id="kpu-meta-sub">—</div></div>
+    <div class="kpi b1"><div class="label">Realizado Upsell</div><div class="value" id="kpu-real">—</div><div class="sub" id="kpu-real-sub">—</div></div>
+    <div class="kpi b4"><div class="label">Atingimento Upsell</div><div class="value" id="kpu-at">—</div><div class="sub" id="kpu-at-sub">—</div></div>
+    <div class="kpi b3"><div class="label">Pipeline Upsell <small>(Base + Em Assinatura)</small></div><div class="value" id="kpu-pipe">—</div><div class="sub" id="kpu-pipe-sub">—</div></div>
+  </div>
+
+  <div class="grid rowUps">
+    <div class="card"><h3>Upsell — Meta × Realizado por Hunter</h3><div class="chart-wrap tall"><canvas id="chartUpsHunter"></canvas></div></div>
+    <div class="card"><h3>Upsell — Meta × Realizado mês a mês</h3><div class="chart-wrap tall"><canvas id="chartUpsMes"></canvas></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>Detalhamento por Hunter — Meta · Realizado · Pipeline (Novo + Upsell)</h3>
+    <div id="tableHunter" style="max-height:420px;overflow:auto"></div>
+  </div>
+
+  <div class="grid row3">
+    <div class="card"><h3>Faturamento por Praça (UF)</h3><div class="chart-wrap"><canvas id="chartUF"></canvas></div></div>
+    <div class="card"><h3>Top Cidades · Origem do Faturamento</h3><div id="tableCidades" style="max-height:300px;overflow:auto"></div></div>
+    <div class="card"><h3>Mix por Produto <small>(somente fechados)</small></h3><div class="chart-wrap"><canvas id="chartProduto"></canvas></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>Top 10 Empresas (Pipeline + Fechado)</h3>
+    <div id="tableEmpresas" style="max-height:380px;overflow:auto"></div>
+  </div>
+
+  <div class="section-divider"><h2>CICLO DE VENDAS &amp; CONVERSÃO</h2><div class="line"></div></div>
+
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi b3"><div class="label">Tempo Médio Fechamento <small>(novos)</small></div><div class="value" id="kpc-tempo">—</div><div class="sub" id="kpc-tempo-sub">—</div></div>
+    <div class="kpi b4"><div class="label">Conversão Geral</div><div class="value" id="kpc-conv">—</div><div class="sub" id="kpc-conv-sub">—</div></div>
+    <div class="kpi b1"><div class="label">Convertido em Receita</div><div class="value" id="kpc-conv-r">—</div><div class="sub" id="kpc-conv-r-sub">—</div></div>
+    <div class="kpi b6"><div class="label">Perdido em Standby</div><div class="value" id="kpc-perdido">—</div><div class="sub" id="kpc-perdido-sub">—</div></div>
+  </div>
+
+  <div class="grid rowCiclo">
+    <div class="card"><h3>Tempo Médio de Fechamento — Mês a Mês <small>(novos)</small></h3><div class="chart-wrap tall"><canvas id="chartTempo"></canvas></div></div>
+    <div class="card"><h3>Conversão por Hunter <small>(Assinado vs Standby)</small></h3><div class="chart-wrap tall"><canvas id="chartConvHunter"></canvas></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>Detalhamento — Ciclo &amp; Conversão por Hunter</h3>
+    <div id="tableCiclo" style="max-height:340px;overflow:auto"></div>
+  </div>
+
+  <div class="section-divider"><h2>PRODUÇÃO DE PROCURAÇÕES</h2><div class="line"></div></div>
+
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi b1"><div class="label">Procurações Total</div><div class="value" id="kp-tot">—</div><div class="sub" id="kp-tot-sub">—</div></div>
+    <div class="kpi b4"><div class="label">Novas</div><div class="value" id="kp-novas">—</div><div class="sub" id="kp-novas-sub">—</div></div>
+    <div class="kpi b2"><div class="label">Renovações</div><div class="value" id="kp-reno">—</div><div class="sub" id="kp-reno-sub">—</div></div>
+    <div class="kpi b3"><div class="label">Hunter destaque</div><div class="value" id="kp-top">—</div><div class="sub" id="kp-top-sub">—</div></div>
+  </div>
+
+  <div class="grid rowProc">
+    <div class="card"><h3>Procurações Mês a Mês</h3><div class="chart-wrap tall"><canvas id="chartProcMes"></canvas></div></div>
+    <div class="card"><h3>Procurações por Hunter <small>(distribuído por mês)</small></h3><div class="chart-wrap tall"><canvas id="chartProcHunter"></canvas></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h3>Detalhamento — Procurações por Hunter × Mês</h3>
+    <div id="tableProc" style="max-height:340px;overflow:auto"></div>
+  </div>
+
+  <div class="footer">Atualizado em REPLACE_DATE · Fonte: Forecast 2026 · Time Comercial</div>
+
+</div><!-- end #page-main -->
+
+<!-- ═══ PAGE: APAS SHOW ═══ -->
+<div id="page-apas" class="wrap">
+
+  <div class="section-divider" style="margin-top:8px">
+    <h2>APAS SHOW 2026</h2>
+    <div class="line"></div>
+    <span class="apas-badge" id="apas-badge">— empresas</span>
+  </div>
+
+  <!-- 7 KPIs -->
+  <div class="kpi-row" style="grid-template-columns:repeat(7,1fr);margin-bottom:16px">
+    <div class="kpi b1"><div class="label">Faturamento Direto</div><div class="value" id="pkpa-fat">—</div><div class="sub" id="pkpa-fat-sub">—</div></div>
+    <div class="kpi b2"><div class="label">Crédito Total</div><div class="value" id="pkpa-cred">—</div><div class="sub" id="pkpa-cred-sub">—</div></div>
+    <div class="kpi b4"><div class="label">Empresas Únicas</div><div class="value" id="pkpa-emp">—</div><div class="sub" id="pkpa-emp-sub">—</div></div>
+    <div class="kpi b6"><div class="label">Pendentes</div><div class="value" id="pkpa-pend">—</div><div class="sub" id="pkpa-pend-sub">—</div></div>
+    <div class="kpi" style="border-left:4px solid var(--green)"><div class="label">&#10003; Com Procuração</div><div class="value" id="pkpa-proc-sim">—</div><div class="sub" id="pkpa-proc-sim-sub">—</div></div>
+    <div class="kpi" style="border-left:4px solid var(--red)"><div class="label">&#9651; Sem Procuração</div><div class="value" id="pkpa-proc-nao">—</div><div class="sub" id="pkpa-proc-nao-sub">—</div></div>
+    <div class="kpi" style="border-left:4px solid var(--gold)"><div class="label">% Habilitadas</div><div class="value" id="pkpa-proc-pct">—</div><div class="sub">proc. cadastrada</div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid" style="grid-template-columns:1.5fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card"><h3>Faturamento vs Crédito por Hunter</h3><div class="chart-wrap tall"><canvas id="chartApasFat"></canvas></div></div>
+    <div class="card"><h3>Distribuição Procuração</h3><div class="chart-wrap tall"><canvas id="chartApasProc"></canvas></div></div>
+  </div>
+
+  <!-- Company table -->
+  <div class="card" style="margin-bottom:14px">
+    <h3>Empresas APAS SHOW <small id="apas-table-count"></small></h3>
+    <div class="apas-company-table" id="apasEmpresasTable"></div>
+  </div>
+
+  <div class="footer">Atualizado em REPLACE_DATE · Fonte: Forecast 2026 · Time Comercial</div>
+
+</div><!-- end #page-apas -->
+
+<script>
+const RAW = REPLACE_DATA_JSON;
+const META = REPLACE_META_JSON;
+const PROCS = REPLACE_PROCS_JSON;
+const APAS = REPLACE_APAS_JSON;
+
+const MONTHS = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const M_IDX = {NOV:11,DEZ:12,JAN:13,FEV:14,MAR:15,ABR:16,MAI:17,JUN:18,JUL:19,AGO:20,SET:21,OUT:22};
+
+const fmtBRL = v => 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtBRLk = v => { v=v||0; if(Math.abs(v)>=1e6) return 'R$ '+(v/1e6).toFixed(1).replace('.',',')+' Mi'; if(Math.abs(v)>=1e3) return 'R$ '+(v/1e3).toFixed(0)+' Mil'; return 'R$ '+v.toFixed(0); };
+const pct = v => (v*100).toFixed(1).replace('.',',')+'%';
+
+Chart.defaults.color = '#8aa0c2'; Chart.defaults.borderColor = '#243558';
+Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif"; Chart.defaults.font.size = 11;
+
+const COLORS = {gold:'#f1c878',gold2:'#e8b659',blue:'#5da9ff',blue2:'#3b82f6',green:'#22c55e',red:'#ef4444',orange:'#f59e0b',cyan:'#06b6d4',purple:'#a78bfa',pink:'#ec4899'};
+const PALETTE = [COLORS.gold,COLORS.blue,COLORS.green,COLORS.orange,COLORS.purple,COLORS.cyan,COLORS.pink,'#94a3b8','#f87171','#34d399','#a3e635','#fbbf24'];
+
+const state = { mes:'TODOS', hunter:'TODOS', uf:'TODOS', origem:'TODOS' };
+
+function unique(arr,key){ const s=new Set(); arr.forEach(x=>{if(x[key]) s.add(x[key]);}); return [...s].sort(); }
+function uniqEmp(arr){ return new Set(arr.filter(r=>r&&r.empresa).map(r=>r.empresa)).size; }
+
+function populateFilters(){
+  const sel=(id,items)=>{ const el=document.getElementById(id); el.innerHTML='<option value="TODOS">TODOS</option>'+items.map(v=>`<option value="${v}">${v}</option>`).join(''); };
+  // Ano comercial: NOV → OUT — todos os meses sempre visíveis
+  const ANO_COM = ['NOV','DEZ','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT'];
+  const elM = document.getElementById('f-mes');
+  elM.innerHTML='<option value="TODOS">TODOS</option>'+ANO_COM.map(m=>`<option value="${m}" ${m===state.mes?'selected':''}>${m}</option>`).join('');
+  sel('f-hunter',unique(RAW,'hunter'));
+  sel('f-uf',unique(RAW,'uf'));
+  sel('f-origem',unique(RAW,'contrato'));
+}
+
+function filterData(opts={}){
+  const skip = opts.skip||[];
+  return RAW.filter(r=>{
+    if(!skip.includes('mes') && state.mes!=='TODOS' && r.mes_assinado!==state.mes) return false;
+    if(!skip.includes('hunter') && state.hunter!=='TODOS' && r.hunter!==state.hunter) return false;
+    if(!skip.includes('uf') && state.uf!=='TODOS' && r.uf!==state.uf) return false;
+    if(!skip.includes('origem') && state.origem!=='TODOS' && r.contrato!==state.origem) return false;
+    return true;
+  });
+}
+
+function sumBy(arr,status){ let s=0; arr.forEach(r=>{ if(!status||(Array.isArray(status)?status.includes(r.status):r.status===status)) s+=r.faturamento; }); return s; }
+
+// META helpers
+function metaNovoFor(month, hunter='TODOS'){
+  if(!month||month==='TODOS') return META.reduce((s,m)=>s+MONTHS.reduce((a,mo)=>a+(m.meta[mo]||0),0),0);
+  if(hunter==='TODOS') return META.reduce((s,m)=>s+(m.meta[month]||0),0);
+  const f=META.find(m=>m.hunter===hunter); return f?(f.meta[month]||0):0;
+}
+function metaUpsFor(month, hunter='TODOS'){
+  if(!month||month==='TODOS') return META.reduce((s,m)=>s+MONTHS.reduce((a,mo)=>a+(m.meta_upsell?.[mo]||0),0),0);
+  if(hunter==='TODOS') return META.reduce((s,m)=>s+(m.meta_upsell?.[month]||0),0);
+  const f=META.find(m=>m.hunter===hunter); return f?(f.meta_upsell?.[month]||0):0;
+}
+function metaTotalFor(month, hunter='TODOS'){ return metaNovoFor(month,hunter) + metaUpsFor(month,hunter); }
+
+let charts={};
+function destroyChart(n){ if(charts[n]){ charts[n].destroy(); charts[n]=null; } }
+
+function renderKPIs(){
+  const dAss = filterData();
+  const fechado = sumBy(dAss,'ASSINADO');
+  // Conversão
+  const dConv = filterData({skip:['mes']}).filter(r=>r.status==='ASSINADO'||r.status==='STANDBY');
+  const ass = dConv.filter(r=>r.status==='ASSINADO').reduce((s,r)=>s+r.faturamento,0);
+  const sb = dConv.filter(r=>r.status==='STANDBY').reduce((s,r)=>s+r.faturamento,0);
+  const conv = (ass+sb)>0 ? ass/(ass+sb) : 0;
+  // Potencial
+  const dPot = filterData({skip:['mes']}).filter(r=>r.status==='BASE');
+  const potencial = dPot.reduce((s,r)=>s+r.faturamento,0);
+  // Meta total (novo+upsell)
+  const metaTot = metaTotalFor(state.mes, state.hunter);
+  const ating = metaTot>0 ? fechado/metaTot : 0;
+
+  document.getElementById('kpi-fechado').textContent = fmtBRLk(fechado);
+  document.getElementById('kpi-fechado-sub').textContent = `${uniqEmp(dAss.filter(r=>r.status==='ASSINADO'))} negócios fechados`;
+  document.getElementById('kpi-conv').textContent = pct(conv);
+  document.getElementById('kpi-conv-sub').textContent = `Convertido R$ ${fmtBRLk(ass).replace('R$ ','')} de R$ ${fmtBRLk(ass+sb).replace('R$ ','')}`;
+  document.getElementById('kpi-potencial').textContent = fmtBRLk(potencial);
+  document.getElementById('kpi-potencial-sub').textContent = `${uniqEmp(dPot)} oportunidades em base`;
+  const metaN = metaNovoFor(state.mes,state.hunter);
+  const metaU = metaUpsFor(state.mes,state.hunter);
+  document.getElementById('kpi-meta').textContent = fmtBRLk(metaTot);
+  document.getElementById('kpi-meta-sub').innerHTML = `Novo ${fmtBRLk(metaN)} · <span style="color:var(--purple)">Ups ${fmtBRLk(metaU)}</span>`;
+  document.getElementById('kpi-atingido').textContent = pct(ating);
+  const gap = metaTot - fechado;
+  document.getElementById('kpi-atingido-sub').innerHTML = gap>0 ? `Gap: <span class="neg">${fmtBRLk(gap)}</span>` : `Superou em <span class="pos">${fmtBRLk(-gap)}</span>`;
+}
+
+// === FECHADO × META MÊS A MÊS ===
+function renderChartTime(){
+  destroyChart('time');
+  const data = filterData({skip:['mes']});
+  const fechMap={}; MONTHS.forEach(m=>fechMap[m]=0);
+  data.forEach(r=>{ if(r.status==='ASSINADO' && r.mes_assinado && fechMap[r.mes_assinado]!==undefined) fechMap[r.mes_assinado]+=r.faturamento; });
+  const metaMap={}; MONTHS.forEach(m=>{ metaMap[m] = metaNovoFor(m,state.hunter) + metaUpsFor(m,state.hunter); });
+  const monthsToShow = MONTHS.filter(m=>fechMap[m]>0||metaMap[m]>0);
+  const labels = monthsToShow.length?monthsToShow:['JAN','FEV','MAR','ABR','MAI'];
+  charts.time = new Chart(document.getElementById('chartTime').getContext('2d'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Meta (Novo+Ups)',data:labels.map(m=>metaMap[m]||0),backgroundColor:'#3a4a6e',borderRadius:4,order:2},
+      {type:'line',label:'Fechado',data:labels.map(m=>fechMap[m]||0),borderColor:COLORS.gold,backgroundColor:COLORS.gold+'33',tension:.3,fill:true,pointBackgroundColor:COLORS.gold,pointRadius:5,pointHoverRadius:7,borderWidth:3,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>{const at=metaMap[c.label]>0?` (${pct((fechMap[c.label]||0)/metaMap[c.label])})`:''; return c.dataset.label+': '+fmtBRL(c.parsed.y)+(c.dataset.label==='Fechado'?at:'');}}}},scales:{y:{ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderChartOrigem(){
+  destroyChart('origem');
+  const d=filterData().filter(r=>r.status==='ASSINADO');
+  const map={}; d.forEach(r=>{const k=r.contrato||'NOVO'; map[k]=(map[k]||0)+r.faturamento;});
+  const labels=Object.keys(map);
+  charts.origem = new Chart(document.getElementById('chartOrigem').getContext('2d'),{
+    type:'doughnut',data:{labels,datasets:[{data:labels.map(l=>map[l]),backgroundColor:[COLORS.gold,COLORS.purple,COLORS.green,COLORS.blue],borderColor:'#0b1220',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>{const t=c.dataset.data.reduce((a,b)=>a+b,0); return `${c.label}: ${fmtBRL(c.parsed)} (${pct(c.parsed/t)})`;}}}}}
+  });
+}
+
+function renderChartStatus(){
+  destroyChart('status');
+  const d=filterData({skip:['mes']});
+  const map={}; d.forEach(r=>{map[r.status]=(map[r.status]||0)+r.faturamento;});
+  const labels=['ASSINADO','EM ASSINATURA','BASE','STANDBY'].filter(l=>map[l]);
+  const cs={ASSINADO:COLORS.green,'EM ASSINATURA':COLORS.blue,BASE:COLORS.orange,STANDBY:'#64748b'};
+  charts.status = new Chart(document.getElementById('chartStatus').getContext('2d'),{
+    type:'bar',data:{labels,datasets:[{data:labels.map(l=>map[l]),backgroundColor:labels.map(l=>cs[l]),borderRadius:6}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtBRL(c.parsed.x)}}},scales:{x:{ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},y:{grid:{display:false}}}}
+  });
+}
+
+// META × Realizado per hunter (stacked novo + upsell)
+function renderChartMeta(){
+  destroyChart('meta');
+  const d = filterData().filter(r=>r.status==='ASSINADO');
+  const realN={}, realU={};
+  d.forEach(r=>{
+    if (r.contrato==='UPSELL') realU[r.hunter]=(realU[r.hunter]||0)+r.faturamento;
+    else realN[r.hunter]=(realN[r.hunter]||0)+r.faturamento;
+  });
+  const metaN={}, metaU={};
+  META.forEach(m=>{
+    if(state.hunter!=='TODOS' && m.hunter!==state.hunter) return;
+    metaN[m.hunter] = state.mes==='TODOS' ? MONTHS.reduce((s,mo)=>s+(m.meta[mo]||0),0) : (m.meta[state.mes]||0);
+    metaU[m.hunter] = state.mes==='TODOS' ? MONTHS.reduce((s,mo)=>s+(m.meta_upsell?.[mo]||0),0) : (m.meta_upsell?.[state.mes]||0);
+  });
+  const all=[...new Set([...Object.keys(realN),...Object.keys(realU),...Object.keys(metaN),...Object.keys(metaU)])].filter(h=>(metaN[h]||0)+(metaU[h]||0)+(realN[h]||0)+(realU[h]||0)>0);
+  all.sort((a,b)=>((metaN[b]||0)+(metaU[b]||0))-((metaN[a]||0)+(metaU[a]||0)));
+  charts.meta = new Chart(document.getElementById('chartMeta').getContext('2d'),{
+    type:'bar',
+    data:{labels:all,datasets:[
+      {label:'Meta Novo',data:all.map(h=>metaN[h]||0),backgroundColor:'#3a4a6e',borderRadius:4,stack:'meta'},
+      {label:'Meta Upsell',data:all.map(h=>metaU[h]||0),backgroundColor:'#7c3aed',borderRadius:4,stack:'meta'},
+      {label:'Realizado Novo',data:all.map(h=>realN[h]||0),backgroundColor:COLORS.gold,borderRadius:4,stack:'real'},
+      {label:'Realizado Upsell',data:all.map(h=>realU[h]||0),backgroundColor:COLORS.purple,borderRadius:4,stack:'real'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.y)}}},scales:{y:{stacked:true,ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},x:{stacked:true,grid:{display:false}}}}
+  });
+}
+
+function renderChartPotencial(){
+  destroyChart('potencial');
+  const d=filterData({skip:['mes']}).filter(r=>r.status==='BASE');
+  const map={}; d.forEach(r=>{const k=r.hunter; if(!map[k]) map[k]={total:0,quente:0,morno:0,frio:0,outro:0}; map[k].total+=r.faturamento; const t=(r.temperatura||'').toUpperCase(); if(t==='QUENTE') map[k].quente+=r.faturamento; else if(t==='MORNO') map[k].morno+=r.faturamento; else if(t==='FRIO') map[k].frio+=r.faturamento; else map[k].outro+=r.faturamento;});
+  const hunters=Object.keys(map).sort((a,b)=>map[b].total-map[a].total);
+  charts.potencial = new Chart(document.getElementById('chartPotencial').getContext('2d'),{
+    type:'bar',data:{labels:hunters,datasets:[
+      {label:'Quente',data:hunters.map(h=>map[h].quente),backgroundColor:'#ef4444',borderRadius:4,stack:'s'},
+      {label:'Morno',data:hunters.map(h=>map[h].morno),backgroundColor:COLORS.orange,borderRadius:4,stack:'s'},
+      {label:'Frio',data:hunters.map(h=>map[h].frio),backgroundColor:COLORS.cyan,borderRadius:4,stack:'s'},
+      {label:'Indefinida',data:hunters.map(h=>map[h].outro),backgroundColor:'#64748b',borderRadius:4,stack:'s'}
+    ]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.x)}}},scales:{x:{stacked:true,ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},y:{stacked:true,grid:{display:false}}}}
+  });
+}
+
+// ============ UPSELL ============
+function renderUpsKPIs(){
+  const metaU = metaUpsFor(state.mes, state.hunter);
+  const dAss = filterData().filter(r=>r.contrato==='UPSELL' && r.status==='ASSINADO');
+  const real = dAss.reduce((s,r)=>s+r.faturamento,0);
+  const at = metaU>0 ? real/metaU : 0;
+  const dPipe = filterData({skip:['mes']}).filter(r=>r.contrato==='UPSELL' && (r.status==='BASE'||r.status==='EM ASSINATURA'));
+  const pipe = dPipe.reduce((s,r)=>s+r.faturamento,0);
+
+  document.getElementById('kpu-meta').textContent = fmtBRLk(metaU);
+  document.getElementById('kpu-meta-sub').textContent = state.mes==='TODOS'?'Total ano':`Meta de ${state.mes}`;
+  document.getElementById('kpu-real').textContent = fmtBRLk(real);
+  document.getElementById('kpu-real-sub').textContent = `${uniqEmp(dAss)} contratos upsell`;
+  document.getElementById('kpu-at').textContent = pct(at);
+  const gap = metaU - real;
+  document.getElementById('kpu-at-sub').innerHTML = gap>0 ? `Gap: <span class="neg">${fmtBRLk(gap)}</span>` : `Superou em <span class="pos">${fmtBRLk(-gap)}</span>`;
+  document.getElementById('kpu-pipe').textContent = fmtBRLk(pipe);
+  document.getElementById('kpu-pipe-sub').textContent = `${uniqEmp(dPipe)} oportunidades upsell`;
+}
+
+function renderChartUpsHunter(){
+  destroyChart('upsH');
+  const d = filterData().filter(r=>r.contrato==='UPSELL' && r.status==='ASSINADO');
+  const real={}; d.forEach(r=>real[r.hunter]=(real[r.hunter]||0)+r.faturamento);
+  const meta={};
+  META.forEach(m=>{
+    if(state.hunter!=='TODOS' && m.hunter!==state.hunter) return;
+    meta[m.hunter] = state.mes==='TODOS' ? MONTHS.reduce((s,mo)=>s+(m.meta_upsell?.[mo]||0),0) : (m.meta_upsell?.[state.mes]||0);
+  });
+  const all = [...new Set([...Object.keys(real),...Object.keys(meta).filter(h=>meta[h]>0)])];
+  all.sort((a,b)=>(meta[b]||0)-(meta[a]||0));
+  charts.upsH = new Chart(document.getElementById('chartUpsHunter').getContext('2d'),{
+    type:'bar',data:{labels:all,datasets:[
+      {label:'Meta',data:all.map(h=>meta[h]||0),backgroundColor:'#3a4a6e',borderRadius:4},
+      {label:'Realizado',data:all.map(h=>real[h]||0),backgroundColor:COLORS.purple,borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderChartUpsMes(){
+  destroyChart('upsM');
+  const d = filterData({skip:['mes']}).filter(r=>r.contrato==='UPSELL' && r.status==='ASSINADO');
+  const realM={}; MONTHS.forEach(m=>realM[m]=0);
+  d.forEach(r=>{ if(r.mes_assinado && realM[r.mes_assinado]!==undefined) realM[r.mes_assinado]+=r.faturamento; });
+  const metaM={}; MONTHS.forEach(m=>metaM[m]=metaUpsFor(m,state.hunter));
+  const monthsToShow = MONTHS.filter(m=>realM[m]>0 || metaM[m]>0);
+  const labels = monthsToShow.length?monthsToShow:['JAN','FEV','MAR','ABR','MAI'];
+  charts.upsM = new Chart(document.getElementById('chartUpsMes').getContext('2d'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Meta Upsell',data:labels.map(m=>metaM[m]||0),backgroundColor:'#3a4a6e',borderRadius:4,order:2},
+      {type:'line',label:'Realizado Upsell',data:labels.map(m=>realM[m]||0),borderColor:COLORS.purple,backgroundColor:COLORS.purple+'33',tension:.3,fill:true,pointBackgroundColor:COLORS.purple,pointRadius:5,pointHoverRadius:7,borderWidth:3,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},x:{grid:{display:false}}}}
+  });
+}
+
+// ============ HUNTER TABLE (Novo + Upsell) ============
+function renderTableHunter(){
+  const d = filterData({skip:['mes']});
+  const dMes = filterData();
+  const map = {};
+  const _empF = {}; // unique companies fechadas por hunter
+  const _ini = ()=>({fechN:0,fechU:0,emAss:0,baseN:0,baseU:0,nF:0});
+  // realizado por contrato
+  dMes.forEach(r=>{
+    if (!map[r.hunter]) { map[r.hunter]=_ini(); _empF[r.hunter]=new Set(); }
+    if (r.status==='ASSINADO'){
+      if (r.contrato==='UPSELL') map[r.hunter].fechU+=r.faturamento;
+      else map[r.hunter].fechN+=r.faturamento;
+      _empF[r.hunter].add(r.empresa);
+    } else if (r.status==='EM ASSINATURA') map[r.hunter].emAss+=r.faturamento;
+  });
+  Object.keys(_empF).forEach(h=>{ map[h].nF = _empF[h].size; });
+  d.forEach(r=>{
+    if (r.status!=='BASE') return;
+    if (!map[r.hunter]) map[r.hunter]=_ini();
+    if (r.contrato==='UPSELL') map[r.hunter].baseU+=r.faturamento;
+    else map[r.hunter].baseN+=r.faturamento;
+  });
+  META.forEach(m=>{ if(!map[m.hunter]) map[m.hunter]=_ini(); });
+
+  const hunters = Object.keys(map);
+  const rows = hunters.map(h=>{
+    const mN = state.mes==='TODOS' ? MONTHS.reduce((s,mo)=>s+(META.find(x=>x.hunter===h)?.meta[mo]||0),0) : (META.find(x=>x.hunter===h)?.meta[state.mes]||0);
+    const mU = state.mes==='TODOS' ? MONTHS.reduce((s,mo)=>s+(META.find(x=>x.hunter===h)?.meta_upsell?.[mo]||0),0) : (META.find(x=>x.hunter===h)?.meta_upsell?.[state.mes]||0);
+    const mTot = mN+mU;
+    const rTot = map[h].fechN + map[h].fechU;
+    const at = mTot>0 ? rTot/mTot : 0;
+    const atN = mN>0 ? map[h].fechN/mN : 0;
+    const atU = mU>0 ? map[h].fechU/mU : 0;
+    return {hunter:h,...map[h],mN,mU,mTot,rTot,at,atN,atU};
+  }).filter(r=>r.rTot>0||r.emAss>0||r.baseN>0||r.baseU>0||r.mTot>0)
+    .sort((a,b)=>(b.rTot+b.emAss)-(a.rTot+a.emAss));
+  const maxFech = Math.max(...rows.map(r=>r.rTot),1);
+
+  const html = `
+    <table>
+      <thead><tr>
+        <th>Hunter</th>
+        <th class="num">Meta Novo</th>
+        <th class="num">Meta Ups</th>
+        <th class="num">Real Novo</th>
+        <th class="num">Real Ups</th>
+        <th class="num">% Novo</th>
+        <th class="num">% Ups</th>
+        <th class="num">% Total</th>
+        <th class="num">Em Ass.</th>
+        <th class="num">Pipeline</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r=>`
+          <tr>
+            <td><b>${r.hunter}</b><div class="small">${r.nF} fechados</div></td>
+            <td class="num">${fmtBRLk(r.mN)}</td>
+            <td class="num" style="color:var(--purple)">${fmtBRLk(r.mU)}</td>
+            <td class="num">${fmtBRLk(r.fechN)}</td>
+            <td class="num" style="color:var(--purple)">${fmtBRLk(r.fechU)}</td>
+            <td class="num"><b style="color:${r.atN>=1?'var(--green)':r.atN>=0.7?'var(--gold)':'var(--red)'}">${r.mN>0?pct(r.atN):'—'}</b></td>
+            <td class="num"><b style="color:${r.atU>=1?'var(--green)':r.atU>=0.7?'var(--gold)':'var(--red)'}">${r.mU>0?pct(r.atU):'—'}</b></td>
+            <td class="num">
+              <b style="color:${r.at>=1?'var(--green)':r.at>=0.7?'var(--gold)':'var(--red)'}">${r.mTot>0?pct(r.at):'—'}</b>
+              <div class="bar ${r.at>=1?'green':''}"><span style="width:${Math.min(100,r.at*100).toFixed(0)}%"></span></div>
+            </td>
+            <td class="num">${fmtBRLk(r.emAss)}</td>
+            <td class="num">${fmtBRLk(r.baseN+r.baseU)}<div class="small" style="text-align:right">N: ${fmtBRLk(r.baseN)} · <span style="color:var(--purple)">U: ${fmtBRLk(r.baseU)}</span></div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+  document.getElementById('tableHunter').innerHTML = html;
+}
+
+function renderChartUF(){
+  destroyChart('uf');
+  const d=filterData({skip:['uf']}); const map={};
+  d.forEach(r=>{ if(!map[r.uf]) map[r.uf]={ass:0,pipe:0}; if(r.status==='ASSINADO') map[r.uf].ass+=r.faturamento; else if(r.status==='BASE'||r.status==='EM ASSINATURA') map[r.uf].pipe+=r.faturamento; });
+  const ufs=Object.keys(map).sort((a,b)=>(map[b].ass+map[b].pipe)-(map[a].ass+map[a].pipe));
+  charts.uf = new Chart(document.getElementById('chartUF').getContext('2d'),{
+    type:'bar',data:{labels:ufs,datasets:[
+      {label:'Fechado',data:ufs.map(u=>map[u].ass),backgroundColor:COLORS.gold,borderRadius:4},
+      {label:'Pipeline',data:ufs.map(u=>map[u].pipe),backgroundColor:COLORS.blue,borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderChartProduto(){
+  destroyChart('produto');
+  const cat=p=>{const s=(p||'').toUpperCase(); if(s.includes('PIS')&&s.includes('COFINS')&&s.includes('INSUMO')) return 'PIS/COFINS INSUMOS'; if(s.includes('PIS')&&s.includes('COFINS')) return 'PIS/COFINS'; if(s.includes('ICMS ST')) return 'EXCLUSÃO ICMS ST'; if(s.includes('ICMS')) return 'ICMS'; if(s.includes('PREVID')||s.includes('INSS')) return 'PREVIDENCIÁRIO'; if(s.includes('IRPJ')||s.includes('CSLL')) return 'IRPJ/CSLL'; if(s.includes('SUBV')) return 'SUBVENÇÃO'; if(s.includes('JCP')) return 'JCP'; if(s.includes('HONOR')) return 'HONORÁRIOS'; return 'OUTROS';};
+  const d=filterData().filter(r=>r.status==='ASSINADO');
+  const map={}; d.forEach(r=>{const k=cat(r.produto); map[k]=(map[k]||0)+r.faturamento;});
+  const labels=Object.keys(map).sort((a,b)=>map[b]-map[a]);
+  charts.produto = new Chart(document.getElementById('chartProduto').getContext('2d'),{
+    type:'doughnut',data:{labels,datasets:[{data:labels.map(l=>map[l]),backgroundColor:PALETTE,borderColor:'#0b1220',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{boxWidth:11,padding:6,font:{size:10}}},tooltip:{callbacks:{label:c=>{const t=c.dataset.data.reduce((a,b)=>a+b,0); return `${c.label}: ${fmtBRLk(c.parsed)} (${pct(c.parsed/t)})`;}}}}}
+  });
+}
+
+function renderTableEmpresas(){
+  const d=filterData(); const map={};
+  d.forEach(r=>{const k=r.empresa; if(!map[k]) map[k]={fechado:0,emAss:0,base:0,hunter:r.hunter,uf:r.uf,cidade:r.cidade,contrato:r.contrato,_prods:new Set()}; if(r.produto) map[k]._prods.add(r.produto); if(r.status==='ASSINADO') map[k].fechado+=r.faturamento; else if(r.status==='EM ASSINATURA') map[k].emAss+=r.faturamento; else if(r.status==='BASE') map[k].base+=r.faturamento;});
+  const list=Object.entries(map).map(([emp,v])=>({empresa:emp,...v,nProd:v._prods.size,total:v.fechado+v.emAss+v.base})).sort((a,b)=>b.total-a.total).slice(0,12);
+  const max=Math.max(...list.map(r=>r.total),1);
+  document.getElementById('tableEmpresas').innerHTML = `
+    <table><thead><tr><th>Empresa</th><th>Hunter</th><th>Praça</th><th>Origem</th><th class="num">Total</th></tr></thead>
+    <tbody>${list.map(r=>`<tr><td title="${r.empresa}"><b>${r.empresa.length>32?r.empresa.slice(0,30)+'…':r.empresa}</b>${r.nProd>1?`<div class="small" style="color:var(--cyan)">${r.nProd} produtos</div>`:''}</td><td>${r.hunter}</td><td>${r.cidade}/${r.uf}</td><td><span class="pill ${r.contrato==='UPSELL'?'f':'n'}">${r.contrato}</span></td><td class="num">${fmtBRLk(r.total)}<div class="bar blue"><span style="width:${(r.total/max*100).toFixed(0)}%"></span></div></td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderTableCidades(){
+  const d=filterData().filter(r=>r.status==='ASSINADO'); const map={};
+  const _empC={}; d.forEach(r=>{const k=`${r.cidade} / ${r.uf}`; if(!map[k]) {map[k]={cidade:r.cidade,uf:r.uf,novo:0,upsell:0,total:0,n:0}; _empC[k]=new Set();} if(r.contrato==='UPSELL') map[k].upsell+=r.faturamento; else map[k].novo+=r.faturamento; map[k].total+=r.faturamento; _empC[k].add(r.empresa);}); Object.keys(_empC).forEach(k=>{map[k].n=_empC[k].size;});
+  const list=Object.values(map).sort((a,b)=>b.total-a.total).slice(0,15);
+  const max=Math.max(...list.map(r=>r.total),1);
+  document.getElementById('tableCidades').innerHTML = `
+    <table><thead><tr><th>Praça</th><th class="num">Novo</th><th class="num">Upsell</th><th class="num">Total</th></tr></thead>
+    <tbody>${list.length===0?'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Sem fechamentos no filtro</td></tr>':list.map(r=>`<tr><td><b>${r.cidade}</b> <span class="small">/${r.uf}</span><div class="small">${r.n} negócios</div></td><td class="num">${fmtBRLk(r.novo)}</td><td class="num">${fmtBRLk(r.upsell)}</td><td class="num">${fmtBRLk(r.total)}<div class="bar"><span style="width:${(r.total/max*100).toFixed(0)}%"></span></div></td></tr>`).join('')}</tbody></table>`;
+}
+
+// ============ CICLO DE VENDAS ============
+function ciclo_diff(r){ const a=M_IDX[r.mes_assinado], b=M_IDX[r.mes]; if(a===undefined||b===undefined) return null; const d=a-b; return d>=0?d:null; }
+
+function renderCicloKPIs(){
+  const dCic=filterData().filter(r=>r.status==='ASSINADO' && r.contrato==='NOVO');
+  const diffs=dCic.map(ciclo_diff).filter(d=>d!==null);
+  const tempo=diffs.length>0?diffs.reduce((s,d)=>s+d,0)/diffs.length:0;
+  const dConv=filterData({skip:['mes']}).filter(r=>r.status==='ASSINADO'||r.status==='STANDBY');
+  const ass=dConv.filter(r=>r.status==='ASSINADO').reduce((s,r)=>s+r.faturamento,0);
+  const sb=dConv.filter(r=>r.status==='STANDBY').reduce((s,r)=>s+r.faturamento,0);
+  const conv=(ass+sb)>0?ass/(ass+sb):0;
+  document.getElementById('kpc-tempo').textContent = tempo.toFixed(1).replace('.',',')+(Math.abs(tempo)===1?' mês':' meses');
+  document.getElementById('kpc-tempo-sub').textContent = `${uniqEmp(dCic.filter(r=>ciclo_diff(r)!==null))} contratos analisados`;
+  document.getElementById('kpc-conv').textContent = pct(conv);
+  document.getElementById('kpc-conv-sub').textContent = `de R$ ${fmtBRLk(ass+sb).replace('R$ ','')} resolvidos`;
+  document.getElementById('kpc-conv-r').textContent = fmtBRLk(ass);
+  document.getElementById('kpc-conv-r-sub').textContent = `${uniqEmp(dConv.filter(r=>r.status==='ASSINADO'))} negócios convertidos`;
+  document.getElementById('kpc-perdido').textContent = fmtBRLk(sb);
+  document.getElementById('kpc-perdido-sub').textContent = `${uniqEmp(dConv.filter(r=>r.status==='STANDBY'))} oportunidades em standby`;
+}
+
+function renderChartTempo(){
+  destroyChart('tempo');
+  const d=filterData({skip:['mes']}).filter(r=>r.status==='ASSINADO' && r.contrato==='NOVO');
+  const buckets={}; const empSets={};
+  ['NOV','DEZ','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT'].forEach(m=>{buckets[m]=[]; empSets[m]=new Set();});
+  d.forEach(r=>{const dd=ciclo_diff(r); if(dd!==null && buckets[r.mes_assinado]!==undefined){buckets[r.mes_assinado].push(dd); empSets[r.mes_assinado].add(r.empresa);}});
+  const labels=Object.keys(buckets).filter(m=>buckets[m].length>0);
+  const avg=labels.map(m=>buckets[m].reduce((s,d)=>s+d,0)/buckets[m].length);
+  const counts=labels.map(m=>empSets[m].size);
+  charts.tempo = new Chart(document.getElementById('chartTempo').getContext('2d'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Contratos fechados',data:counts,backgroundColor:'#3a4a6e',borderRadius:4,yAxisID:'y1',order:2},
+      {type:'line',label:'Tempo médio (meses)',data:avg,borderColor:COLORS.orange,backgroundColor:COLORS.orange+'33',tension:.3,fill:true,pointBackgroundColor:COLORS.orange,pointRadius:6,pointHoverRadius:8,borderWidth:3,yAxisID:'y',order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>{if(c.dataset.label==='Tempo médio (meses)') return `Tempo médio: ${c.parsed.y.toFixed(2).replace('.',',')} meses`; return c.dataset.label+': '+c.parsed.y;}}}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Meses'},ticks:{callback:v=>v.toFixed(1).replace('.',',')+' m'},grid:{color:'#1c2a47'}},y1:{position:'right',beginAtZero:true,title:{display:true,text:'# Contratos'},ticks:{precision:0},grid:{display:false}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderChartConvHunter(){
+  destroyChart('convH');
+  const d=filterData({skip:['mes']}).filter(r=>r.status==='ASSINADO'||r.status==='STANDBY');
+  const map={}; d.forEach(r=>{if(!map[r.hunter]) map[r.hunter]={ass:0,sb:0}; if(r.status==='ASSINADO') map[r.hunter].ass+=r.faturamento; else map[r.hunter].sb+=r.faturamento;});
+  const hunters=Object.keys(map).sort((a,b)=>(map[b].ass+map[b].sb)-(map[a].ass+map[a].sb));
+  charts.convH = new Chart(document.getElementById('chartConvHunter').getContext('2d'),{
+    type:'bar',data:{labels:hunters,datasets:[
+      {label:'Convertido',data:hunters.map(h=>map[h].ass),backgroundColor:COLORS.green,borderRadius:4,stack:'s'},
+      {label:'Standby',data:hunters.map(h=>map[h].sb),backgroundColor:COLORS.red,borderRadius:4,stack:'s'}
+    ]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>{const t=map[c.label].ass+map[c.label].sb; const p=t>0?(c.parsed.x/t*100).toFixed(1):0; return c.dataset.label+': '+fmtBRL(c.parsed.x)+` (${p.replace('.',',')}%)`;}}}},scales:{x:{stacked:true,ticks:{callback:v=>fmtBRLk(v)},grid:{color:'#1c2a47'}},y:{stacked:true,grid:{display:false}}}}
+  });
+}
+
+function renderTableCiclo(){
+  const dAll=filterData({skip:['mes']});
+  const map={}; const _empCi={};
+  dAll.forEach(r=>{
+    if(!map[r.hunter]) {map[r.hunter]={diffs:[],ass:0,sb:0,nNeg:0}; _empCi[r.hunter]=new Set();}
+    if(r.status==='ASSINADO'){
+      map[r.hunter].ass+=r.faturamento;
+      _empCi[r.hunter].add(r.empresa);
+      if(r.contrato==='NOVO'){ const dd=ciclo_diff(r); if(dd!==null) map[r.hunter].diffs.push(dd); }
+    } else if(r.status==='STANDBY') map[r.hunter].sb+=r.faturamento;
+  });
+  Object.keys(_empCi).forEach(h=>{map[h].nNeg = _empCi[h].size;});
+  const hunters=Object.keys(map).filter(h=>map[h].ass>0||map[h].sb>0).sort((a,b)=>(map[b].ass+map[b].sb)-(map[a].ass+map[a].sb));
+  const T={ass:0,sb:0,diffs:[]}; hunters.forEach(h=>{T.ass+=map[h].ass; T.sb+=map[h].sb; T.diffs.push(...map[h].diffs); T.nNeg=(T.nNeg||0)+map[h].nNeg;});
+  document.getElementById('tableCiclo').innerHTML = `
+    <table><thead><tr><th>Hunter</th><th class="num">Assinado</th><th class="num">Standby</th><th class="num">Conversão</th><th class="num">Tempo Médio (novos)</th><th class="num"># Negócios</th></tr></thead>
+    <tbody>${hunters.map(h=>{const r=map[h]; const t=r.ass+r.sb; const c=t>0?r.ass/t:0; const a=r.diffs.length>0?r.diffs.reduce((s,d)=>s+d,0)/r.diffs.length:null; return `<tr><td><b>${h}</b></td><td class="num" style="color:var(--green)">${fmtBRLk(r.ass)}</td><td class="num" style="color:var(--red)">${fmtBRLk(r.sb)}</td><td class="num"><b style="color:${c>=0.9?'var(--green)':c>=0.7?'var(--gold)':'var(--red)'}">${pct(c)}</b><div class="bar ${c>=0.9?'green':c<0.7?'red':''}"><span style="width:${(c*100).toFixed(0)}%"></span></div></td><td class="num">${a!==null?a.toFixed(2).replace('.',',')+' meses':'—'}</td><td class="num">${r.nNeg}</td></tr>`;}).join('')}<tr style="background:#1a2a44;font-weight:700"><td><b style="color:var(--gold)">TOTAL</b></td><td class="num" style="color:var(--green)">${fmtBRLk(T.ass)}</td><td class="num" style="color:var(--red)">${fmtBRLk(T.sb)}</td><td class="num"><b>${pct(T.ass/(T.ass+T.sb))}</b></td><td class="num">${T.diffs.length>0?(T.diffs.reduce((s,d)=>s+d,0)/T.diffs.length).toFixed(2).replace('.',',')+' meses':'—'}</td><td class="num">${T.nNeg||0}</td></tr></tbody></table>`;
+}
+
+// ============ PROCURAÇÕES ============
+function filterProcs(opts={}){const skip=opts.skip||[]; return PROCS.filter(p=>{if(!skip.includes('mes')&&state.mes!=='TODOS'&&p.mes!==state.mes) return false; if(!skip.includes('hunter')&&state.hunter!=='TODOS'&&p.hunter!==state.hunter) return false; return true;});}
+
+function renderProcKPIs(){
+  const d=filterProcs(); const novas=d.filter(p=>p.tipo==='NOVO').length; const reno=d.filter(p=>p.tipo==='RENOVAÇÃO').length; const tot=d.length;
+  document.getElementById('kp-tot').textContent=tot;
+  document.getElementById('kp-tot-sub').textContent=state.mes==='TODOS'?'Acumulado YTD':`Mês: ${state.mes}`;
+  document.getElementById('kp-novas').textContent=novas;
+  document.getElementById('kp-novas-sub').textContent=tot>0?pct(novas/tot)+' do total':'—';
+  document.getElementById('kp-reno').textContent=reno;
+  document.getElementById('kp-reno-sub').textContent=tot>0?pct(reno/tot)+' do total':'—';
+  const map={}; d.forEach(p=>{map[p.hunter]=(map[p.hunter]||0)+1;});
+  const top=Object.entries(map).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kp-top').textContent=top?top[0]:'—';
+  document.getElementById('kp-top-sub').textContent=top?`${top[1]} procurações`:'—';
+}
+
+function renderChartProcMes(){
+  destroyChart('procmes');
+  const d=filterProcs({skip:['mes']});
+  const m={NOVO:{},RENOVAÇÃO:{}}; ['JAN','FEV','MAR','ABR','MAI'].forEach(mo=>{m.NOVO[mo]=0;m.RENOVAÇÃO[mo]=0;});
+  d.forEach(p=>{if(m[p.tipo]) m[p.tipo][p.mes]=(m[p.tipo][p.mes]||0)+1;});
+  const labels=['JAN','FEV','MAR','ABR','MAI'];
+  charts.procmes = new Chart(document.getElementById('chartProcMes').getContext('2d'),{
+    type:'bar',data:{labels,datasets:[
+      {label:'Novas',data:labels.map(l=>m.NOVO[l]||0),backgroundColor:COLORS.green,borderRadius:4,stack:'s'},
+      {label:'Renovações',data:labels.map(l=>m.RENOVAÇÃO[l]||0),backgroundColor:COLORS.blue,borderRadius:4,stack:'s'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y}}},scales:{y:{stacked:true,beginAtZero:true,ticks:{precision:0},grid:{color:'#1c2a47'},title:{display:true,text:'Quantidade'}},x:{stacked:true,grid:{display:false}}}}
+  });
+}
+
+function renderChartProcHunter(){
+  destroyChart('prochunter');
+  const d=filterProcs(); const map={};
+  d.forEach(p=>{if(!map[p.hunter]) map[p.hunter]={JAN:0,FEV:0,MAR:0,ABR:0,MAI:0,total:0}; if(map[p.hunter][p.mes]!==undefined) map[p.hunter][p.mes]+=1; map[p.hunter].total+=1;});
+  const hunters=Object.keys(map).sort((a,b)=>map[b].total-map[a].total);
+  const monthsShown=state.mes==='TODOS'?['JAN','FEV','MAR','ABR','MAI']:[state.mes];
+  const cm={JAN:COLORS.gold,FEV:COLORS.blue,MAR:COLORS.green,ABR:COLORS.purple,MAI:COLORS.orange};
+  charts.prochunter = new Chart(document.getElementById('chartProcHunter').getContext('2d'),{
+    type:'bar',data:{labels:hunters,datasets:monthsShown.map(mo=>({label:mo,data:hunters.map(h=>map[h][mo]||0),backgroundColor:cm[mo],borderRadius:4,stack:'s'}))},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x}}},scales:{x:{stacked:true,beginAtZero:true,ticks:{precision:0},grid:{color:'#1c2a47'},title:{display:true,text:'Quantidade'}},y:{stacked:true,grid:{display:false}}}}
+  });
+}
+
+function renderTableProc(){
+  const d=filterProcs({skip:['mes']});
+  const map={}; d.forEach(p=>{if(!map[p.hunter]) map[p.hunter]={JAN:0,FEV:0,MAR:0,ABR:0,MAI:0,novo:0,reno:0,total:0}; if(map[p.hunter][p.mes]!==undefined) map[p.hunter][p.mes]+=1; if(p.tipo==='NOVO') map[p.hunter].novo+=1; else map[p.hunter].reno+=1; map[p.hunter].total+=1;});
+  const hunters=Object.keys(map).sort((a,b)=>map[b].total-map[a].total);
+  const T={JAN:0,FEV:0,MAR:0,ABR:0,MAI:0,novo:0,reno:0,total:0}; hunters.forEach(h=>{['JAN','FEV','MAR','ABR','MAI','novo','reno','total'].forEach(k=>T[k]+=map[h][k]);});
+  const max=Math.max(...hunters.map(h=>map[h].total),1);
+  document.getElementById('tableProc').innerHTML = `
+    <table><thead><tr><th>Hunter</th><th class="num">JAN</th><th class="num">FEV</th><th class="num">MAR</th><th class="num">ABR</th><th class="num">MAI</th><th class="num">Novas</th><th class="num">Renovações</th><th class="num">Total</th></tr></thead>
+    <tbody>${hunters.map(h=>`<tr><td><b>${h}</b></td><td class="num">${map[h].JAN||'-'}</td><td class="num">${map[h].FEV||'-'}</td><td class="num">${map[h].MAR||'-'}</td><td class="num">${map[h].ABR||'-'}</td><td class="num">${map[h].MAI||'-'}</td><td class="num" style="color:var(--green)">${map[h].novo||'-'}</td><td class="num" style="color:var(--blue)">${map[h].reno||'-'}</td><td class="num"><b>${map[h].total}</b><div class="bar blue"><span style="width:${(map[h].total/max*100).toFixed(0)}%"></span></div></td></tr>`).join('')}<tr style="background:#1a2a44;font-weight:700"><td><b style="color:var(--gold)">TOTAL</b></td><td class="num">${T.JAN}</td><td class="num">${T.FEV}</td><td class="num">${T.MAR}</td><td class="num">${T.ABR}</td><td class="num">${T.MAI}</td><td class="num" style="color:var(--green)">${T.novo}</td><td class="num" style="color:var(--blue)">${T.reno}</td><td class="num">${T.total}</td></tr></tbody></table>`;
+}
+
+// ============ APAS SHOW ============
+function renderApas(){
+  // APAS has its own page — nothing on main page
+}
+
+function renderApasPage(){
+  const d = APAS || {};
+  const hunterFilter = state.hunter !== 'TODOS' ? state.hunter : null;
+  const byH = (d.by_hunter || [])
+    .filter(x => !hunterFilter || x.hunter === hunterFilter)
+    .slice().sort((a,b) => b.fat - a.fat);
+
+  const total_fat  = hunterFilter ? byH.reduce((s,x)=>s+x.fat,0)  : (d.total_fat||0);
+  const total_cred = hunterFilter ? byH.reduce((s,x)=>s+x.cred,0) : (d.total_cred||0);
+  const empresas   = hunterFilter ? new Set((RAW.filter(r=>r.origem&&r.origem.toUpperCase().includes('APAS')&&r.hunter===hunterFilter)).map(r=>r.empresa)).size : (d.empresas||0);
+  const pendentes  = hunterFilter ? byH.reduce((s,x)=>s+x.pendentes,0) : (d.pendentes||0);
+  const proc_sim   = hunterFilter ? byH.reduce((s,x)=>s+(x.proc_sim||0),0) : (d.proc_sim||0);
+  const proc_nao   = hunterFilter ? byH.reduce((s,x)=>s+(x.proc_nao||0),0) : (d.proc_nao||0);
+  const linhas     = d.linhas || 0;
+  const proc_total = proc_sim + proc_nao;
+  const proc_pct   = proc_total > 0 ? Math.round((proc_sim / proc_total) * 100) : 0;
+
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  const badge = document.getElementById('apas-badge');
+  if(badge) badge.textContent = empresas + ' empresa' + (empresas!==1?'s':'') + (hunterFilter ? ' · ' + hunterFilter : '');
+
+  set('pkpa-fat', fmtBRLk(total_fat));
+  set('pkpa-fat-sub', linhas + ' contratos registrados');
+  set('pkpa-cred', fmtBRLk(total_cred));
+  set('pkpa-cred-sub', 'base de cálculo honorários');
+  set('pkpa-emp', empresas);
+  set('pkpa-emp-sub', 'empresas únicas' + (hunterFilter?' (hunter)':''));
+  set('pkpa-pend', pendentes);
+  set('pkpa-pend-sub', 'aguardando valor lançado');
+  set('pkpa-proc-sim', proc_sim);
+  set('pkpa-proc-sim-sub', 'habilitadas para oportunidades');
+  set('pkpa-proc-nao', proc_nao);
+  set('pkpa-proc-nao-sub', 'sem cadastro de procuração');
+  set('pkpa-proc-pct', proc_pct + '%');
+
+  // Company table
+  const apasRaw = RAW.filter(r =>
+    r.origem && r.origem.toUpperCase().includes('APAS') &&
+    (!hunterFilter || r.hunter === hunterFilter)
+  );
+  const empMap = {};
+  apasRaw.forEach(r => {
+    const key = r.empresa || '—';
+    if(!empMap[key]) empMap[key] = {empresa:key, hunter:r.hunter||'—', fat:0, cred:0, proc:r.proc_cadastrada||''};
+    empMap[key].fat  += (r.faturamento||0);
+    empMap[key].cred += (r.credito||0);
+    if((r.proc_cadastrada||'').toUpperCase()==='SIM') empMap[key].proc = 'SIM';
+  });
+  const empList = Object.values(empMap).sort((a,b) => {
+    const as = a.proc.toUpperCase()==='SIM', bs = b.proc.toUpperCase()==='SIM';
+    if(as && !bs) return -1; if(bs && !as) return 1;
+    return b.fat - a.fat;
+  });
+
+  const countEl = document.getElementById('apas-table-count');
+  if(countEl) countEl.textContent = empList.length + ' empresas' + (hunterFilter?' — '+hunterFilter:'');
+
+  const tableEl = document.getElementById('apasEmpresasTable');
+  if(tableEl) tableEl.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Empresa</th><th>Hunter</th>
+        <th class="num">Faturamento</th>
+        <th class="num">Crédito</th>
+        <th class="num">Procuração</th>
+      </tr></thead>
+      <tbody>${empList.map(e=>`<tr>
+        <td><b>${e.empresa}</b></td>
+        <td style="color:var(--muted)">${e.hunter}</td>
+        <td class="num" style="color:var(--gold)">${e.fat>0?fmtBRLk(e.fat):'<span style="color:var(--muted)">—</span>'}</td>
+        <td class="num" style="color:var(--blue)">${e.cred>0?fmtBRLk(e.cred):'<span style="color:var(--muted)">—</span>'}</td>
+        <td class="num">${e.proc.toUpperCase()==='SIM'
+          ?'<span style="color:var(--green);font-weight:700">&#10003; SIM</span>'
+          :'<span style="color:var(--red)">&#9651; NÃO</span>'}</td>
+      </tr>`).join('')}
+      <tr style="background:#1a2a44;font-weight:700">
+        <td colspan="2" style="color:var(--gold)">TOTAL — ${empList.length} empresas</td>
+        <td class="num" style="color:var(--gold)">${fmtBRLk(empList.reduce((s,e)=>s+e.fat,0))}</td>
+        <td class="num" style="color:var(--blue)">${fmtBRLk(empList.reduce((s,e)=>s+e.cred,0))}</td>
+        <td class="num"><span style="color:var(--green)">${empList.filter(e=>e.proc.toUpperCase()==='SIM').length} hab.</span> · <span style="color:var(--red)">${empList.filter(e=>e.proc.toUpperCase()!=='SIM').length} pend.</span></td>
+      </tr>
+      </tbody>
+    </table>`;
+
+  // Charts
+  destroyChart('apasfat');
+  destroyChart('apasProc');
+  const fatEl = document.getElementById('chartApasFat');
+  if(fatEl) charts.apasfat = new Chart(fatEl.getContext('2d'),{type:'bar',data:{labels:byH.map(x=>x.hunter),datasets:[{label:'Faturamento',data:byH.map(x=>x.fat),backgroundColor:COLORS.gold,borderRadius:4},{label:'Crédito',data:byH.map(x=>x.cred),backgroundColor:'rgba(93,169,255,0.35)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtBRL(c.parsed.x)}}},scales:{x:{beginAtZero:true,grid:{color:'#1c2a47'},ticks:{callback:v=>fmtBRLk(v)}},y:{grid:{display:false}}}}});
+  const procEl = document.getElementById('chartApasProc');
+  if(procEl) charts.apasProc = new Chart(procEl.getContext('2d'),{type:'doughnut',data:{labels:['Com Procuração','Sem Procuração'],datasets:[{data:[proc_sim,proc_nao],backgroundColor:[COLORS.green,COLORS.red],borderWidth:0,hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:14,padding:14}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+' emp.'}}}}});
+}
+
+function goApas(){
+  document.getElementById('page-main').style.display='none';
+  document.getElementById('page-apas').style.display='block';
+  document.getElementById('btnGoApas').style.display='none';
+  document.getElementById('btnGoMain').style.display='inline-flex';
+  window.scrollTo(0,0);
+  renderApasPage();
+}
+
+function goMain(){
+  document.getElementById('page-apas').style.display='none';
+  document.getElementById('page-main').style.display='block';
+  document.getElementById('btnGoMain').style.display='none';
+  document.getElementById('btnGoApas').style.display='inline-flex';
+  window.scrollTo(0,0);
+}
+
+function bindFilters(){
+  document.getElementById('f-mes').addEventListener('change',e=>{state.mes=e.target.value; renderAll();});
+  document.getElementById('f-hunter').addEventListener('change',e=>{
+    state.hunter=e.target.value; renderAll();
+    if(document.getElementById('page-apas').style.display!=='none') renderApasPage();
+  });
+  document.getElementById('f-uf').addEventListener('change',e=>{state.uf=e.target.value; renderAll();});
+  document.getElementById('f-origem').addEventListener('change',e=>{state.origem=e.target.value; renderAll();});
+  document.getElementById('reset').addEventListener('click',()=>{
+    state.mes='MAI';state.hunter='TODOS';state.uf='TODOS';state.origem='TODOS';
+    document.getElementById('f-mes').value='TODOS';
+    document.getElementById('f-hunter').value='TODOS';
+    document.getElementById('f-uf').value='TODOS';
+    document.getElementById('f-origem').value='TODOS';
+    renderAll();
+  });
+  document.getElementById('btnGoApas').addEventListener('click', goApas);
+  document.getElementById('btnGoMain').addEventListener('click', goMain);
+}
+
+
+
+function renderAll(){
+  renderKPIs();
+  renderChartTime();
+  renderChartOrigem();
+  renderChartStatus();
+  renderChartMeta();
+  renderChartPotencial();
+  renderUpsKPIs();
+  renderChartUpsHunter();
+  renderChartUpsMes();
+  renderTableHunter();
+  renderChartUF();
+  renderChartProduto();
+  renderTableEmpresas();
+  renderTableCidades();
+  renderCicloKPIs();
+  renderChartTempo();
+  renderChartConvHunter();
+  renderTableCiclo();
+  renderProcKPIs();
+  renderChartProcMes();
+  renderChartProcHunter();
+  renderTableProc();
+}
+
+populateFilters();
+bindFilters();
+renderAll();
+</script>
+</body>
+</html>
