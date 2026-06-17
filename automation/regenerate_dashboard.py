@@ -15,11 +15,12 @@ _MNT = _detect_sessions_root()
 if _MNT is None:
     raise RuntimeError('Nao foi possivel localizar /sessions/<id>/mnt/Indicadores Time Comercial')
 
-SOURCE_XLSX  = os.path.join(_MNT, 'Planejamento 2026', 'forescast atualizado 2026.xlsx')
+_PLANEJAMENTO_DIR = os.path.join(_MNT, 'Planejamento 2026')
 LAST_GOOD    = os.path.join(_MNT, 'Indicadores Time Comercial', 'automation', 'forescast_last_good.xlsx')
+SOURCE_XLSX  = LAST_GOOD  # fallback; _pick_source() sobrescreve isso
 OUTPUT_HTML  = os.path.join(_MNT, 'Indicadores Time Comercial', 'One_Page_Comercial_2026.html')
 LOG_FILE     = os.path.join(_MNT, 'Indicadores Time Comercial', 'automation', 'last_run.log')
-TEMPLATE     = os.path.join(_MNT, 'Indicadores Time Comercial', 'automation', 'dashboard_template.html')
+TEMPLATE     = os.path.join(_MNT, 'Indicadores Time Comercial', 'demo', 'Dashboard_Comercial_2026.html')
 
 UPS_ANUAL = {
   'RAFAEL': 2_000_000, 'HUDSON': 0, 'DIMAS': 923_000, 'HEITOR': 923_000,
@@ -221,16 +222,59 @@ def _load_workbook_resilient(path):
     raise RuntimeError('Todas as estrategias de leitura falharam e nao ha copia last-good')
 
 
+def _pick_source():
+    """Varre a pasta Planejamento 2026 e escolhe o xlsx mais recente e legivel.
+    Fallback: last_good salvo na pasta automation."""
+    import glob as _glob, datetime
+
+    candidates = []
+
+    # Varre todos os .xlsx em Planejamento 2026
+    if os.path.isdir(_PLANEJAMENTO_DIR):
+        for path in _glob.glob(os.path.join(_PLANEJAMENTO_DIR, '*.xlsx')):
+            try:
+                if not os.access(path, os.R_OK):
+                    continue
+                mtime = os.path.getmtime(path)
+                size  = os.path.getsize(path)
+                if size < 10000:  # ignora arquivos muito pequenos (placeholders)
+                    continue
+                candidates.append((path, mtime))
+            except Exception:
+                pass
+
+    # Ordena pelo mais recente
+    candidates.sort(key=lambda x: -x[1])
+
+    for path, mtime in candidates:
+        ts = datetime.datetime.fromtimestamp(mtime).strftime('%d/%m/%Y %H:%M')
+        log(f'Fonte encontrada: {os.path.basename(path)} | {ts}')
+
+    if candidates:
+        chosen = candidates[0][0]
+        log(f'Usando (mais recente): {os.path.basename(chosen)}')
+        return chosen
+
+    # Nenhum arquivo legivel em Planejamento 2026 — usa last_good
+    if os.path.exists(LAST_GOOD):
+        log('Nenhuma fonte em Planejamento 2026 acessivel. Usando last_good.')
+        return LAST_GOOD
+
+    log('ERRO: nenhum arquivo fonte encontrado.')
+    return None
+
+
 def main():
     log('=' * 60)
     log('Inicio da regeneracao')
 
-    if not os.path.exists(SOURCE_XLSX):
-        log(f'ERRO: arquivo fonte nao encontrado: {SOURCE_XLSX}')
+    chosen = _pick_source()
+    if chosen is None:
+        log('ERRO: nenhum arquivo fonte disponivel')
         sys.exit(1)
 
-    log(f'Lendo: {SOURCE_XLSX}')
-    wb = _load_workbook_resilient(SOURCE_XLSX)
+    log(f'Lendo: {chosen}')
+    wb = _load_workbook_resilient(chosen)
 
     sh = wb['FORECAST 2026']
     rows = list(sh.iter_rows(values_only=True))
@@ -245,32 +289,64 @@ def main():
     MES_NORM = {'ABRI':'ABR','MAIO':'MAI','JANEIRO':'JAN','FEVEREIRO':'FEV',
                 'MARCO':'MAR','MARÇO':'MAR','ABRIL':'ABR','JUNHO':'JUN',
                 'JULHO':'JUL','AGOSTO':'AGO','SETEMBRO':'SET','OUTUBRO':'OUT',
-                'NOVEMBRO':'NOV','DEZEMBRO':'DEZ','NAN':'','NONE':''}
+                'NOVEMBRO':'NOV','DEZEMBRO':'DEZ','NAN':'','NONE':'',
+                # abreviações já corretas (passam direto)
+                'JAN':'JAN','FEV':'FEV','MAR':'MAR','ABR':'ABR','MAI':'MAI',
+                'JUN':'JUN','JUL':'JUL','AGO':'AGO','SET':'SET','OUT':'OUT',
+                'NOV':'NOV','DEZ':'DEZ'}
+
+    # Índices com fallback para posição fixa (compatível com arquivo sem cabeçalho HUNTER)
+    CI = {
+        'HUNTER':   cols.get('HUNTER',   0),
+        'EMPRESA':  cols.get('EMPRESA',  1),
+        'REGIAO':   cols.get(REGIAO_KEY, 2),
+        'PRODUTO':  cols.get('PRODUTO',  3),
+        'CONTRATO': cols.get('CONTRATO', 4),
+        'PARCEIRO': cols.get('PARCEIRO', 5),
+        'CREDITO':  cols.get(CRED_KEY,   6),
+        'HONOR':    cols.get(HONOR_KEY,  7),
+        'FAT':      cols.get('FATURAMENTO', 8),
+        'STATUS':   cols.get('STATUS',   9),
+        'MES':      cols.get('MES',      10),
+        'MES_ASS':  cols.get('MES ASSINADO', 11),
+        'ORIGEM':   cols.get('Origem',   12),
+        'PROC':     cols.get('PROCURACAO CADASTRADA ?', cols.get('PROCURAÇÃO CADASTRADA ?', 13)),
+        'TEMP':     cols.get('TEMPERATURA', 14),
+    }
+
+    # Correcoes manuais de hunter por empresa (fonte de verdade > Excel)
+    HUNTER_OVERRIDE = {
+        'SUPER DABARRA LTDA': 'ANDERSON',
+    }
 
     records = []
     for row in data_rows:
-        if not row or row[cols.get('HUNTER',0)] is None: continue
-        hunter = str(row[cols['HUNTER']]).strip().upper()
+        if not row or len(row) <= CI['HUNTER'] or row[CI['HUNTER']] is None: continue
+        hunter = str(row[CI['HUNTER']]).strip().upper()
         hunter = {'NATALIA':'NATHALIA','THIAGO ':'THIAGO'}.get(hunter, hunter)
-        empresa = str(row[cols['EMPRESA']]).strip() if row[cols.get('EMPRESA',1)] else ''
+        empresa = str(row[CI['EMPRESA']]).strip() if CI['EMPRESA'] < len(row) and row[CI['EMPRESA']] else ''
+        if empresa in HUNTER_OVERRIDE:
+            hunter = HUNTER_OVERRIDE[empresa]
         if not empresa: continue
-        regiao   = row[cols.get(REGIAO_KEY, 2)]
-        produto  = row[cols.get('PRODUTO',3)] or 'OUTROS'
-        contrato = str(row[cols['CONTRATO']]).strip().upper() if row[cols.get('CONTRATO',4)] else 'NOVO'
+        regiao   = row[CI['REGIAO']]   if CI['REGIAO']   < len(row) else None
+        produto  = row[CI['PRODUTO']]  if CI['PRODUTO']  < len(row) else None
+        produto  = produto or 'OUTROS'
+        contrato = str(row[CI['CONTRATO']]).strip().upper() if CI['CONTRATO'] < len(row) and row[CI['CONTRATO']] else 'NOVO'
         contrato = 'NOVO' if contrato in ('','NAN','NONE') else contrato
-        parceiro = str(row[cols['PARCEIRO']]).strip().upper() if row[cols.get('PARCEIRO',5)] else 'NAO'
-        honor    = row[cols.get(HONOR_KEY, 7)] or 0
-        fat      = parse_brl(row[cols.get('FATURAMENTO', 8)])
-        cred     = parse_brl(row[cols.get(CRED_KEY, 6)])
-        status   = str(row[cols['STATUS']]).strip().upper()  if row[cols.get('STATUS',9)]  else ''
-        mes      = MES_NORM.get(str(row[cols['MES']]).strip().upper()          if row[cols.get('MES',10)]          else '', '')
-        mes_ass  = MES_NORM.get(str(row[cols['MES ASSINADO']]).strip().upper() if row[cols.get('MES ASSINADO',11)] else '', '')
-        temp     = str(row[cols['TEMPERATURA']]).strip().upper() if row[cols.get('TEMPERATURA',12)] else 'INDEFINIDA'
+        parceiro = str(row[CI['PARCEIRO']]).strip().upper() if CI['PARCEIRO'] < len(row) and row[CI['PARCEIRO']] else 'NAO'
+        honor    = row[CI['HONOR']] if CI['HONOR'] < len(row) else 0
+        honor    = honor or 0
+        fat      = parse_brl(row[CI['FAT']]    if CI['FAT']    < len(row) else None)
+        cred     = parse_brl(row[CI['CREDITO']] if CI['CREDITO'] < len(row) else None)
+        status   = str(row[CI['STATUS']]).strip().upper()  if CI['STATUS']  < len(row) and row[CI['STATUS']]  else ''
+        mes      = MES_NORM.get(str(row[CI['MES']]).strip().upper()     if CI['MES']     < len(row) and row[CI['MES']]     else '', '')
+        mes_ass  = MES_NORM.get(str(row[CI['MES_ASS']]).strip().upper() if CI['MES_ASS'] < len(row) and row[CI['MES_ASS']] else '', '')
+        temp     = str(row[CI['TEMP']]).strip().upper() if CI['TEMP'] < len(row) and row[CI['TEMP']] else 'INDEFINIDA'
         temp     = {'NAN':'INDEFINIDA','NONE':'INDEFINIDA'}.get(temp, temp)
 
         uf = get_uf(regiao); cidade = clean_city(regiao)
-        origem_raw = row[cols.get('Origem', -1)] if cols.get('Origem') is not None and cols['Origem'] < len(row) else None
-        proc_raw   = row[cols.get('PROCURAÇÃO CADASTRADA ?', -1)] if cols.get('PROCURAÇÃO CADASTRADA ?') is not None and cols['PROCURAÇÃO CADASTRADA ?'] < len(row) else None
+        origem_raw = row[CI['ORIGEM']] if CI['ORIGEM'] < len(row) else None
+        proc_raw   = row[CI['PROC']]   if CI['PROC']   < len(row) else None
         records.append({
             'hunter': hunter, 'empresa': empresa,
             'regiao': f"{cidade} / {uf}" if uf!='N/D' else cidade,
@@ -318,6 +394,7 @@ def main():
         'Procurações Mar':   {'mes':'MAR','data_start':3,'cols':{'empresa':1,'hunter':5,'proc':7}},
         'Procurações Abril': {'mes':'ABR','data_start':2,'cols':{'empresa':1,'hunter':5,'proc':6}},
         'procurações Maio':  {'mes':'MAI','data_start':2,'cols':{'empresa':1,'hunter':5,'proc':6}},
+        'Procurações de Junho': {'mes':'JUN','data_start':2,'cols':{'empresa':1,'hunter':5,'proc':6}},
     }
     procs = []
     for sn, info in sheets_info.items():
@@ -339,8 +416,9 @@ def main():
     sh_fc    = wb['FORECAST 2026']
     rows_fc  = list(sh_fc.iter_rows(values_only=True))
     cols_fc  = {h:i for i,h in enumerate(rows_fc[0]) if h}
-    origem_col = cols_fc.get('Origem')
-    proc_col   = cols_fc.get('PROCURAÇÃO CADASTRADA ?')  # coluna com SIM/vazio
+    # Usa CI já calculado (com fallbacks por posição) para consistência
+    origem_col = CI['ORIGEM']
+    proc_col   = CI['PROC']
 
     by_hunter_apas  = {}
     empresas_apas   = set()
@@ -356,11 +434,13 @@ def main():
         ov = row[origem_col] if origem_col < len(row) else None
         if not ov or 'APAS' not in str(ov).upper(): continue
         linhas_apas += 1
-        hunter  = str(row[cols_fc.get('HUNTER',0)]).strip().upper() if row[cols_fc.get('HUNTER',0)] else 'N/D'
+        hunter  = str(row[CI['HUNTER']]).strip().upper() if CI['HUNTER'] < len(row) and row[CI['HUNTER']] else 'N/D'
         hunter  = {'NATALIA':'NATHALIA','THIAGO ':'THIAGO'}.get(hunter, hunter)
-        empresa = str(row[cols_fc.get('EMPRESA',1)]).strip() if row[cols_fc.get('EMPRESA',1)] else ''
-        fat     = parse_brl(row[cols_fc.get('FATURAMENTO',8)])
-        cred    = parse_brl(row[cols_fc.get('CREDITO',6)] if cols_fc.get('CREDITO') else row[6])
+        empresa = str(row[CI['EMPRESA']]).strip() if CI['EMPRESA'] < len(row) and row[CI['EMPRESA']] else ''
+        if empresa in HUNTER_OVERRIDE:
+            hunter = HUNTER_OVERRIDE[empresa]
+        fat     = parse_brl(row[CI['FAT']]     if CI['FAT']     < len(row) else None)
+        cred    = parse_brl(row[CI['CREDITO']] if CI['CREDITO'] < len(row) else None)
         # Lê o campo direto: SIM = tem procuração
         proc_v  = row[proc_col] if proc_col is not None and proc_col < len(row) else None
         tem_proc = str(proc_v).strip().upper() == 'SIM' if proc_v else False
@@ -410,9 +490,45 @@ def main():
     }
     log(f'APAS Show: {linhas_apas} linhas · {len(empresas_apas)} empresas · Fat R$ {total_fat_apas:,.0f} · Cred R$ {total_cred_apas:,.0f} · {pendentes_apas} pendentes')
 
+    # ── Montar objeto _D para Dashboard_Comercial_2026.html ──────────
+    apas_origens = {'APAS', 'APAS SHOW', 'APAS SHOW 2026'}
+    records_d = []
+    for r in records:
+        origem_upper = str(r.get('origem', '')).strip().upper()
+        records_d.append({
+            'hunter':    r['hunter'],
+            'empresa':   r['empresa'],
+            'uf':        r['uf'],
+            'cidade':    r.get('cidade', ''),
+            'produto':   r['produto'],
+            'contrato':  r['contrato'],
+            'parceiro':  r.get('parceiro', ''),
+            'credito':   r.get('credito', 0),
+            'honorarios': r.get('honorarios', 0),
+            'fat':       r['faturamento'],
+            'status':    r['status'],
+            'mes':       r['mes'],
+            'mes_ass':   r.get('mes_assinado', ''),
+            'temp':      r.get('temperatura', ''),
+            'origem':    r.get('origem', ''),
+            'is_apas':   any(a in str(r.get('origem', '')).strip().upper() for a in ('APAS', 'APAS SHOW')),
+            'proc_ok':   str(r.get('proc_cadastrada', '')).strip().upper() == 'SIM',
+        })
+    meta_monthly = [sum(h['meta'].get(m, 0) for h in meta) for m in MONTHS]
+    meta_hunters  = {h['hunter']: [h['meta'].get(m, 0) for m in MONTHS] for h in meta}
+    ups_monthly   = [sum(h.get('meta_upsell', {}).get(m, 0) for h in meta) for m in MONTHS]
+    d_data = {
+        'records':      records_d,
+        'meta_monthly': meta_monthly,
+        'meta_hunters': meta_hunters,
+        'ups_monthly':  ups_monthly,
+        'proc_records': procs,
+    }
+
     with open(TEMPLATE, 'r', encoding='utf-8') as f:
         html = f.read()
-    html = html.replace('REPLACE_DATE',       datetime.datetime.now().strftime('%d/%m/%Y %H:%M'))
+    html = html.replace('REPLACE_DATE',    datetime.datetime.now().strftime('%d/%m/%Y %H:%M'))
+    html = html.replace('REPLACE_D_JSON',  json.dumps(d_data, ensure_ascii=False))
     html = html.replace('REPLACE_DATA_JSON',  json.dumps(records,   ensure_ascii=False))
     html = html.replace('REPLACE_META_JSON',  json.dumps(meta,      ensure_ascii=False))
     html = html.replace('REPLACE_PROCS_JSON', json.dumps(procs,     ensure_ascii=False))
@@ -422,14 +538,7 @@ def main():
         f.write(html)
 
     log(f'HTML gerado: {OUTPUT_HTML} ({os.path.getsize(OUTPUT_HTML):,} bytes)')
-    log('Fim da regeneracao - SUCESSO')
-    print(f'__STATS__: forecast={len(records)} meta={len(meta)} procs={len(procs)} html_size={os.path.getsize(OUTPUT_HTML)}', flush=True)
+    print(f'__STATS__: forecast={len(records)} meta={len(meta)} procs={len(procs)} html_size={os.path.getsize(OUTPUT_HTML)}')
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        log(f'ERRO FATAL: {e}')
-        import traceback
-        log(traceback.format_exc())
-        sys.exit(1)
+    main()

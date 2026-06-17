@@ -432,7 +432,7 @@ tbody td{padding:6px 10px;color:var(--text)}
 
 <script>
 const _D = REPLACE_D_JSON;
-const RECORDS=_D.records,META_MONTHLY=_D.meta_monthly,META_HUNTERS=_D.meta_hunters,PROC_RECORDS=_D.proc_records;
+const RECORDS=_D.records,META_MONTHLY=_D.meta_monthly,META_HUNTERS=_D.meta_hunters,UPS_MONTHLY=_D.ups_monthly||[],PROC_RECORDS=_D.proc_records;
 const MESES=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
 const MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const PAL=['#4f7fff','#20c997','#ff922b','#9775fa','#ff4d6d','#74c0fc','#ffd43b','#51cf66','#f06595','#63e6be','#a9e34b','#66d9e8'];
@@ -504,7 +504,13 @@ function agg(recs){
   if(F.hunter&&META_HUNTERS[F.hunter])meta_m=META_HUNTERS[F.hunter];
   const meta_ytd=meta_m.slice(0,ytd_i).reduce((s,v)=>s+v,0);
   const meta_anual=meta_m.reduce((s,v)=>s+v,0);
-  const ating=meta_ytd>0?fat_novo/meta_ytd:0,ating_anual=meta_anual>0?fat_total/meta_anual:0;
+  const ups_ytd=UPS_MONTHLY.slice(0,ytd_i).reduce((s,v)=>s+v,0);
+  const ups_anual=UPS_MONTHLY.reduce((s,v)=>s+v,0);
+  const meta_total_ytd=meta_ytd+ups_ytd;
+  const meta_total_anual=meta_anual+ups_anual;
+  const ating=meta_ytd>0?fat_novo/meta_ytd:0;
+  const ating_ytd_total=meta_total_ytd>0?fat_total/meta_total_ytd:0;
+  const ating_anual=meta_total_anual>0?fat_total/meta_total_anual:0;
   const byh={};
   fech.forEach(r=>{
     if(!byh[r.hunter])byh[r.hunter]={fat:0,fat_novo:0,fat_base:0,emps:new Set(),prods:new Set(),cred:0};
@@ -534,7 +540,7 @@ function agg(recs){
   apas.forEach(r=>{if(!apas_emps[r.empresa])apas_emps[r.empresa]={fat:0,cred:0,status:r.status,hunter:r.hunter,proc:r.proc_ok};apas_emps[r.empresa].fat+=r.fat;apas_emps[r.empresa].cred+=(r.credito||0);});
   const fat_parc=Object.values(byparc).reduce((s,v)=>s+v.fat,0);
   const conv=recs.length>0?fech.length/recs.length:0,ticket=emps_novo.size>0?fat_novo/emps_novo.size:0;
-  return{recs,fat_novo,fat_base,fat_total,fat_pipe,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ating,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
+  return{recs,fat_novo,fat_base,fat_total,fat_pipe,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ups_ytd,ups_anual,meta_total_ytd,meta_total_anual,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
 }
 function showTab(t){
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
@@ -548,8 +554,8 @@ function render(t){const recs=getFiltered(),d=agg(recs);rExec(d);if(t==='receita
 function rExec(d){
   si('exec-sl-right',d.emps_fech+' empresas únicas fechadas · '+RECORDS.length+' registros totais');
   const ap=(d.ating*100).toFixed(1).replace('.',',')+'%',gap=d.meta_ytd-d.fat_novo;
-  si('e1-val',brl(d.fat_novo));si('e1-sub',d.emps_novo+' empresas novas (ASSINADO)');si('e1-badge',ap+' da meta');sw('e1-fill',Math.min(d.ating*100,100));si('e1-pl',(d.ating*100).toFixed(1)+'% da meta Jan-Mai');si('e1-pr',brl(d.meta_anual));
-  si('e2-val',brl(d.fat_pipe));si('e2-sub','Em negociação ativa');si('e2-badge',Object.values(d.bytemp).reduce((s,v)=>s+v.cnt,0)+' oportunidades');sw('e2-fill',Math.min(d.fat_pipe/d.meta_anual*100,100));si('e2-pr',brl(d.fat_pipe));
+  si('e1-val',brl(d.fat_total));si('e1-sub','Nova: '+brl(d.fat_novo)+' · Upsell: '+brl(d.fat_base));si('e1-badge',ap+' meta nova');sw('e1-fill',Math.min(d.ating*100,100));si('e1-pl',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);si('e1-pr',brl(d.meta_total_anual));
+  si('e2-val',brl(d.fat_pipe));si('e2-sub','Em negociação ativa');si('e2-badge',Object.values(d.bytemp).reduce((s,v)=>s+v.cnt,0)+' oportunidades');sw('e2-fill',Math.min(d.fat_pipe/d.meta_total_anual*100,100));si('e2-pr',brl(d.fat_pipe));
   si('e3-val',brl(d.meta_ytd));si('e3-sub','Jan–'+MP[d.ytd_i-1]+' acumulado');sw('e3-fill',Math.min(d.ating*100,100));si('e3-pr',ap);
   si('e4-val',ap);si('e4-sub',gap>0?'Gap: '+brl(gap)+' faltante':'Superou em '+brl(-gap));si('e4-badge',d.ating>=1?'<span class="kc-badge up">✓ Acima da meta</span>':'<span class="kc-badge dn">▼ Abaixo do ritmo</span>');sw('e4-fill',Math.min(d.ating*100,100));si('e4-pr',brl(d.meta_anual));
   si('e5-val',(d.conv*100).toFixed(1).replace('.',',')+'%');si('e5-sub',d.emps_fech+' fechadas de '+[...new Set(d.recs.map(r=>r.empresa))].length+' abordadas');sw('e5-fill',d.conv*100);si('e5-pr',d.emps_fech+' únicos');
@@ -557,13 +563,13 @@ function rExec(d){
   si('e7-val',brl(d.fat_novo));si('e7-sub',d.emps_novo+' empresas novas');si('e7-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('e8-val',brl(d.fat_base));si('e8-sub',d.emps_base+' contratos base');si('e8-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('e9-val',brl(d.ticket));si('e9-sub','Novo: '+brl(d.emps_novo>0?d.fat_novo/d.emps_novo:0)+' · Upsell: '+brl(d.emps_base>0?d.fat_base/d.emps_base:0));
-  const atAnual=(d.ating_anual*100).toFixed(1).replace('.',',')+'%';
-  si('e10-val',atAnual);
-  si('e10-sub',brl(d.fat_total)+' de '+brl(d.meta_anual)+' meta');
-  si('e10-badge',F.hunter?F.hunter+' · '+atAnual+' da meta':'Jan–Dez 2026');
-  sw('e10-fill',Math.min(d.ating_anual*100,100));
-  si('e10-pl',atAnual+' do ano');
-  si('e10-pr',brl(d.meta_anual));
+  const atYTD=(d.ating_ytd_total*100).toFixed(1).replace('.',',')+'%';
+  si('e10-val',atYTD);
+  si('e10-sub',brl(d.fat_total)+' de '+brl(d.meta_total_ytd)+' meta Jan–'+MP[d.ytd_i-1]);
+  si('e10-badge',F.hunter?F.hunter+' · '+atYTD:'Nova+Upsell · Jan–'+MP[d.ytd_i-1]);
+  sw('e10-fill',Math.min(d.ating_ytd_total*100,100));
+  si('e10-pl',atYTD+' do YTD');
+  si('e10-pr',brl(d.meta_total_ytd));
   const m5=MESES.slice(0,Math.max(d.ytd_i,6));
   mk('ch-exec-meta',{type:'bar',data:{labels:m5.map((_,i)=>MP[i]),datasets:[{type:'bar',label:'Meta',data:m5.map((_,i)=>d.meta_m[i]||0),backgroundColor:'rgba(255,146,43,.25)',borderRadius:4,order:2},{type:'line',label:'Fechado',data:m5.map(m=>d.bym[m].novo+d.bym[m].base),borderColor:'#20c997',backgroundColor:'rgba(32,201,151,.1)',tension:.3,fill:true,pointBackgroundColor:'#20c997',pointRadius:4,borderWidth:2,order:1}]},options:{...VERT,plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10,font:{size:10}}}}}});
   const tlist=Object.entries(d.bytemp).sort((a,b)=>b[1].fat-a[1].fat);
