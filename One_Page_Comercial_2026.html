@@ -582,8 +582,8 @@ function rExec(d){
   document.getElementById('tb-top-cli').innerHTML=d.top_cli.map((c,i)=>`<tr><td><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.emp}">${c.emp}</td><td>${c.uf}</td><td class="r">${brlF(c.fat)}</td><td><span class="tag t${c.status==='ASSINADO'?'g':'p'}">${c.status==='ASSINADO'?'NOVO':'BASE'}</span></td></tr>`).join('');
 }
 function rReceita(d){
-  const pp=d.fat_novo>0?d.fat_parc/d.fat_novo:0;
-  si('r1-val',brl(d.fat_novo));si('r1-sub',d.emps_novo+' empresas novas');si('r1-badge',(d.ating*100).toFixed(1)+'% da meta Jan-Mai');
+  const pp=d.fat_total>0?d.fat_parc/d.fat_total:0;
+  si('r1-val',brl(d.fat_total));si('r1-sub','Nova: '+brl(d.fat_novo)+' · Upsell: '+brl(d.fat_base));si('r1-badge',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);
   si('r2-val',brl(d.fat_novo));si('r2-sub',d.emps_novo+' clientes novos');si('r2-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('r3-val',brl(d.fat_base));si('r3-sub',d.emps_base+' contratos base');si('r3-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('r4-val',brl(d.fat_parc));si('r4-sub',(pp*100).toFixed(0)+'% da receita ASSINADO');
