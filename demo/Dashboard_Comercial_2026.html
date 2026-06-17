@@ -678,4 +678,10 @@ function rApas(d){
   mk('ch-apas-status',{type:'doughnut',data:{labels:asl.map(([s])=>s),datasets:[{data:asl.map(([,v])=>v),backgroundColor:asl.map(([s])=>asc[s]||'#74c0fc'),borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10}}}}});
   const sa=ae.sort((a,b)=>(b[1].cred||0)-(a[1].cred||0));
   const st={'ASSINADO':'g','BASE':'p','EM ASSINATURA':'y','STANDBY':'r'}
-  document.getElementById('tb-apas').innerHTML=sa.map(([e,v],i)=>`
+  document.getElementById('tb-apas').innerHTML=sa.map(([e,v],i)=>`<tr><td>${i+1}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e}"><strong>${e}</strong></td><td>${v.hunter||'—'}</td><td><span class="tag t${st[v.status]||'r'}">${v.status||'—'}</span></td><td class="r">${brl(v.cred||0)}</td><td class="r">${brl(v.fat||0)}</td><td style="text-align:center">${v.proc?'✅':'❌'}</td></tr>`).join('');
+}
+buildFilters();
+renderAll();
+</script>
+</body>
+</html>
