@@ -613,25 +613,31 @@ function rTime(d){
   document.getElementById('hunter-cards').innerHTML=hl.map(([h,v],i)=>{const mh=hm[i],a=mh>0?v.fat_novo/mh:0,col=a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';return`<div class="kc" style="--kc:${col}"><div style="display:flex;align-items:center;justify-content:space-between"><div class="kc-lbl">${h}</div><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></div><div class="kc-val">${brl(v.fat_novo)}</div><div class="kc-sub">Base: ${brl(v.fat_base)} · ${v.emps.size} emp.</div><div class="kc-bar"><div class="kc-fill" style="width:${Math.min(a*100,100).toFixed(0)}%;background:${col}"></div></div><div class="kc-pct"><span>Meta: ${brl(mh)}</span><span>${mh>0?pf(a):'S/meta'}</span></div></div>`;}).join('');
 }
 function rProc(d){
-  const proc=PROC_RECORDS,novas=proc.filter(p=>p.tipo&&p.tipo.toUpperCase().includes('NOV')).length,renos=proc.filter(p=>p.tipo&&!p.tipo.toUpperCase().includes('NOV')).length;
+  // Helper: "NOVO"=nova, "RENOVAÇÃO"=reno — evita falso-positivo pois RENOVAÇÃO contém 'NOV'
+  const isNova=t=>t&&/^novo$/i.test(t.trim());
+  const isReno=t=>t&&/renov/i.test(t);
+  // Filtra por hunter se ativo
+  const proc=F.hunter?PROC_RECORDS.filter(p=>p.hunter===F.hunter):PROC_RECORDS;
+  const novas=proc.filter(p=>isNova(p.tipo)).length,renos=proc.filter(p=>isReno(p.tipo)).length;
   const ef=new Set(d.recs.filter(r=>r.status==='ASSINADO'||r.status==='BASE').map(r=>r.empresa));
   const ep=new Set(proc.map(p=>p.empresa));
   const sem=[...ef].filter(e=>!ep.has(e));
   const taxa=ef.size>0?(ep.size/ef.size*100).toFixed(0):0;
-  si('p1-val',proc.length);si('p1-sub','Jan–Mai 2026');
+  const mAtual=MESES[d.ytd_i-1]||MESES[5];
+  si('p1-val',proc.length);si('p1-sub','Jan–'+mAtual.charAt(0)+mAtual.slice(1).toLowerCase()+' 2026');
   si('p2-val',novas);si('p2-sub','Primeiro cadastro');si('p2-badge',proc.length>0?(novas/proc.length*100).toFixed(0)+'% do total':'');
   si('p3-val',renos);si('p3-sub',proc.length>0?(renos/proc.length*100).toFixed(0)+'% do total':'');
   si('p4-val',sem.length);si('p4-sub','Contratos sem proc. cadastrada');
   si('p5-val',taxa+'%');sw('p5-fill',+taxa);
-  const bm={};MESES.slice(0,6).forEach(m=>bm[m]={nova:0,reno:0});
-  proc.forEach(p=>{if(bm[p.mes]){if(p.tipo&&p.tipo.toUpperCase().includes('NOV'))bm[p.mes].nova++;else bm[p.mes].reno++;}});
-  const mp=MESES.slice(0,6);
+  const bm={};MESES.slice(0,d.ytd_i).forEach(m=>bm[m]={nova:0,reno:0});
+  proc.forEach(p=>{if(bm[p.mes]){if(isNova(p.tipo))bm[p.mes].nova++;else if(isReno(p.tipo))bm[p.mes].reno++;}});
+  const mp=MESES.slice(0,d.ytd_i);
   mk('ch-proc-mes',{type:'bar',data:{labels:mp.map((_,i)=>MP[i]),datasets:[{label:'Novas',data:mp.map(m=>bm[m].nova),backgroundColor:'#20c997',borderRadius:4,stack:'s'},{label:'Renovações',data:mp.map(m=>bm[m].reno),backgroundColor:'#ff922b',borderRadius:4,stack:'s'}]},options:{responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{...GRID,ticks:{color:'#8899bb',font:{size:10}}},y:{...GRID,stacked:true}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
-  const bh={};proc.forEach(p=>{if(!bh[p.hunter])bh[p.hunter]={nova:0,reno:0};if(p.tipo&&p.tipo.toUpperCase().includes('NOV'))bh[p.hunter].nova++;else bh[p.hunter].reno++;});
+  const bh={};proc.forEach(p=>{if(!bh[p.hunter])bh[p.hunter]={nova:0,reno:0};if(isNova(p.tipo))bh[p.hunter].nova++;else if(isReno(p.tipo))bh[p.hunter].reno++;});
   const ph=Object.entries(bh).sort((a,b)=>(b[1].nova+b[1].reno)-(a[1].nova+a[1].reno)).slice(0,10);
   mk('ch-proc-hunter',{type:'bar',data:{labels:ph.map(([h])=>h),datasets:[{label:'Novas',data:ph.map(([,v])=>v.nova),backgroundColor:'#20c997',borderRadius:3,stack:'s'},{label:'Renovações',data:ph.map(([,v])=>v.reno),backgroundColor:'#ff922b',borderRadius:3,stack:'s'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{stacked:true,...GRID},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
   document.getElementById('tb-proc-hunters').innerHTML=ph.map(([h,v],i)=>{const tot=v.nova+v.reno;return`<tr><td>${i+1}</td><td><strong>${h}</strong></td><td class="r">${v.nova}</td><td class="r">${v.reno}</td><td class="r"><strong>${tot}</strong></td><td class="r">${tot>0?(v.nova/tot*100).toFixed(0)+'%':'—'}</td></tr>`;}).join('');
-  document.getElementById('tb-proc-full').innerHTML=proc.slice(0,120).map(p=>`<tr><td class="b-text">${p.mes}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.empresa}"><strong>${p.empresa}</strong></td><td>${p.hunter}</td><td><span class="tag t${p.tipo&&p.tipo.toUpperCase().includes('NOV')?'g':'b'}">${p.tipo?p.tipo.slice(0,12):'—'}</span></td></tr>`).join('');
+  document.getElementById('tb-proc-full').innerHTML=proc.slice(0,120).map(p=>`<tr><td class="b-text">${p.mes}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.empresa}"><strong>${p.empresa}</strong></td><td>${p.hunter}</td><td><span class="tag t${isNova(p.tipo)?'g':isReno(p.tipo)?'b':'n'}">${p.tipo?p.tipo.slice(0,12):'—'}</span></td></tr>`).join('');
 }
 function rClientes(d){
   const emps=Object.entries(d.empprod),tot_e=emps.length,xsi=tot_e>0?emps.reduce((s,[,v])=>s+v.prods.size,0)/tot_e:0;
@@ -672,4 +678,4 @@ function rApas(d){
   mk('ch-apas-status',{type:'doughnut',data:{labels:asl.map(([s])=>s),datasets:[{data:asl.map(([,v])=>v),backgroundColor:asl.map(([s])=>asc[s]||'#74c0fc'),borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10}}}}});
   const sa=ae.sort((a,b)=>(b[1].cred||0)-(a[1].cred||0));
   const st={'ASSINADO':'g','BASE':'p','EM ASSINATURA':'y','STANDBY':'r'}
-  document.getElementById('tb-apas').innerHTML=sa.map(([e,v],i)=>`<tr><td>${i+1}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e}">${e}</td><td>${v.hunter||'—'}</td><td><span class="tag t${st[v.status]||'r'}">${v.status||'—'}</span></td><td class="r">${brl(v.cred||0)}</td><td class="r">${brl(v.f
+  document.getElementById('tb-apas').innerHTML=sa.map(([e,v],i)=>`
