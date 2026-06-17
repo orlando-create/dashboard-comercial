@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategicos Core Comercial 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0f14;--bg2:#12151e;--bg3:#181c28;--card:#1c2030;--card2:#232840;
+  --border:#252d45;--accent:#4f7fff;--accent2:#7c5cfc;--green:#2ecc71;
+  --red:#ff4d6d;--yellow:#ffd43b;--orange:#ff922b;--purple:#9775fa;
+  --blue:#74c0fc;--teal:#20c997;--text:#e2e8f4;--text2:#8899bb;--text3:#4a5878;
+  --shadow:0 8px 32px rgba(0,0,0,.5);--r:10px;--r2:6px;
+}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.4}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* TOPBAR */
+#topbar{display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;min-height:52px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:50}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-right:4px}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:7px;display:grid;place-items:center;font-size:14px}
+.logo-name{font-weight:800;font-size:13px;letter-spacing:-.2px}.logo-name em{color:var(--accent);font-style:normal}
+.sep{width:1px;height:26px;background:var(--border);flex-shrink:0}
+.filters{display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;padding:2px 0}
+.filters::-webkit-scrollbar{height:0}
+.fg{display:flex;flex-direction:column;gap:1px;min-width:84px}
+.fg label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.fg select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 20px 4px 7px;border-radius:5px;font-size:11px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234a5878'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;transition:.15s}
+.fg select:focus{outline:none;border-color:var(--accent)}
+.top-btns{display:flex;gap:5px;flex-shrink:0;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:.15s;white-space:nowrap}
+.btn-g{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-g:hover{background:var(--bg3);color:var(--text)}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{filter:brightness(1.15)}
+.btn-apas{background:linear-gradient(135deg,#f59f00,#e8590c);color:#fff;font-weight:800}.btn-apas:hover{filter:brightness(1.1)}
+.live{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--teal);font-weight:700;flex-shrink:0}
+.dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TABBAR */
+#tabbar{display:flex;align-items:center;gap:0;padding:0 16px;height:40px;min-height:40px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
+#tabbar::-webkit-scrollbar{height:0}
+.tab{display:flex;align-items:center;gap:5px;padding:0 14px;height:40px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s}
+.tab:hover{color:var(--text2);background:rgba(255,255,255,.03)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .ti{font-size:13px}
+
+/* PANELS */
+#content{flex:1;overflow:hidden}
+.panel{display:none;height:100%;overflow-y:auto;padding:16px;gap:14px;flex-direction:column}
+.panel.on{display:flex}
+
+/* SECTION LABEL */
+.sl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:6px;margin-bottom:-2px}
+.sl::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px}
+.sl-row{display:flex;align-items:center;justify-content:space-between}
+
+/* KPI GRID */
+.kg{display:grid;gap:10px}
+.kg-5{grid-template-columns:repeat(5,1fr)}
+.kg-4{grid-template-columns:repeat(4,1fr)}
+.kg-3{grid-template-columns:repeat(3,1fr)}
+
+/* KPI CARD */
+.kc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden;transition:.2s}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--accent))}
+.kc:hover{border-color:var(--kc,var(--accent));transform:translateY(-1px);box-shadow:var(--shadow)}
+.kc-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.kc-val{font-size:21px;font-weight:800;line-height:1;margin:5px 0 2px;color:var(--text)}
+.kc-sub{font-size:10px;color:var(--text2)}
+.kc-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700;margin-top:5px}
+.up{background:rgba(46,204,113,.12);color:var(--green)}
+.dn{background:rgba(255,77,109,.12);color:var(--red)}
+.warn{background:rgba(255,212,59,.12);color:var(--yellow)}
+.neu{background:rgba(116,192,252,.12);color:var(--blue)}
+.kc-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden}
+.kc-fill{height:100%;border-radius:2px;background:var(--kc,var(--accent));transition:width .7s ease}
+.kc-pct{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:3px}
+
+/* CHART CARDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:14px}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.cc.full{grid-column:1/-1}
+.cc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cc-title{font-size:11px;font-weight:700;color:var(--text);letter-spacing:-.1px}
+.cc-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.leg{display:flex;gap:8px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text2)}
+.ld{width:8px;height:8px;border-radius:2px}
+.cw{position:relative;flex:1}.cw canvas{max-height:210px}
+.cw.t canvas{max-height:260px}
+.cw.s canvas{max-height:160px}
+
+/* FUNNEL */
+.funnel{display:flex;flex-direction:column;gap:5px;flex:1;justify-content:center}
+.fs{display:flex;align-items:center;gap:8px}
+.fl{width:82px;font-size:10px;color:var(--text2);text-align:right;flex-shrink:0}
+.fo{flex:1;background:var(--bg3);border-radius:4px;height:28px;overflow:hidden}
+.ff{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap}
+.fv{width:100px;font-size:10px;color:var(--text);text-align:right;flex-shrink:0}
+.fc{width:32px;font-size:9px;color:var(--text3);text-align:right;flex-shrink:0}
+
+/* TABLE */
+.tw{overflow:auto;border-radius:var(--r2);border:1px solid var(--border)}
+.tw.h220{max-height:220px}.tw.h260{max-height:260px}.tw.h300{max-height:300px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{background:var(--bg3);padding:7px 10px;text-align:left;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:1}
+th.r,td.r{text-align:right}
+tbody tr{border-bottom:1px solid rgba(37,45,69,.5);transition:.1s}
+tbody tr:hover{background:var(--bg3)}
+tbody td{padding:6px 10px;color:var(--text)}
+.rn{width:22px;height:22px;background:var(--bg3);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3)}
+.rn.g{background:rgba(255,212,59,.12);color:var(--yellow)}
+.rn.s{background:rgba(116,192,252,.12);color:var(--blue)}
+.rn.b{background:rgba(255,146,43,.12);color:var(--orange)}
+.tag{display:inline-flex;align-items:center;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:700}
+.tg{background:rgba(46,204,113,.12);color:var(--green)}
+.tr{background:rgba(255,77,109,.12);color:var(--red)}
+.ty{background:rgba(255,212,59,.12);color:var(--yellow)}
+.tb{background:rgba(116,192,252,.12);color:var(--blue)}
+.tp{background:rgba(151,117,250,.12);color:var(--purple)}
+.tgr{background:rgba(74,88,120,.2);color:var(--text3)}
+.to{background:rgba(255,146,43,.12);color:var(--orange)}
+.pbi{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-left:5px}
+.pbif{height:100%;border-radius:2px;background:var(--accent)}
+.g-text{color:var(--green);font-weight:600}
+.r-text{color:var(--red)}
+.y-text{color:var(--yellow)}
+.b-text{color:var(--blue)}
+.p-text{color:var(--purple)}
+.a-text{color:var(--accent)}
+
+/* MATRIX */
+.mx{position:relative;flex:1;min-height:220px}
+.mx-dot{position:absolute;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;cursor:pointer;transform:translate(-50%,-50%);transition:.2s;border:2px solid rgba(255,255,255,.1)}
+.mx-dot:hover{transform:translate(-50%,-50%) scale(1.4);z-index:10}
+.mx-ax{position:absolute;background:var(--border)}
+.mx-ax.h{left:36px;right:0;height:1px;bottom:24px}
+.mx-ax.v{top:0;bottom:24px;width:1px;left:36px}
+.mx-ql{position:absolute;font-size:8px;font-weight:700;padding:2px 5px;background:var(--bg3);border-radius:3px}
+
+/* ALERTS */
+.al-list{display:flex;flex-direction:column;gap:5px;flex:1;overflow:auto}
+.al{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:7px;border-left:3px solid var(--red)}
+.al.w{border-left-color:var(--yellow)}
+.al.i{border-left-color:var(--blue)}
+.al-icon{font-size:14px;flex-shrink:0}
+.al-t{flex:1;font-size:11px}
+.al-t strong{display:block;color:var(--text);font-size:11px}
+.al-t span{color:var(--text3);font-size:10px}
+.al-b{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;flex-shrink:0}
+.al-b.r{background:rgba(255,77,109,.12);color:var(--red)}
+.al-b.y{background:rgba(255,212,59,.12);color:var(--yellow)}
+
+/* APAS HEADER */
+.apas-hdr{background:linear-gradient(135deg,rgba(245,159,0,.12),rgba(232,89,12,.08));border:1px solid rgba(245,159,0,.25);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:12px}
+.apas-badge{background:linear-gradient(135deg,#f59f00,#e8590c);border-radius:6px;padding:5px 11px;font-size:11px;font-weight:800;color:#fff;letter-spacing:.3px;flex-shrink:0}
+.apas-ti h2{font-size:15px;font-weight:800;color:var(--text)}
+.apas-ti p{font-size:10px;color:var(--text3);margin-top:1px}
+.apas-stat{text-align:right;flex-shrink:0}
+.apas-stat big{font-size:22px;font-weight:800;color:#f59f00;display:block}
+.apas-stat small{font-size:10px;color:var(--text3)}
+
+/* RESPONSIVE */
+@media(max-width:1200px){.kg-5{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.kg-5,.kg-4,.kg-3{grid-template-columns:repeat(2,1fr)}.g2,.g3,.g21,.g12{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div id="shell">
+
+<header id="topbar">
+  <div class="logo">
+    <div class="logo-mark">📊</div>
+    <div class="logo-name"><em>Strategicos</em> Core Comercial</div>
+  </div>
+  <div class="sep"></div>
+  <div class="filters" id="filterRow">
+    <div class="fg"><label>Mês</label>
+      <select id="f-mes" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="fg"><label>Hunter</label>
+      <select id="f-hunter" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="fg"><label>Estado (UF)</label>
+      <select id="f-uf" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="fg"><label>Status</label>
+      <select id="f-status" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option value="fechado">Fechado (Ass+Base)</option>
+        <option value="assinado">Assinado (Novo)</option>
+        <option value="base">Base (Recorrente)</option>
+        <option value="pipeline">Pipeline</option>
+      </select></div>
+    <div class="fg"><label>Produto</label>
+      <select id="f-produto" onchange="applyFilters()"><option value="">Todos</option></select></div>
+  </div>
+  <div class="sep"></div>
+  <div class="top-btns">
+    <div class="live"><div class="dot"></div><span id="rec-count">— registros</span></div>
+    <button class="btn btn-g" onclick="clearFilters()">↺ Limpar</button>
+    <button class="btn btn-g">⬇ Exportar</button>
+    <button class="btn btn-apas" onclick="showTab('apas')">🏆 APAS SHOW</button>
+  </div>
+</header>
+
+<nav id="tabbar">
+  <div class="tab on" onclick="showTab('exec')" data-t="exec"><span class="ti">⚡</span>Visão Executiva</div>
+  <div class="tab" onclick="showTab('receita')" data-t="receita"><span class="ti">💰</span>Receita &amp; Performance</div>
+  <div class="tab" onclick="showTab('time')" data-t="time"><span class="ti">👥</span>Performance do Time</div>
+  <div class="tab" onclick="showTab('proc')" data-t="proc"><span class="ti">📋</span>Procurações</div>
+  <div class="tab" onclick="showTab('clientes')" data-t="clientes"><span class="ti">🏢</span>Clientes</div>
+  <div class="tab" onclick="showTab('apas')" data-t="apas"><span class="ti">🏆</span>APAS Show</div>
+</nav>
+
+<main id="content">
+
+<div class="panel on" id="p-exec">
+  <div class="sl-row">
+    <div class="sl" id="exec-sl">KPIs Principais · Jan–Mai 2026</div>
+    <div style="font-size:10px;color:var(--text3)" id="exec-sl-right">—</div>
+  </div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:var(--teal)">
+      <div class="kc-lbl">💵 Faturamento Fechado</div>
+      <div class="kc-val" id="e1-val">—</div>
+      <div class="kc-sub" id="e1-sub">—</div>
+      <span class="kc-badge up" id="e1-badge">—</span>
+      <div class="kc-bar"><div class="kc-fill" id="e1-fill" style="width:0%"></div></div>
+      <div class="kc-pct"><span id="e1-pl">—</span><span id="e1-pr">—</span></div>
+    </div>
+    <div class="kc" style="--kc:var(--accent)">
+      <div class="kc-lbl">🎯 Forecast (Pipeline)</div>
+      <div class="kc-val" id="e2-val">—</div>
+      <div class="kc-sub" id="e2-sub">—</div>
+      <span class="kc-badge neu" id="e2-badge">—</span>
+      <div class="kc-bar"><div class="kc-fill" id="e2-fill" style="width:0%"></div></div>
+      <div class="kc-pct"><span>Pipeline ativo</span><span id="e2-pr">—</span></div>
+    </div>
+    <div class="kc" style="--kc:var(--orange)">
+      <div class="kc-lbl">📌 Meta Consolidada</div>
+      <div class="kc-val" id="e3-val">—</div>
+      <div class="kc-sub" id="e3-sub">—</div>
+      <span class="kc-badge warn" id="e3-badge">Jan–Mai 2026</span>
+      <div class="kc-bar"><div class="kc-fill" id="e3-fill" style="width:0%;background:var(--orange)"></div></div>
+      <div class="kc-pct"><span>Atingimento acum.</span><span id="e3-pr">—</span></div>
+    </div>
+    <div class="kc" style="--kc:var(--green)">
+      <div class="kc-lbl">🏁 Atingimento</div>
+      <div class="kc-val g-text" id="e4-val">—</div>
+      <div class="kc-sub" id="e4-sub">—</div>
+      <div id="e4-badge">—</div>
+      <div class="kc-bar"><div class="kc-fill" id="e4-fill" style="width:0%;background:var(--green)"></div></div>
+      <div class="kc-pct"><span>Meta anual</span><span id="e4-pr">—</span></div>
+    </div>
+    <div class="kc" style="--kc:var(--purple)">
+      <div class="kc-lbl">🔄 Conversão</div>
+      <div class="kc-val" id="e5-val">—</div>
+      <div class="kc-sub" id="e5-sub">—</div>
+      <span class="kc-badge up">Empresa única</span>
+      <div class="kc-bar"><div class="kc-fill" id="e5-fill" style="width:0%;background:var(--purple)"></div></div>
+      <div class="kc-pct"><span>Fechadas/total</span><span id="e5-pr">—</span></div>
+    </div>
+  </div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📈 MRR Estimado</div><div class="kc-val" id="e6-val">—</div><div class="kc-sub" id="e6-sub">—</div><span class="kc-badge up">5 meses</span></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🆕 Receita Nova</div><div class="kc-val" id="e7-val">—</div><div class="kc-sub" id="e7-sub">—</div><span class="kc-badge neu" id="e7-badge">Contratos NOVO</span></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🔁 Receita Base (Upsell)</div><div class="kc-val" id="e8-val">—</div><div class="kc-sub" id="e8-sub">—</div><span class="kc-badge warn" id="e8-badge">Contratos UPSELL</span></div>
+    <div class="kc" style="--kc:var(--blue)"><div class="kc-lbl">🎟 Ticket Médio</div><div class="kc-val" id="e9-val">—</div><div class="kc-sub" id="e9-sub">—</div><span class="kc-badge up">Por empresa única</span></div>
+    <div class="kc" style="--kc:var(--green)">
+      <div class="kc-lbl">📊 YTD — Meta × Realizado</div>
+      <div class="kc-val g-text" id="e10-val">—</div>
+      <div class="kc-sub" id="e10-sub">—</div>
+      <span class="kc-badge up" id="e10-badge">Jan–Dez 2026</span>
+      <div class="kc-bar"><div class="kc-fill" id="e10-fill" style="width:0%;background:var(--green)"></div></div>
+      <div class="kc-pct"><span id="e10-pl">—</span><span id="e10-pr">—</span></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="cc">
+      <div class="cc-head">
+        <div><div class="cc-title">📅 Fechado × Meta — Mês a Mês</div><div class="cc-sub">Faturamento acumulado Jan–Mai 2026</div></div>
+        <div class="leg"><div class="li"><div class="ld" style="background:var(--teal)"></div>Fechado</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Meta</div></div>
+      </div>
+      <div class="cw"><canvas id="ch-exec-meta"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">🌊 Pipeline Ativo</div><div class="cc-sub">Temperatura · Empresas únicas</div></div></div>
+      <div class="cw t"><canvas id="ch-exec-temp"></canvas></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">🏆 Resultado por Hunter</div><div class="cc-sub">Meta × Realizado · R$ mil</div></div><div class="leg"><div class="li"><div class="ld" style="background:var(--teal)"></div>Fechado</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Meta</div></div></div>
+      <div class="cw t"><canvas id="ch-exec-hunters"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">🔥 Pipeline por Temperatura</div><div class="cc-sub">Empresas únicas no funil ativo</div></div></div>
+      <div class="cw t"><canvas id="ch-exec-pipe-temp"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head"><div><div class="cc-title">⭐ Top 10 Clientes</div><div class="cc-sub">Por faturamento · 2026</div></div></div>
+      <div class="tw h260"><table><thead><tr><th>#</th><th>Cliente</th><th>UF</th><th class="r">Faturamento</th><th>Tipo</th></tr></thead><tbody id="tb-top-cli"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-receita">
+  <div class="sl">Receita &amp; Performance Comercial · 2026</div>
+  <div class="kg kg-4">
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">💰 Receita Total</div><div class="kc-val" id="r1-val">—</div><div class="kc-sub" id="r1-sub">—</div><span class="kc-badge up" id="r1-badge">—</span></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🆕 Receita Nova</div><div class="kc-val" id="r2-val">—</div><div class="kc-sub" id="r2-sub">—</div><span class="kc-badge neu" id="r2-badge">—</span></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🔁 Receita Base</div><div class="kc-val" id="r3-val">—</div><div class="kc-sub" id="r3-sub">—</div><span class="kc-badge warn" id="r3-badge">—</span></div>
+    <div class="kc" style="--kc:var(--purple)"><div class="kc-lbl">🤝 Via Parceiros</div><div class="kc-val" id="r4-val">—</div><div class="kc-sub" id="r4-sub">—</div><span class="kc-badge up" id="r4-badge">—</span></div>
+  </div>
+  <div class="kg kg-3">
+    <div class="kc" style="--kc:var(--blue)"><div class="kc-lbl">🎟 Ticket Médio</div><div class="kc-val" id="r5-val">—</div><div class="kc-sub" id="r5-sub">—</div></div>
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">💳 Crédito Identificado</div><div class="kc-val" id="r6-val">—</div><div class="kc-sub" id="r6-sub">—</div></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🔄 MRR Estimado</div><div class="kc-val" id="r7-val">—</div><div class="kc-sub" id="r7-sub">—</div></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📅 Meta × Realizado Mensal</div></div><div class="leg"><div class="li"><div class="ld" style="background:var(--teal)"></div>Fechado</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Meta</div></div></div><div class="cw t"><canvas id="ch-rec-meta"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📦 Receita por Produto</div><div class="cc-sub">Ranking · R$ mil</div></div></div><div class="cw t"><canvas id="ch-rec-prod"></canvas></div></div>
+  </div>
+  <div class="g3">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">👤 Receita por Hunter</div></div></div><div class="cw t"><canvas id="ch-rec-hunter"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🌎 Receita por Estado</div></div></div><div class="cw t"><canvas id="ch-rec-uf"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🔗 Ranking Parceiros</div></div></div><div class="tw h260"><table><thead><tr><th>#</th><th>Parceiro</th><th class="r">Receita</th><th class="r">Clientes</th><th class="r">Ticket</th></tr></thead><tbody id="tb-parceiros"></tbody></table></div></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🧩 Novo × Base (Upsell)</div></div></div><div class="cw"><canvas id="ch-rec-mix"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🏷 Mix de Produtos</div></div></div><div class="tw h220"><table><thead><tr><th>Produto</th><th class="r">Qtd</th><th class="r">Receita</th><th class="r">Part.%</th></tr></thead><tbody id="tb-mix-prod"></tbody></table></div></div>
+  </div>
+</div>
+
+<div class="panel" id="p-time">
+  <div class="sl" id="time-sl">Performance do Time Comercial · Mai 2026</div>
+  <div class="kg kg-4">
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">👥 Hunters Ativos</div><div class="kc-val" id="t1-val">—</div><div class="kc-sub" id="t1-sub">—</div></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🥇 Top Hunter</div><div class="kc-val" id="t2-val">—</div><div class="kc-sub" id="t2-sub">—</div><span class="kc-badge up" id="t2-badge">—</span></div>
+    <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Acima de 100%</div><div class="kc-val" id="t3-val">—</div><div class="kc-sub" id="t3-sub">—</div></div>
+    <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">⚠ Em Atenção (&lt;70%)</div><div class="kc-val" id="t4-val">—</div><div class="kc-sub" id="t4-sub">—</div></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🏆 Ranking Hunter — Meta × Realizado</div></div><div class="leg"><div class="li"><div class="ld" style="background:var(--teal)"></div>Fechado</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Meta</div></div></div><div class="cw t"><canvas id="ch-time-rank"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📦 Mix Novo × Base por Hunter</div></div></div><div class="cw t"><canvas id="ch-time-mix"></canvas></div></div>
+  </div>
+  <div class="cc full"><div class="cc-head"><div><div class="cc-title">📊 Detalhamento Completo por Hunter</div></div></div>
+    <div class="tw h260"><table><thead><tr><th>#</th><th>Hunter</th><th class="r">Realizado Novo</th><th class="r">Base</th><th class="r">Meta YTD</th><th class="r">Ating.</th><th class="r">Empresas</th><th class="r">Produtos</th><th>Progresso</th></tr></thead><tbody id="tb-hunters"></tbody></table></div>
+  </div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">🃏 Cards Individuais · Hunters</div></div></div>
+    <div id="hunter-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:4px"></div>
+  </div>
+</div>
+
+<div class="panel" id="p-proc">
+  <div class="sl">Controle de Procurações · Jan–Mai 2026</div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Total Procurações</div><div class="kc-val" id="p1-val">—</div><div class="kc-sub" id="p1-sub">—</div></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🆕 Novas</div><div class="kc-val" id="p2-val">—</div><div class="kc-sub" id="p2-sub">—</div><span class="kc-badge up" id="p2-badge">—</span></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🔁 Renovações</div><div class="kc-val" id="p3-val">—</div><div class="kc-sub" id="p3-sub">—</div></div>
+    <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">⚠ Sem Procuração</div><div class="kc-val r-text" id="p4-val">—</div><div class="kc-sub" id="p4-sub">—</div><span class="kc-badge dn">Ação necessária</span></div>
+    <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Taxa Proc./Contrato</div><div class="kc-val g-text" id="p5-val">—</div><div class="kc-sub">Meta: 95%</div><div class="kc-bar"><div class="kc-fill" id="p5-fill" style="width:0%;background:var(--green)"></div></div></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📅 Procurações Mês a Mês</div><div class="cc-sub">Novas × Renovadas</div></div><div class="leg"><div class="li"><div class="ld" style="background:var(--accent)"></div>Novas</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Renovadas</div></div></div><div class="cw t"><canvas id="ch-proc-mes"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">👤 Procurações por Hunter</div></div></div><div class="cw t"><canvas id="ch-proc-hunter"></canvas></div></div>
+  </div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">📊 Ranking Hunters — Procurações</div></div></div>
+    <div class="tw h220"><table><thead><tr><th>#</th><th>Hunter</th><th class="r">Novas</th><th class="r">Renovações</th><th class="r">Total</th><th class="r">% Novas</th></tr></thead><tbody id="tb-proc-hunters"></tbody></table></div>
+  </div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">📋 Lista Completa · Procurações</div></div></div>
+    <div class="tw h260"><table><thead><tr><th>Mês</th><th>Empresa</th><th>Hunter</th><th>Tipo</th></tr></thead><tbody id="tb-proc-full"></tbody></table></div>
+  </div>
+</div>
+
+<div class="panel" id="p-clientes">
+  <div class="sl">Base de Clientes · Análise 360° · Empresa Única</div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">🏢 Empresas Únicas</div><div class="kc-val" id="c1-val">—</div><div class="kc-sub" id="c1-sub">—</div></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🆕 Empresas Novas</div><div class="kc-val" id="c2-val">—</div><div class="kc-sub" id="c2-sub">—</div><span class="kc-badge neu" id="c2-badge">—</span></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">♻ Base (Upsell)</div><div class="kc-val" id="c3-val">—</div><div class="kc-sub" id="c3-sub">—</div><span class="kc-badge warn" id="c3-badge">—</span></div>
+    <div class="kc" style="--kc:var(--blue)"><div class="kc-lbl">💵 Receita/Empresa</div><div class="kc-val" id="c4-val">—</div><div class="kc-sub" id="c4-sub">—</div></div>
+    <div class="kc" style="--kc:var(--purple)"><div class="kc-lbl">📦 Produtos/Empresa</div><div class="kc-val" id="c5-val">—</div><div class="kc-sub" id="c5-sub">—</div><span class="kc-badge warn">Cross-sell index</span></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📊 Curva ABC · Análise 80/20</div><div class="cc-sub">Concentração de receita por empresa</div></div></div><div class="cw t"><canvas id="ch-cli-abc"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🌎 Empresas por Estado</div></div></div><div class="cw t"><canvas id="ch-cli-uf"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">👤 Empresas por Hunter</div></div></div><div class="cw"><canvas id="ch-cli-hunter"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🔄 Cross-sell · Produtos por Empresa</div></div></div><div class="cw"><canvas id="ch-cli-cross"></canvas></div></div>
+  </div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">🏆 Ranking Empresas · Curva ABC</div></div></div>
+    <div class="tw h260"><table><thead><tr><th>#</th><th>Curva</th><th>Empresa</th><th>UF</th><th>Hunter</th><th class="r">Faturamento</th><th class="r">Produtos</th><th class="r">Part.%</th></tr></thead><tbody id="tb-cli-rank"></tbody></table></div>
+  </div>
+</div>
+
+<div class="panel" id="p-apas">
+  <div class="apas-hdr">
+    <div class="apas-badge">🏆 APAS SHOW 2026</div>
+    <div class="apas-ti"><h2>Painel APAS Show — Resultados &amp; Procurações</h2><p>Feira de negócios · Edição 2026 · Dados consolidados</p></div>
+    <div style="flex:1"></div>
+    <div class="apas-stat"><big id="apas-emps-count">—</big><small>empresas visitadas</small></div>
+    <div class="apas-stat" style="margin-left:20px"><big id="apas-proc-pct" style="color:var(--teal)">—</big><small>alcance de procuração</small></div>
+  </div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:#f59f00"><div class="kc-lbl">💵 Faturamento Direto</div><div class="kc-val" style="color:#f59f00" id="a1-val">—</div><div class="kc-sub" id="a1-sub">—</div></div>
+    <div class="kc" style="--kc:#e8590c"><div class="kc-lbl">📊 Crédito Total</div><div class="kc-val" id="a2-val">—</div><div class="kc-sub" id="a2-sub">—</div></div>
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">🏢 Empresas Únicas</div><div class="kc-val" id="a3-val">—</div><div class="kc-sub" id="a3-sub">—</div></div>
+    <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Com Procuração</div><div class="kc-val g-text" id="a4-val">—</div><div class="kc-sub" id="a4-sub">—</div><div class="kc-bar"><div class="kc-fill" id="a4-fill" style="width:0%;background:var(--green)"></div></div></div>
+    <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">❌ Sem Procuração</div><div class="kc-val r-text" id="a5-val">—</div><div class="kc-sub" id="a5-sub">—</div><span class="kc-badge dn">Ação urgente</span></div>
+  </div>
+  <div class="g3">
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">👤 Faturamento por Hunter</div></div></div><div class="cw t"><canvas id="ch-apas-hunter"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🆕 Novo × Upsell</div></div></div><div class="cw t"><canvas id="ch-apas-mix"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📦 Status das Empresas APAS</div></div></div><div class="cw t"><canvas id="ch-apas-status"></canvas></div></div>
+  </div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">🏢 Ranking Completo — APAS Show 2026</div></div></div>
+    <div class="tw h300"><table><thead><tr><th>#</th><th>Empresa</th><th>Hunter</th><th>Status</th><th class="r">Crédito</th><th class="r">Faturamento</th><th>Procuração</th></tr></thead><tbody id="tb-apas"></tbody></table></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const _D = REPLACE_D_JSON;
+const RECORDS=_D.records,META_MONTHLY=_D.meta_monthly,META_HUNTERS=_D.meta_hunters,PROC_RECORDS=_D.proc_records;
+const MESES=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const MP=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const PAL=['#4f7fff','#20c997','#ff922b','#9775fa','#ff4d6d','#74c0fc','#ffd43b','#51cf66','#f06595','#63e6be','#a9e34b','#66d9e8'];
+Chart.defaults.font.size=10;Chart.defaults.color='#4a5878';Chart.defaults.borderColor='#1c2332';
+const GRID={grid:{color:'rgba(28,35,50,.8)'},ticks:{color:'#4a5878'}};
+const TTP={backgroundColor:'#232840',borderColor:'#252d45',borderWidth:1,titleColor:'#e2e8f4',bodyColor:'#8899bb',padding:10,cornerRadius:7};
+const BASE={responsive:true,maintainAspectRatio:true,animation:{duration:400},plugins:{legend:{display:false},tooltip:TTP}};
+const HORZ={...BASE,indexAxis:'y',scales:{x:{...GRID},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}}};
+const VERT={...BASE,scales:{x:{...GRID,ticks:{color:'#8899bb',font:{size:10}}},y:{...GRID,ticks:{callback:v=>brl(v),color:'#4a5878'}}}};
+const charts={};
+function mk(id,cfg){const c=document.getElementById(id);if(!c)return;if(charts[id])charts[id].destroy();charts[id]=new Chart(c,cfg);}
+const brl=v=>{v=v||0;if(Math.abs(v)>=1e6)return'R$'+(v/1e6).toFixed(1).replace('.',',')+' Mi';if(Math.abs(v)>=1e3)return'R$'+(v/1e3).toFixed(0)+' K';return'R$'+Math.round(v);};
+const brlF=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(v||0);
+const pf=v=>((v||0)*100).toFixed(1).replace('.',',')+'%';
+const si=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h;};
+const sw=(id,w)=>{const e=document.getElementById(id);if(e)e.style.width=Math.min(Math.max(w,0),100)+'%';};
+let F={hunter:'',mes:'',uf:'',status:'',produto:''};
+function buildFilters(){
+  const add=(id,vals)=>vals.forEach(v=>{const o=document.createElement('option');o.value=o.textContent=v;document.getElementById(id).appendChild(o);});
+  add('f-hunter',[...new Set(RECORDS.map(r=>r.hunter))].filter(Boolean).sort());
+  add('f-mes',MESES);
+  add('f-uf',[...new Set(RECORDS.map(r=>r.uf))].filter(u=>u&&u!='XX').sort());
+  add('f-produto',[...new Set(RECORDS.map(r=>r.produto))].filter(Boolean).sort());
+}
+function applyFilters(){
+  F.hunter=document.getElementById('f-hunter').value;
+  F.mes=document.getElementById('f-mes').value;
+  F.uf=document.getElementById('f-uf').value;
+  F.status=document.getElementById('f-status').value;
+  F.produto=document.getElementById('f-produto').value;
+  renderAll();
+}
+function clearFilters(){
+  F={hunter:'',mes:'',uf:'',status:'',produto:''};
+  ['f-hunter','f-mes','f-uf','f-status','f-produto'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+}
+function getFiltered(){
+  return RECORDS.filter(r=>{
+    if(F.hunter&&r.hunter!==F.hunter)return false;
+    if(F.mes&&(r.mes_ass||r.mes)!==F.mes)return false;
+    if(F.uf&&r.uf!==F.uf)return false;
+    if(F.produto&&r.produto!==F.produto)return false;
+    if(F.status){
+      if(F.status==='fechado'&&!['ASSINADO','BASE'].includes(r.status))return false;
+      if(F.status==='assinado'&&r.status!=='ASSINADO')return false;
+      if(F.status==='base'&&r.status!=='BASE')return false;
+      if(F.status==='pipeline'&&!['EM ASSINATURA','STANDBY'].includes(r.status))return false;
+    }
+    return true;
+  });
+}
+function agg(recs){
+  const ass=recs.filter(r=>r.status==='ASSINADO'),base=recs.filter(r=>r.status==='BASE');
+  const pipe=recs.filter(r=>r.status==='EM ASSINATURA'||r.status==='STANDBY');
+  const fech=recs.filter(r=>r.status==='ASSINADO'||r.status==='BASE');
+  const fat_novo=ass.reduce((s,r)=>s+r.fat,0),fat_base=base.reduce((s,r)=>s+r.fat,0);
+  const fat_total=fat_novo+fat_base,fat_pipe=pipe.reduce((s,r)=>s+r.fat,0);
+  const cred=recs.reduce((s,r)=>s+(r.credito||0),0);
+  const emps_novo=new Set(ass.map(r=>r.empresa)),emps_base=new Set(base.map(r=>r.empresa)),emps_fech=new Set(fech.map(r=>r.empresa));
+  const bym={};MESES.forEach(m=>bym[m]={novo:0,base:0,pipe:0});
+  ass.forEach(r=>{const m=r.mes_ass||r.mes;if(bym[m])bym[m].novo+=r.fat;});
+  base.forEach(r=>{const m=r.mes_ass||r.mes;if(bym[m])bym[m].base+=r.fat;});
+  pipe.forEach(r=>{const m=r.mes||r.mes_ass;if(bym[m])bym[m].pipe+=r.fat;});
+  const mcd=MESES.filter(m=>bym[m].novo>0);
+  const TODAY_I=new Date().getMonth()+1; // 1=JAN … 12=DEZ, dinâmico
+  const ytd_i=Math.min(mcd.length>0?Math.max(...mcd.map(m=>MESES.indexOf(m)))+1:TODAY_I,TODAY_I);
+  let meta_m=[...META_MONTHLY];
+  if(F.hunter&&META_HUNTERS[F.hunter])meta_m=META_HUNTERS[F.hunter];
+  const meta_ytd=meta_m.slice(0,ytd_i).reduce((s,v)=>s+v,0);
+  const meta_anual=meta_m.reduce((s,v)=>s+v,0);
+  const ating=meta_ytd>0?fat_novo/meta_ytd:0,ating_anual=meta_anual>0?fat_total/meta_anual:0;
+  const byh={};
+  fech.forEach(r=>{
+    if(!byh[r.hunter])byh[r.hunter]={fat:0,fat_novo:0,fat_base:0,emps:new Set(),prods:new Set(),cred:0};
+    byh[r.hunter].fat+=r.fat;byh[r.hunter].cred+=(r.credito||0);byh[r.hunter].emps.add(r.empresa);byh[r.hunter].prods.add(r.produto);
+    if(r.status==='ASSINADO')byh[r.hunter].fat_novo+=r.fat;else byh[r.hunter].fat_base+=r.fat;
+  });
+  const byprod={};
+  fech.forEach(r=>{if(!byprod[r.produto])byprod[r.produto]={fat:0,cnt:0,emps:new Set()};byprod[r.produto].fat+=r.fat;byprod[r.produto].cnt++;byprod[r.produto].emps.add(r.empresa);});
+  const byuf={};
+  fech.forEach(r=>{if(!byuf[r.uf])byuf[r.uf]={fat:0,emps:new Set()};byuf[r.uf].fat+=r.fat;byuf[r.uf].emps.add(r.empresa);});
+  const _excPar=new Set(['NÃO','NAO','N','NENHUM','NENHUMA','SEM PARCEIRO','SIM','']);
+  const byparc={};
+  fech.filter(r=>r.parceiro&&!_excPar.has(String(r.parceiro).trim().toUpperCase())).forEach(r=>{if(!byparc[r.parceiro])byparc[r.parceiro]={fat:0,emps:new Set()};byparc[r.parceiro].fat+=r.fat;byparc[r.parceiro].emps.add(r.empresa);});
+  const bytemp={};
+  pipe.forEach(r=>{if(!bytemp[r.temp])bytemp[r.temp]={fat:0,cnt:0};bytemp[r.temp].fat+=r.fat;bytemp[r.temp].cnt++;});
+  const empprod={};
+  fech.forEach(r=>{if(!empprod[r.empresa])empprod[r.empresa]={fat:0,prods:new Set(),hunter:r.hunter,uf:r.uf,status:r.status};empprod[r.empresa].fat+=r.fat;empprod[r.empresa].prods.add(r.produto);});
+  const top_cli=Object.entries(empprod).sort((a,b)=>b[1].fat-a[1].fat).slice(0,15).map(([e,v])=>({emp:e,fat:v.fat,n_prods:v.prods.size,hunter:v.hunter,uf:v.uf,status:v.status}));
+  const xd={};Object.values(empprod).forEach(v=>{const n=v.prods.size;xd[n]=(xd[n]||0)+1;});
+  const apas=recs.filter(r=>r.is_apas);
+  const apas_fech=apas.filter(r=>r.status==='ASSINADO'||r.status==='BASE');
+  const apas_fat=apas_fech.reduce((s,r)=>s+r.fat,0),apas_cred=apas.reduce((s,r)=>s+(r.credito||0),0);
+  const apas_emps_set=new Set(apas.map(r=>r.empresa));
+  const apas_byh={};
+  apas_fech.forEach(r=>{if(!apas_byh[r.hunter])apas_byh[r.hunter]={fat:0,cred:0,emps:new Set()};apas_byh[r.hunter].fat+=r.fat;apas_byh[r.hunter].cred+=(r.credito||0);apas_byh[r.hunter].emps.add(r.empresa);});
+  const apas_emps={};
+  apas.forEach(r=>{if(!apas_emps[r.empresa])apas_emps[r.empresa]={fat:0,cred:0,status:r.status,hunter:r.hunter,proc:r.proc_ok};apas_emps[r.empresa].fat+=r.fat;apas_emps[r.empresa].cred+=(r.credito||0);});
+  const fat_parc=Object.values(byparc).reduce((s,v)=>s+v.fat,0);
+  const conv=recs.length>0?fech.length/recs.length:0,ticket=emps_novo.size>0?fat_novo/emps_novo.size:0;
+  return{recs,fat_novo,fat_base,fat_total,fat_pipe,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ating,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
+}
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(e=>e.classList.remove('on'));
+  document.querySelector('[data-t="'+t+'"]').classList.add('on');
+  document.getElementById('p-'+t).classList.add('on');
+  setTimeout(()=>render(t),60);
+}
+function renderAll(){const recs=getFiltered(),d=agg(recs);document.getElementById('rec-count').textContent=recs.length+' registros';const t=document.querySelector('.tab.on')?.dataset.t||'exec';rExec(d);if(t==='receita')rReceita(d);if(t==='time')rTime(d);if(t==='proc')rProc(d);if(t==='clientes')rClientes(d);if(t==='apas')rApas(d);}
+function render(t){const recs=getFiltered(),d=agg(recs);rExec(d);if(t==='receita')rReceita(d);if(t==='time')rTime(d);if(t==='proc')rProc(d);if(t==='clientes')rClientes(d);if(t==='apas')rApas(d);}
+function rExec(d){
+  si('exec-sl-right',d.emps_fech+' empresas únicas fechadas · '+RECORDS.length+' registros totais');
+  const ap=(d.ating*100).toFixed(1).replace('.',',')+'%',gap=d.meta_ytd-d.fat_novo;
+  si('e1-val',brl(d.fat_novo));si('e1-sub',d.emps_novo+' empresas novas (ASSINADO)');si('e1-badge',ap+' da meta');sw('e1-fill',Math.min(d.ating*100,100));si('e1-pl',(d.ating*100).toFixed(1)+'% da meta Jan-Mai');si('e1-pr',brl(d.meta_anual));
+  si('e2-val',brl(d.fat_pipe));si('e2-sub','Em negociação ativa');si('e2-badge',Object.values(d.bytemp).reduce((s,v)=>s+v.cnt,0)+' oportunidades');sw('e2-fill',Math.min(d.fat_pipe/d.meta_anual*100,100));si('e2-pr',brl(d.fat_pipe));
+  si('e3-val',brl(d.meta_ytd));si('e3-sub','Jan–'+MP[d.ytd_i-1]+' acumulado');sw('e3-fill',Math.min(d.ating*100,100));si('e3-pr',ap);
+  si('e4-val',ap);si('e4-sub',gap>0?'Gap: '+brl(gap)+' faltante':'Superou em '+brl(-gap));si('e4-badge',d.ating>=1?'<span class="kc-badge up">✓ Acima da meta</span>':'<span class="kc-badge dn">▼ Abaixo do ritmo</span>');sw('e4-fill',Math.min(d.ating*100,100));si('e4-pr',brl(d.meta_anual));
+  si('e5-val',(d.conv*100).toFixed(1).replace('.',',')+'%');si('e5-sub',d.emps_fech+' fechadas de '+[...new Set(d.recs.map(r=>r.empresa))].length+' abordadas');sw('e5-fill',d.conv*100);si('e5-pr',d.emps_fech+' únicos');
+  si('e6-val',brl(d.mrr));si('e6-sub','Média mensal Jan–'+MP[d.ytd_i-1]);
+  si('e7-val',brl(d.fat_novo));si('e7-sub',d.emps_novo+' empresas novas');si('e7-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('e8-val',brl(d.fat_base));si('e8-sub',d.emps_base+' contratos base');si('e8-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('e9-val',brl(d.ticket));si('e9-sub','Novo: '+brl(d.emps_novo>0?d.fat_novo/d.emps_novo:0)+' · Upsell: '+brl(d.emps_base>0?d.fat_base/d.emps_base:0));
+  const atAnual=(d.ating_anual*100).toFixed(1).replace('.',',')+'%';
+  si('e10-val',atAnual);
+  si('e10-sub',brl(d.fat_total)+' de '+brl(d.meta_anual)+' meta');
+  si('e10-badge',F.hunter?F.hunter+' · '+atAnual+' da meta':'Jan–Dez 2026');
+  sw('e10-fill',Math.min(d.ating_anual*100,100));
+  si('e10-pl',atAnual+' do ano');
+  si('e10-pr',brl(d.meta_anual));
+  const m5=MESES.slice(0,Math.max(d.ytd_i,6));
+  mk('ch-exec-meta',{type:'bar',data:{labels:m5.map((_,i)=>MP[i]),datasets:[{type:'bar',label:'Meta',data:m5.map((_,i)=>d.meta_m[i]||0),backgroundColor:'rgba(255,146,43,.25)',borderRadius:4,order:2},{type:'line',label:'Fechado',data:m5.map(m=>d.bym[m].novo+d.bym[m].base),borderColor:'#20c997',backgroundColor:'rgba(32,201,151,.1)',tension:.3,fill:true,pointBackgroundColor:'#20c997',pointRadius:4,borderWidth:2,order:1}]},options:{...VERT,plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10,font:{size:10}}}}}});
+  const tlist=Object.entries(d.bytemp).sort((a,b)=>b[1].fat-a[1].fat);
+  const TC={'QUENTE':'#ff4d6d','MORNO':'#ffd43b','MORNA':'#ffd43b','FRIA':'#4f7fff','FRIO':'#4f7fff'};
+  mk('ch-exec-temp',{type:'doughnut',data:{labels:tlist.map(([t])=>t),datasets:[{data:tlist.map(([,v])=>v.fat),backgroundColor:tlist.map(([t])=>TC[t]||'#9775fa'),borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10,font:{size:10}}},tooltip:{...TTP,callbacks:{label:c=>`${c.label}: ${brl(c.raw)}`}}}}});
+  mk('ch-exec-pipe-temp',{type:'bar',data:{labels:tlist.map(([t])=>t),datasets:[{data:tlist.map(([,v])=>v.cnt),backgroundColor:tlist.map(([t])=>TC[t]||'#9775fa'),borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${c.raw} empresas · ${brl(tlist[c.dataIndex][1].fat)}`}}}}});
+  const hl=Object.entries(d.byh).sort((a,b)=>b[1].fat_novo-a[1].fat_novo).slice(0,10);
+  const hm=hl.map(([h])=>{const mh=META_HUNTERS[h];return mh?mh.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;});
+  mk('ch-exec-hunters',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Meta YTD',data:hm,backgroundColor:'rgba(255,146,43,.3)',borderRadius:3},{label:'Fechado',data:hl.map(([,v])=>v.fat_novo),backgroundColor:'#20c997',borderRadius:3}]},options:{...HORZ,plugins:{...HORZ.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>`${c.dataset.label}: ${brl(c.raw)}`}}}}});
+  document.getElementById('tb-top-cli').innerHTML=d.top_cli.map((c,i)=>`<tr><td><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.emp}">${c.emp}</td><td>${c.uf}</td><td class="r">${brlF(c.fat)}</td><td><span class="tag t${c.status==='ASSINADO'?'g':'p'}">${c.status==='ASSINADO'?'NOVO':'BASE'}</span></td></tr>`).join('');
+}
+function rReceita(d){
+  const pp=d.fat_novo>0?d.fat_parc/d.fat_novo:0;
+  si('r1-val',brl(d.fat_novo));si('r1-sub',d.emps_novo+' empresas novas');si('r1-badge',(d.ating*100).toFixed(1)+'% da meta Jan-Mai');
+  si('r2-val',brl(d.fat_novo));si('r2-sub',d.emps_novo+' clientes novos');si('r2-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('r3-val',brl(d.fat_base));si('r3-sub',d.emps_base+' contratos base');si('r3-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('r4-val',brl(d.fat_parc));si('r4-sub',(pp*100).toFixed(0)+'% da receita ASSINADO');
+  si('r5-val',brl(d.ticket));si('r5-sub',d.emps_fech+' empresas');
+  si('r6-val',brl(d.cred));si('r6-sub','Potencial de crédito total');
+  si('r7-val',brl(d.mrr));si('r7-sub','Média mensal estimada');
+  const m5=MESES.slice(0,Math.max(d.ytd_i,6));
+  mk('ch-rec-meta',{type:'bar',data:{labels:m5.map((_,i)=>MP[i]),datasets:[{label:'Fechado',data:m5.map(m=>d.bym[m].novo+d.bym[m].base),backgroundColor:'#20c997',borderRadius:4},{type:'line',label:'Meta',data:m5.map((_,i)=>d.meta_m[i]||0),borderColor:'#ff922b',backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:3,pointBackgroundColor:'#ff922b'}]},options:{...VERT,plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const pr=Object.entries(d.byprod).sort((a,b)=>b[1].fat-a[1].fat).slice(0,10);
+  mk('ch-rec-prod',{type:'bar',data:{labels:pr.map(([p])=>p.length>20?p.slice(0,18)+'…':p),datasets:[{data:pr.map(([,v])=>v.fat),backgroundColor:PAL,borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${brl(c.raw)}`}}}}});
+  const hl=Object.entries(d.byh).sort((a,b)=>b[1].fat-a[1].fat).slice(0,10);
+  mk('ch-rec-hunter',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{data:hl.map(([,v])=>v.fat),backgroundColor:'#4f7fff',borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${brl(c.raw)}`}}}}});
+  const uf=Object.entries(d.byuf).sort((a,b)=>b[1].fat-a[1].fat).slice(0,10);
+  mk('ch-rec-uf',{type:'bar',data:{labels:uf.map(([u])=>u),datasets:[{data:uf.map(([,v])=>v.fat),backgroundColor:'#74c0fc',borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${brl(c.raw)}`}}}}});
+  mk('ch-rec-mix',{type:'doughnut',data:{labels:['Novo (Assinado)','Base (Recorrente)'],datasets:[{data:[d.fat_novo,d.fat_base],backgroundColor:['#20c997','#9775fa'],borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const parcs=Object.entries(d.byparc).sort((a,b)=>b[1].fat-a[1].fat);
+  document.getElementById('tb-parceiros').innerHTML=parcs.map(([p,v],i)=>`<tr><td><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></td><td>${p}</td><td class="r">${brlF(v.fat)}</td><td class="r">${v.emps.size}</td><td class="r">${brl(v.fat/v.emps.size)}</td></tr>`).join('');
+  const pa=Object.entries(d.byprod).sort((a,b)=>b[1].fat-a[1].fat),tot=pa.reduce((s,[,v])=>s+v.fat,0);
+  document.getElementById('tb-mix-prod').innerHTML=pa.map(([p,v])=>`<tr><td>${p}</td><td class="r">${v.cnt}</td><td class="r">${brlF(v.fat)}</td><td class="r">${tot>0?(v.fat/tot*100).toFixed(1):0}%</td></tr>`).join('');
+}
+function rTime(d){
+  const hl=Object.entries(d.byh).sort((a,b)=>b[1].fat_novo-a[1].fat_novo);
+  const hm=hl.map(([h])=>{const mh=META_HUNTERS[h];return mh?mh.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;});
+  const at=hl.map(([,v],i)=>hm[i]>0?v.fat_novo/hm[i]:0);
+  const top=hl[0]||['—',{fat_novo:0}];
+  si('t1-val',hl.length);si('t1-sub',hl.filter(([h])=>META_HUNTERS[h]).length+' com meta definida');
+  si('t2-val',top[0]);si('t2-sub',brl(top[1].fat_novo)+' faturado novo');si('t2-badge',hm[0]>0?(at[0]*100).toFixed(0)+'% da meta':'');
+  si('t3-val',at.filter(a=>a>=1).length);si('t3-sub','Hunters ≥ 100% da meta');
+  si('t4-val',at.filter(a=>a>0&&a<0.7).length);si('t4-sub','Hunters < 70% da meta');
+  mk('ch-time-rank',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Meta YTD',data:hm,backgroundColor:'rgba(255,146,43,.3)',borderRadius:3},{label:'Fechado',data:hl.map(([,v])=>v.fat_novo),backgroundColor:hl.map((_,i)=>at[i]>=1?'#20c997':'#4f7fff'),borderRadius:3}]},options:{...HORZ,plugins:{...HORZ.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>`${c.dataset.label}: ${brl(c.raw)}`}}}}});
+  mk('ch-time-mix',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Novo',data:hl.map(([,v])=>v.fat_novo),backgroundColor:'#20c997',borderRadius:3,stack:'s'},{label:'Base',data:hl.map(([,v])=>v.fat_base),backgroundColor:'rgba(151,117,250,.6)',borderRadius:3,stack:'s'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{stacked:true,...GRID},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
+  document.getElementById('tb-hunters').innerHTML=hl.map(([h,v],i)=>{const mh=hm[i],a=mh>0?v.fat_novo/mh:0,col=a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';return`<tr><td>${i+1}</td><td><strong>${h}</strong></td><td class="r">${brlF(v.fat_novo)}</td><td class="r b-text">${brl(v.fat_base)}</td><td class="r">${brl(mh)}</td><td class="r"><strong style="color:${col}">${mh>0?pf(a):'—'}</strong></td><td class="r">${v.emps.size}</td><td class="r">${v.prods.size}</td><td><div class="pbi"><span class="pbif" style="width:${Math.min(a*100,100).toFixed(0)}%;background:${col}"></span></div></td></tr>`;}).join('');
+  document.getElementById('hunter-cards').innerHTML=hl.map(([h,v],i)=>{const mh=hm[i],a=mh>0?v.fat_novo/mh:0,col=a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';return`<div class="kc" style="--kc:${col}"><div style="display:flex;align-items:center;justify-content:space-between"><div class="kc-lbl">${h}</div><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></div><div class="kc-val">${brl(v.fat_novo)}</div><div class="kc-sub">Base: ${brl(v.fat_base)} · ${v.emps.size} emp.</div><div class="kc-bar"><div class="kc-fill" style="width:${Math.min(a*100,100).toFixed(0)}%;background:${col}"></div></div><div class="kc-pct"><span>Meta: ${brl(mh)}</span><span>${mh>0?pf(a):'S/meta'}</span></div></div>`;}).join('');
+}
+function rProc(d){
+  const proc=PROC_RECORDS,novas=proc.filter(p=>p.tipo&&p.tipo.toUpperCase().includes('NOV')).length,renos=proc.filter(p=>p.tipo&&!p.tipo.toUpperCase().includes('NOV')).length;
+  const ef=new Set(d.recs.filter(r=>r.status==='ASSINADO'||r.status==='BASE').map(r=>r.empresa));
+  const ep=new Set(proc.map(p=>p.empresa));
+  const sem=[...ef].filter(e=>!ep.has(e));
+  const taxa=ef.size>0?(ep.size/ef.size*100).toFixed(0):0;
+  si('p1-val',proc.length);si('p1-sub','Jan–Mai 2026');
+  si('p2-val',novas);si('p2-sub','Primeiro cadastro');si('p2-badge',proc.length>0?(novas/proc.length*100).toFixed(0)+'% do total':'');
+  si('p3-val',renos);si('p3-sub',proc.length>0?(renos/proc.length*100).toFixed(0)+'% do total':'');
+  si('p4-val',sem.length);si('p4-sub','Contratos sem proc. cadastrada');
+  si('p5-val',taxa+'%');sw('p5-fill',+taxa);
+  const bm={};MESES.slice(0,6).forEach(m=>bm[m]={nova:0,reno:0});
+  proc.forEach(p=>{if(bm[p.mes]){if(p.tipo&&p.tipo.toUpperCase().includes('NOV'))bm[p.mes].nova++;else bm[p.mes].reno++;}});
+  const mp=MESES.slice(0,6);
+  mk('ch-proc-mes',{type:'bar',data:{labels:mp.map((_,i)=>MP[i]),datasets:[{label:'Novas',data:mp.map(m=>bm[m].nova),backgroundColor:'#20c997',borderRadius:4,stack:'s'},{label:'Renovações',data:mp.map(m=>bm[m].reno),backgroundColor:'#ff922b',borderRadius:4,stack:'s'}]},options:{responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{...GRID,ticks:{color:'#8899bb',font:{size:10}}},y:{...GRID,stacked:true}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const bh={};proc.forEach(p=>{if(!bh[p.hunter])bh[p.hunter]={nova:0,reno:0};if(p.tipo&&p.tipo.toUpperCase().includes('NOV'))bh[p.hunter].nova++;else bh[p.hunter].reno++;});
+  const ph=Object.entries(bh).sort((a,b)=>(b[1].nova+b[1].reno)-(a[1].nova+a[1].reno)).slice(0,10);
+  mk('ch-proc-hunter',{type:'bar',data:{labels:ph.map(([h])=>h),datasets:[{label:'Novas',data:ph.map(([,v])=>v.nova),backgroundColor:'#20c997',borderRadius:3,stack:'s'},{label:'Renovações',data:ph.map(([,v])=>v.reno),backgroundColor:'#ff922b',borderRadius:3,stack:'s'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{stacked:true,...GRID},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
+  document.getElementById('tb-proc-hunters').innerHTML=ph.map(([h,v],i)=>{const tot=v.nova+v.reno;return`<tr><td>${i+1}</td><td><strong>${h}</strong></td><td class="r">${v.nova}</td><td class="r">${v.reno}</td><td class="r"><strong>${tot}</strong></td><td class="r">${tot>0?(v.nova/tot*100).toFixed(0)+'%':'—'}</td></tr>`;}).join('');
+  document.getElementById('tb-proc-full').innerHTML=proc.slice(0,120).map(p=>`<tr><td class="b-text">${p.mes}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.empresa}"><strong>${p.empresa}</strong></td><td>${p.hunter}</td><td><span class="tag t${p.tipo&&p.tipo.toUpperCase().includes('NOV')?'g':'b'}">${p.tipo?p.tipo.slice(0,12):'—'}</span></td></tr>`).join('');
+}
+function rClientes(d){
+  const emps=Object.entries(d.empprod),tot_e=emps.length,xsi=tot_e>0?emps.reduce((s,[,v])=>s+v.prods.size,0)/tot_e:0;
+  si('c1-val',d.emps_fech);si('c1-sub','Total sem duplicatas');
+  si('c2-val',d.emps_novo);si('c2-sub','Primeiro contrato 2026');si('c2-badge',d.emps_fech>0?(d.emps_novo/d.emps_fech*100).toFixed(0)+'%':'');
+  si('c3-val',d.emps_base);si('c3-sub','Expansão de contratos');si('c3-badge',d.emps_fech>0?(d.emps_base/d.emps_fech*100).toFixed(0)+'%':'');
+  si('c4-val',brl(d.ticket));si('c4-sub','Média por empresa');
+  si('c5-val',xsi.toFixed(1)+'×');si('c5-sub','Produtos médios por empresa');
+  const sorted=emps.sort((a,b)=>b[1].fat-a[1].fat),tot_f=sorted.reduce((s,[,v])=>s+v.fat,0);
+  const abc20=sorted.slice(0,20);let run=0;
+  const acc=abc20.map(([,v])=>{run+=v.fat;return tot_f>0?run/tot_f*100:0;});
+  mk('ch-cli-abc',{type:'bar',data:{labels:abc20.map(([e])=>e.slice(0,12)),datasets:[{label:'Faturamento',data:abc20.map(([,v])=>v.fat),backgroundColor:'#4f7fff',borderRadius:3,yAxisID:'y'},{type:'line',label:'Acum.%',data:acc,borderColor:'#ffd43b',backgroundColor:'transparent',borderWidth:2,tension:.4,pointRadius:2,yAxisID:'y2'}]},options:{...VERT,scales:{x:{...GRID,ticks:{color:'#8899bb',font:{size:9}}},y:{...GRID,ticks:{callback:v=>brl(v),color:'#4a5878'}},y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'%',color:'#ffd43b'},min:0,max:100}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const uf=Object.entries(d.byuf).sort((a,b)=>b[1].fat-a[1].fat).slice(0,10);
+  mk('ch-cli-uf',{type:'bar',data:{labels:uf.map(([u])=>u),datasets:[{data:uf.map(([,v])=>v.emps.size),backgroundColor:'#74c0fc',borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${c.raw} empresas`}}}}});
+  const bhe={};Object.values(d.empprod).forEach(v=>{if(!bhe[v.hunter])bhe[v.hunter]=0;bhe[v.hunter]++;});
+  const hE=Object.entries(bhe).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  mk('ch-cli-hunter',{type:'doughnut',data:{labels:hE.map(([h])=>h),datasets:[{data:hE.map(([,v])=>v),backgroundColor:PAL,borderColor:'#1c2030',borderWidth:2}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10,font:{size:10}}}}}});
+  const xsl=Object.keys(d.xd).map(Number).sort((a,b)=>a-b);
+  mk('ch-cli-cross',{type:'bar',data:{labels:xsl.map(n=>n+' produto'+(n>1?'s':'')),datasets:[{data:xsl.map(n=>d.xd[n]),backgroundColor:PAL,borderRadius:4}]},options:{...VERT,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${c.raw} empresas`}}}}});
+  let accF=0;
+  document.getElementById('tb-cli-rank').innerHTML=sorted.slice(0,60).map(([e,v],i)=>{accF+=v.fat;const ap=tot_f>0?accF/tot_f*100:0,ac=ap<=80?'g':ap<=95?'y':'r',al=ap<=80?'A':ap<=95?'B':'C';return`<tr><td>${i+1}</td><td><span class="tag t${ac}">${al}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e}"><strong>${e}</strong></td><td>${v.uf}</td><td>${v.hunter}</td><td class="r">${brlF(v.fat)}</td><td class="r">${v.prods.size}×</td><td class="r">${tot_f>0?(v.fat/tot_f*100).toFixed(1):0}%</td></tr>`;}).join('');
+}
+function rApas(d){
+  const ae=Object.entries(d.apas_emps),tot=ae.length,cp=ae.filter(([,v])=>v.proc).length,sp=tot-cp,pp=tot>0?(cp/tot*100).toFixed(0)+'%':'—';
+  si('apas-emps-count',tot);si('apas-proc-pct',pp);
+  si('a1-val',brl(d.apas_fat));si('a1-sub',new Set(d.apas.filter(r=>r.status==='ASSINADO'||r.status==='BASE').map(r=>r.empresa)).size+' empresas fechadas');
+  si('a2-val',brl(d.apas_cred));si('a2-sub','Potencial total identificado');
+  si('a3-val',tot);si('a3-sub',cp+' com proc · '+sp+' sem');
+  si('a4-val',cp);si('a4-sub',pp+' das empresas APAS');sw('a4-fill',tot>0?cp/tot*100:0);
+  si('a5-val',sp);si('a5-sub','Pendentes de cadastro');
+  const ah=Object.entries(d.apas_byh).sort((a,b)=>b[1].fat-a[1].fat);
+  mk('ch-apas-hunter',{type:'bar',data:{labels:ah.map(([h])=>h),datasets:[{label:'Faturamento',data:ah.map(([,v])=>v.fat),backgroundColor:'#f59f00',borderRadius:4}]},options:{...HORZ,plugins:{...BASE.plugins,tooltip:{...TTP,callbacks:{label:c=>`${brl(c.raw)}`}}}}});
+  const aa=d.apas.filter(r=>r.status==='ASSINADO').reduce((s,r)=>s+r.fat,0),ab=d.apas.filter(r=>r.status==='BASE').reduce((s,r)=>s+r.fat,0);
+  mk('ch-apas-mix',{type:'doughnut',data:{labels:['Novo (Assinado)','Base (Upsell)'],datasets:[{data:[aa,ab],backgroundColor:['#20c997','#9775fa'],borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const astat={};d.apas.forEach(r=>{astat[r.status]=(astat[r.status]||0)+1;});
+  const asl=Object.entries(astat).sort((a,b)=>b[1]-a[1]);
+  const asc={'ASSINADO':'#20c997','BASE':'#9775fa','EM ASSINATURA':'#ff922b','STANDBY':'#4a5878'};
+  mk('ch-apas-status',{type:'doughnut',data:{labels:asl.map(([s])=>s),datasets:[{data:asl.map(([,v])=>v),backgroundColor:asl.map(([s])=>asc[s]||'#74c0fc'),borderColor:'#1c2030',borderWidth:3}]},options:{...BASE,scales:{},plugins:{...BASE.plugins,legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:10}}}}});
+  const sa=ae.sort((a,b)=>(b[1].cred||0)-(a[1].cred||0));
+  const st={'ASSINADO':'g','BASE':'p','EM ASSINATURA':'y','STANDBY':'r'}
+  document.getElementById('tb-apas').innerHTML=sa.map(([e,v],i)=>`<tr><td>${i+1}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e}">${e}</td><td>${v.hunter||'—'}</td><td><span class="tag t${st[v.status]||'r'}">${v.status||'—'}</span></td><td class="r">${brl(v.cred||0)}</td><td class="r">${brl(v.f
