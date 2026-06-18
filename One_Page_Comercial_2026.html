@@ -490,6 +490,8 @@ function agg(recs){
   const pipe=recs.filter(r=>r.status==='EM ASSINATURA'||r.status==='STANDBY');
   const fech=recs.filter(r=>r.status==='ASSINADO'||r.status==='BASE');
   const fat_novo=ass.reduce((s,r)=>s+r.fat,0),fat_base=base.reduce((s,r)=>s+r.fat,0);
+  const fat_ass_novo=ass.filter(r=>String(r.contrato||'').toUpperCase()==='NOVO').reduce((s,r)=>s+r.fat,0);
+  const fat_ass_ups=fat_novo-fat_ass_novo;
   const fat_total=fat_novo+fat_base,fat_pipe=pipe.reduce((s,r)=>s+r.fat,0);
   const cred=recs.reduce((s,r)=>s+(r.credito||0),0);
   const emps_novo=new Set(ass.map(r=>r.empresa)),emps_base=new Set(base.map(r=>r.empresa)),emps_fech=new Set(fech.map(r=>r.empresa));
@@ -509,7 +511,7 @@ function agg(recs){
   const meta_total_ytd=meta_ytd+ups_ytd;
   const meta_total_anual=meta_anual+ups_anual;
   const ating=meta_ytd>0?fat_novo/meta_ytd:0;
-  const ating_ytd_total=meta_total_ytd>0?fat_total/meta_total_ytd:0;
+  const ating_ytd_total=meta_total_ytd>0?fat_novo/meta_total_ytd:0;
   const ating_anual=meta_total_anual>0?fat_total/meta_total_anual:0;
   const byh={};
   fech.forEach(r=>{
@@ -540,7 +542,7 @@ function agg(recs){
   apas.forEach(r=>{if(!apas_emps[r.empresa])apas_emps[r.empresa]={fat:0,cred:0,status:r.status,hunter:r.hunter,proc:r.proc_ok};apas_emps[r.empresa].fat+=r.fat;apas_emps[r.empresa].cred+=(r.credito||0);});
   const fat_parc=Object.values(byparc).reduce((s,v)=>s+v.fat,0);
   const conv=recs.length>0?fech.length/recs.length:0,ticket=emps_novo.size>0?fat_novo/emps_novo.size:0;
-  return{recs,fat_novo,fat_base,fat_total,fat_pipe,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ups_ytd,ups_anual,meta_total_ytd,meta_total_anual,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
+  return{recs,fat_novo,fat_base,fat_total,fat_pipe,fat_ass_novo,fat_ass_ups,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ups_ytd,ups_anual,meta_total_ytd,meta_total_anual,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
 }
 function showTab(t){
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
@@ -554,7 +556,7 @@ function render(t){const recs=getFiltered(),d=agg(recs);rExec(d);if(t==='receita
 function rExec(d){
   si('exec-sl-right',d.emps_fech+' empresas únicas fechadas · '+RECORDS.length+' registros totais');
   const ap=(d.ating*100).toFixed(1).replace('.',',')+'%',gap=d.meta_ytd-d.fat_novo;
-  si('e1-val',brl(d.fat_total));si('e1-sub','Nova: '+brl(d.fat_novo)+' · Upsell: '+brl(d.fat_base));si('e1-badge',ap+' meta nova');sw('e1-fill',Math.min(d.ating*100,100));si('e1-pl',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);si('e1-pr',brl(d.meta_total_anual));
+  si('e1-val',brl(d.fat_novo));si('e1-sub','Novo: '+brl(d.fat_ass_novo)+' · Upsell: '+brl(d.fat_ass_ups));si('e1-badge',ap+' meta nova');sw('e1-fill',Math.min(d.ating*100,100));si('e1-pl',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);si('e1-pr',brl(d.meta_total_anual));
   si('e2-val',brl(d.fat_pipe));si('e2-sub','Em negociação ativa');si('e2-badge',Object.values(d.bytemp).reduce((s,v)=>s+v.cnt,0)+' oportunidades');sw('e2-fill',Math.min(d.fat_pipe/d.meta_total_anual*100,100));si('e2-pr',brl(d.fat_pipe));
   si('e3-val',brl(d.meta_ytd));si('e3-sub','Jan–'+MP[d.ytd_i-1]+' acumulado');sw('e3-fill',Math.min(d.ating*100,100));si('e3-pr',ap);
   si('e4-val',ap);si('e4-sub',gap>0?'Gap: '+brl(gap)+' faltante':'Superou em '+brl(-gap));si('e4-badge',d.ating>=1?'<span class="kc-badge up">✓ Acima da meta</span>':'<span class="kc-badge dn">▼ Abaixo do ritmo</span>');sw('e4-fill',Math.min(d.ating*100,100));si('e4-pr',brl(d.meta_anual));
@@ -565,7 +567,7 @@ function rExec(d){
   si('e9-val',brl(d.ticket));si('e9-sub','Novo: '+brl(d.emps_novo>0?d.fat_novo/d.emps_novo:0)+' · Upsell: '+brl(d.emps_base>0?d.fat_base/d.emps_base:0));
   const atYTD=(d.ating_ytd_total*100).toFixed(1).replace('.',',')+'%';
   si('e10-val',atYTD);
-  si('e10-sub',brl(d.fat_total)+' de '+brl(d.meta_total_ytd)+' meta Jan–'+MP[d.ytd_i-1]);
+  si('e10-sub',brl(d.fat_novo)+' de '+brl(d.meta_total_ytd)+' meta Jan–'+MP[d.ytd_i-1]);
   si('e10-badge',F.hunter?F.hunter+' · '+atYTD:'Nova+Upsell · Jan–'+MP[d.ytd_i-1]);
   sw('e10-fill',Math.min(d.ating_ytd_total*100,100));
   si('e10-pl',atYTD+' do YTD');
@@ -583,7 +585,7 @@ function rExec(d){
 }
 function rReceita(d){
   const pp=d.fat_total>0?d.fat_parc/d.fat_total:0;
-  si('r1-val',brl(d.fat_total));si('r1-sub','Nova: '+brl(d.fat_novo)+' · Upsell: '+brl(d.fat_base));si('r1-badge',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);
+  si('r1-val',brl(d.fat_novo));si('r1-sub','Novo: '+brl(d.fat_ass_novo)+' · Upsell: '+brl(d.fat_ass_ups));si('r1-badge',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);
   si('r2-val',brl(d.fat_novo));si('r2-sub',d.emps_novo+' clientes novos');si('r2-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('r3-val',brl(d.fat_base));si('r3-sub',d.emps_base+' contratos base');si('r3-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('r4-val',brl(d.fat_parc));si('r4-sub',(pp*100).toFixed(0)+'% da receita ASSINADO');
