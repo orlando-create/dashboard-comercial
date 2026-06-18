@@ -538,7 +538,7 @@ function agg(recs){
   const top_cli=Object.entries(empprod).sort((a,b)=>b[1].fat-a[1].fat).slice(0,15).map(([e,v])=>({emp:e,fat:v.fat,n_prods:v.prods.size,hunter:v.hunter,uf:v.uf,status:v.status}));
   const xd={};Object.values(empprod).forEach(v=>{const n=v.prods.size;xd[n]=(xd[n]||0)+1;});
   const apas=recs.filter(r=>r.is_apas);
-  const apas_fech=apas.filter(r=>r.status==='ASSINADO'||r.status==='BASE');
+  const apas_fech=apas.filter(r=>r.status!=='STANDBY');
   const apas_fat=apas_fech.reduce((s,r)=>s+r.fat,0),apas_cred=apas.reduce((s,r)=>s+(r.credito||0),0);
   const apas_emps_set=new Set(apas.map(r=>r.empresa));
   const apas_byh={};
