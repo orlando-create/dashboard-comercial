@@ -490,7 +490,8 @@ function agg(recs){
   const pipe=recs.filter(r=>r.status==='EM ASSINATURA'||r.status==='STANDBY');
   const fech=recs.filter(r=>r.status==='ASSINADO'||r.status==='BASE');
   const fat_novo=ass.reduce((s,r)=>s+r.fat,0),fat_base=base.reduce((s,r)=>s+r.fat,0);
-  const fat_ass_novo=ass.filter(r=>String(r.contrato||'').toUpperCase()==='NOVO').reduce((s,r)=>s+r.fat,0);
+  const _emps_ups=new Set(ass.filter(r=>String(r.contrato||'').toUpperCase()==='UPSELL').map(r=>r.empresa));
+  const fat_ass_novo=ass.filter(r=>!_emps_ups.has(r.empresa)).reduce((s,r)=>s+r.fat,0);
   const fat_ass_ups=fat_novo-fat_ass_novo;
   const fat_total=fat_novo+fat_base,fat_pipe=pipe.reduce((s,r)=>s+r.fat,0);
   const cred=recs.reduce((s,r)=>s+(r.credito||0),0);
