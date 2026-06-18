@@ -493,6 +493,9 @@ function agg(recs){
   const _emps_ups=new Set(ass.filter(r=>String(r.contrato||'').toUpperCase()==='UPSELL').map(r=>r.empresa));
   const fat_ass_novo=ass.filter(r=>!_emps_ups.has(r.empresa)).reduce((s,r)=>s+r.fat,0);
   const fat_ass_ups=fat_novo-fat_ass_novo;
+  const _emps_ups_base=new Set(base.filter(r=>String(r.contrato||'').toUpperCase()==='UPSELL').map(r=>r.empresa));
+  const fat_base_ups=base.filter(r=>_emps_ups_base.has(r.empresa)).reduce((s,r)=>s+r.fat,0);
+  const fat_base_novo=fat_base-fat_base_ups;
   const fat_total=fat_novo+fat_base,fat_pipe=pipe.reduce((s,r)=>s+r.fat,0);
   const cred=recs.reduce((s,r)=>s+(r.credito||0),0);
   const emps_novo=new Set(ass.map(r=>r.empresa)),emps_base=new Set(base.map(r=>r.empresa)),emps_fech=new Set(fech.map(r=>r.empresa));
@@ -543,7 +546,7 @@ function agg(recs){
   apas.forEach(r=>{if(!apas_emps[r.empresa])apas_emps[r.empresa]={fat:0,cred:0,status:r.status,hunter:r.hunter,proc:r.proc_ok};apas_emps[r.empresa].fat+=r.fat;apas_emps[r.empresa].cred+=(r.credito||0);});
   const fat_parc=Object.values(byparc).reduce((s,v)=>s+v.fat,0);
   const conv=recs.length>0?fech.length/recs.length:0,ticket=emps_novo.size>0?fat_novo/emps_novo.size:0;
-  return{recs,fat_novo,fat_base,fat_total,fat_pipe,fat_ass_novo,fat_ass_ups,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ups_ytd,ups_anual,meta_total_ytd,meta_total_anual,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
+  return{recs,fat_novo,fat_base,fat_total,fat_pipe,fat_ass_novo,fat_ass_ups,fat_base_novo,fat_base_ups,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,ups_ytd,ups_anual,meta_total_ytd,meta_total_anual,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
 }
 function showTab(t){
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
@@ -564,7 +567,7 @@ function rExec(d){
   si('e5-val',(d.conv*100).toFixed(1).replace('.',',')+'%');si('e5-sub',d.emps_fech+' fechadas de '+[...new Set(d.recs.map(r=>r.empresa))].length+' abordadas');sw('e5-fill',d.conv*100);si('e5-pr',d.emps_fech+' únicos');
   si('e6-val',brl(d.mrr));si('e6-sub','Média mensal Jan–'+MP[d.ytd_i-1]);
   si('e7-val',brl(d.fat_novo));si('e7-sub',d.emps_novo+' empresas novas');si('e7-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
-  si('e8-val',brl(d.fat_base));si('e8-sub',d.emps_base+' contratos base');si('e8-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('e8-val',brl(d.fat_base));si('e8-sub','Novo: '+brl(d.fat_base_novo)+' · Upsell: '+brl(d.fat_base_ups));si('e8-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('e9-val',brl(d.ticket));si('e9-sub','Novo: '+brl(d.emps_novo>0?d.fat_novo/d.emps_novo:0)+' · Upsell: '+brl(d.emps_base>0?d.fat_base/d.emps_base:0));
   const atYTD=(d.ating_ytd_total*100).toFixed(1).replace('.',',')+'%';
   si('e10-val',atYTD);
@@ -588,7 +591,7 @@ function rReceita(d){
   const pp=d.fat_total>0?d.fat_parc/d.fat_total:0;
   si('r1-val',brl(d.fat_novo));si('r1-sub','Novo: '+brl(d.fat_ass_novo)+' · Upsell: '+brl(d.fat_ass_ups));si('r1-badge',(d.ating*100).toFixed(1)+'% meta nova Jan–'+MP[d.ytd_i-1]);
   si('r2-val',brl(d.fat_novo));si('r2-sub',d.emps_novo+' clientes novos');si('r2-badge',(d.fat_novo+d.fat_base>0?d.fat_novo/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
-  si('r3-val',brl(d.fat_base));si('r3-sub',d.emps_base+' contratos base');si('r3-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
+  si('r3-val',brl(d.fat_base));si('r3-sub','Novo: '+brl(d.fat_base_novo)+' · Upsell: '+brl(d.fat_base_ups));si('r3-badge',(d.fat_novo+d.fat_base>0?d.fat_base/(d.fat_novo+d.fat_base)*100:0).toFixed(0)+'% do mix');
   si('r4-val',brl(d.fat_parc));si('r4-sub',(pp*100).toFixed(0)+'% da receita ASSINADO');
   si('r5-val',brl(d.ticket));si('r5-sub',d.emps_fech+' empresas');
   si('r6-val',brl(d.cred));si('r6-sub','Potencial de crédito total');
