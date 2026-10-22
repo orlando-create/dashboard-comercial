@@ -637,17 +637,17 @@ function agg(recs){
   const pipe=recs.filter(r=>r.status==='EM ASSINATURA'||r.status==='STANDBY');
   const fech=ass;
   const fat_novo=ass.reduce((s,r)=>s+r.fat,0),fat_base=base.reduce((s,r)=>s+r.fat,0);
-  const _emps_ups=new Set(ass.filter(r=>String(r.contrato||'').toUpperCase()==='UPSELL').map(r=>r.empresa));
-  const fat_ass_novo=ass.filter(r=>!_emps_ups.has(r.empresa)).reduce((s,r)=>s+r.fat,0);
+  // Regra por LINHA (22/10/2026): cada linha conta pelo seu proprio Contrato (NOVO/UPSELL)
+  const _isUps=r=>String(r.contrato||'').trim().toUpperCase()==='UPSELL';
+  const fat_ass_novo=ass.filter(r=>!_isUps(r)).reduce((s,r)=>s+r.fat,0);
   const fat_ass_ups=fat_novo-fat_ass_novo;
-  const _emps_ups_base=new Set(base.filter(r=>String(r.contrato||'').toUpperCase()==='UPSELL').map(r=>r.empresa));
-  const fat_base_ups=base.filter(r=>_emps_ups_base.has(r.empresa)).reduce((s,r)=>s+r.fat,0);
+  const fat_base_ups=base.filter(_isUps).reduce((s,r)=>s+r.fat,0);
   const fat_base_novo=fat_base-fat_base_ups;
   const fat_total=fat_novo+fat_base,fat_pipe=pipe.reduce((s,r)=>s+r.fat,0);
   const cred=recs.reduce((s,r)=>s+(r.credito||0),0);
   const emps_novo=new Set(ass.map(r=>r.empresa)),emps_base=new Set(base.map(r=>r.empresa)),emps_fech=new Set(fech.map(r=>r.empresa));
   // Empresas de contrato NOVO de fato (exclui quem tem qualquer linha UPSELL) — usado no card "Receita Nova"
-  const emps_ass_novo=new Set(ass.filter(r=>!_emps_ups.has(r.empresa)).map(r=>r.empresa));
+  const emps_ass_novo=new Set(ass.filter(r=>!_isUps(r)).map(r=>r.empresa));
   // Pipeline (forecast) = Base (possibilidade de assinatura) + Em Assinatura (eminência de fechar).
   // STANDBY é perdido — não entra no potencial do pipeline, é reportado à parte.
   const emAssinatura=recs.filter(r=>r.status==='EM ASSINATURA');
@@ -689,7 +689,7 @@ function agg(recs){
   fech.forEach(r=>{
     if(!byh[r.hunter])byh[r.hunter]={fat:0,fat_novo:0,fat_ass_novo:0,fat_ass_ups:0,fat_base:0,fat_pipe:0,emps:new Set(),prods:new Set(),cred:0};
     byh[r.hunter].fat+=r.fat;byh[r.hunter].fat_novo+=r.fat;byh[r.hunter].cred+=(r.credito||0);byh[r.hunter].emps.add(r.empresa);byh[r.hunter].prods.add(r.produto);
-    if(_emps_ups.has(r.empresa))byh[r.hunter].fat_ass_ups+=r.fat;else byh[r.hunter].fat_ass_novo+=r.fat;
+    if(_isUps(r))byh[r.hunter].fat_ass_ups+=r.fat;else byh[r.hunter].fat_ass_novo+=r.fat;
   });
   pipe.forEach(r=>{
     if(!byh[r.hunter])byh[r.hunter]={fat:0,fat_novo:0,fat_ass_novo:0,fat_ass_ups:0,fat_base:0,fat_pipe:0,emps:new Set(),prods:new Set(),cred:0};
