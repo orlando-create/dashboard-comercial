@@ -355,6 +355,17 @@ tbody td{padding:6px 10px;color:var(--text)}
 
 <div class="panel" id="p-time">
   <div class="sl" id="time-sl">Performance do Time Comercial · Mai 2026</div>
+  <div class="cc full" id="prod-box"><div class="cc-head"><div><div class="cc-title">🎯 Mês do Hunter — Meta × Realizado × Material para fechar</div><div class="cc-sub" id="prod-sub">—</div></div></div>
+    <div class="kg kg-5" style="margin-bottom:10px">
+      <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🎯 Meta do mês</div><div class="kc-val" id="pr1-val">—</div><div class="kc-sub" id="pr1-sub">—</div></div>
+      <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Realizado</div><div class="kc-val" id="pr2-val">—</div><div class="kc-sub" id="pr2-sub">—</div><div class="kc-bar"><div class="kc-fill" id="pr2-fill" style="width:0%;background:var(--green)"></div></div></div>
+      <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">📉 Gap p/ meta</div><div class="kc-val" id="pr3-val">—</div><div class="kc-sub" id="pr3-sub">—</div></div>
+      <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🧲 Pipeline disponível</div><div class="kc-val" id="pr4-val">—</div><div class="kc-sub" id="pr4-sub">—</div><span class="kc-badge up" id="pr4-badge">—</span></div>
+      <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Procurações</div><div class="kc-val" id="pr5-val">—</div><div class="kc-sub" id="pr5-sub">—</div></div>
+    </div>
+    <div class="tw h300"><table><thead><tr><th>#</th><th>Hunter</th><th class="r">Meta mês</th><th class="r">Realizado</th><th class="r">Novo / Upsell</th><th class="r">Ating.</th><th class="r">Gap</th><th class="r">Em Assinatura</th><th class="r">Base</th><th class="r">Cobertura</th><th>Material p/ meta</th><th class="r">Proc. N / R</th><th class="r">Ating. YTD</th></tr></thead><tbody id="tb-prod"></tbody></table></div>
+    <div style="font-size:9px;color:var(--text3);margin-top:6px">Cobertura = (Em Assinatura + Base) ÷ Gap. 🟢 Em Assinatura sozinho cobre o gap · 🟡 cobre só somando a Base · 🔴 pipeline menor que o gap. Pipeline = oportunidades abertas do hunter (qualquer mês); Standby/perdido não entra.</div>
+  </div>
   <div class="kg kg-4">
     <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">👥 Hunters Ativos</div><div class="kc-val" id="t1-val">—</div><div class="kc-sub" id="t1-sub">—</div></div>
     <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🥇 Top Hunter</div><div class="kc-val" id="t2-val">—</div><div class="kc-sub" id="t2-sub">—</div><span class="kc-badge up" id="t2-badge">—</span></div>
@@ -846,7 +857,50 @@ function rReceita(d){
   const pa=Object.entries(d.byprod).sort((a,b)=>b[1].fat-a[1].fat),tot=pa.reduce((s,[,v])=>s+v.fat,0);
   document.getElementById('tb-mix-prod').innerHTML=pa.map(([p,v])=>`<tr><td>${p}</td><td class="r">${v.cnt}</td><td class="r">${brlF(v.fat)}</td><td class="r">${tot>0?(v.fat/tot*100).toFixed(1):0}%</td></tr>`).join('');
 }
+function rProducao(d){
+  // Visão do MÊS por hunter: meta, realizado, gap, pipeline disponível, procurações. Respeita filtros.
+  const TODAY_I=new Date().getMonth();
+  const mi=F.mes?MESES.indexOf(F.mes):TODAY_I, M=MESES[mi];
+  const isNova=t=>t&&/^nov[oa]$/i.test(t.trim()), isReno=t=>t&&/renov/i.test(t);
+  const normH=h=>h==='KATARYNI'?'KATARINY':h;
+  const _isUps=r=>String(r.contrato||'').trim().toUpperCase()==='UPSELL';
+  const base=RECORDS.filter(r=>(!F.hunter||r.hunter===F.hunter)&&(!F.uf||r.uf===F.uf)&&(!F.produto||r.produto===F.produto));
+  const real=base.filter(r=>r.status==='ASSINADO'&&r.mes_ass===M);
+  const realYTD=base.filter(r=>r.status==='ASSINADO'&&MESES.indexOf(r.mes_ass)>=0&&MESES.indexOf(r.mes_ass)<=mi);
+  const emAss=base.filter(r=>r.status==='EM ASSINATURA'), bas=base.filter(r=>r.status==='BASE');
+  const proc=(PROC_RECORDS||[]).filter(p=>(!F.hunter||normH(p.hunter)===F.hunter)&&p.mes===M);
+  const rem=new Set((META_AJUSTE&&META_AJUSTE.removidos)||[]);
+  const metaM=h=>((META_HUNTERS[h]||[])[mi]||0)+((UPS_HUNTERS[h]||[])[mi]||0);
+  const metaYTD=h=>{let t=0;for(let i=0;i<=mi;i++)t+=((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0);return t;};
+  const H={};const g=h=>H[h]||(H[h]={nv:0,up:0,ytd:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
+  real.forEach(r=>{const o=g(r.hunter);if(_isUps(r))o.up+=r.fat||0;else o.nv+=r.fat||0;});
+  realYTD.forEach(r=>{g(r.hunter).ytd+=r.fat||0;});
+  emAss.forEach(r=>{const o=g(r.hunter);o.ea+=r.fat||0;o.eaN++;});
+  bas.forEach(r=>{const o=g(r.hunter);o.bs+=r.fat||0;o.bsN++;});
+  proc.forEach(p=>{const h=normH(p.hunter);if(!h||h==='N/D')return;const o=g(h);if(isNova(p.tipo))o.pn++;else if(isReno(p.tipo))o.pr++;});
+  Object.keys(META_HUNTERS||{}).forEach(h=>{if(metaM(h)>0&&(!F.hunter||h===F.hunter))g(h);});
+  const rows=Object.entries(H).filter(([h,v])=>h&&h!=='N/D'&&!['NATHALIA','NATALIA'].includes(h)&&!(rem.has(h)&&v.nv+v.up+v.pn+v.pr===0))
+    .map(([h,v])=>{const meta=metaM(h),rl=v.nv+v.up,gap=Math.max(meta-rl,0),pipe=v.ea+v.bs,cob=gap>0?pipe/gap:null,mY=metaYTD(h);
+      let st;if(meta<=0)st=['⚪','S/ meta','gr'];else if(rl>=meta)st=['✅','Meta batida','g'];else if(v.ea>=gap)st=['🟢','Em Assinatura cobre','g'];else if(pipe>=gap)st=['🟡','Depende da Base','y'];else st=['🔴','Falta material','r'];
+      return{h,meta,rl,gap,pipe,cob,st,aY:mY>0?v.ytd/mY:null,...v};})
+    .sort((a,b)=>b.meta-a.meta||b.rl-a.rl);
+  const T=rows.reduce((t,r)=>{['meta','rl','nv','up','ea','eaN','bs','bsN','pn','pr'].forEach(k=>t[k]+=r[k]);return t;},{meta:0,rl:0,nv:0,up:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
+  const Tgap=Math.max(T.meta-T.rl,0),Tcob=Tgap>0?(T.ea+T.bs)/Tgap:null;
+  const lbl=MP[mi]+' 2026'+(F.mes?'':' (mês atual — use o filtro Mês para trocar)');
+  si('prod-sub',lbl+(F.hunter?' · '+F.hunter:'')+(F.uf?' · '+F.uf:'')+(F.produto?' · '+F.produto:'')+(F.uf?' · procurações não têm UF (mostradas sem esse filtro)':''));
+  si('pr1-val',brl(T.meta));{const _n=rows.filter(r=>r.meta>0).length;si('pr1-sub',_n+(_n===1?' hunter':' hunters')+' com meta');}
+  si('pr2-val',brl(T.rl));si('pr2-sub','Novo: '+brl(T.nv)+' · Upsell: '+brl(T.up)+(T.meta>0?' · '+pf(T.rl/T.meta):''));sw('pr2-fill',T.meta>0?T.rl/T.meta*100:0);
+  si('pr3-val',Tgap>0?brl(Tgap):'Meta batida');si('pr3-sub',Tgap>0?rows.filter(r=>r.st[2]!=='g'&&r.meta>0).length+' hunters abaixo sem cobertura garantida':'Superou em '+brl(T.rl-T.meta));
+  si('pr4-val',brl(T.ea+T.bs));si('pr4-sub','Em Assinatura: '+brl(T.ea)+' ('+T.eaN+') · Base: '+brl(T.bs)+' ('+T.bsN+')');si('pr4-badge',Tcob===null?'Meta já batida':'Cobertura '+(Tcob*100).toFixed(0)+'% do gap');
+  si('pr5-val',T.pn+T.pr);si('pr5-sub','Novas: '+T.pn+' · Renovações: '+T.pr);
+  const dim=x=>`<span style="opacity:.35">${x}</span>`;
+  const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
+  document.getElementById('tb-prod').innerHTML=rows.map((r,i)=>{const a=r.meta>0?r.rl/r.meta:null;return`<tr><td>${i+1}</td><td><strong>${r.h}</strong></td><td class="r">${r.meta?brl(r.meta):dim('—')}</td><td class="r"><strong>${r.rl?brl(r.rl):dim('0')}</strong></td><td class="r" style="font-size:10px"><span class="g-text">${brl(r.nv)}</span> / <span class="p-text">${brl(r.up)}</span></td><td class="r"><strong style="color:${a===null?'inherit':colA(a)}">${a===null?dim('—'):pf(a)}</strong></td><td class="r">${r.gap?brl(r.gap):dim('—')}</td><td class="r">${r.ea?brl(r.ea)+' <span style="opacity:.5">('+r.eaN+')</span>':dim('—')}</td><td class="r">${r.bs?brl(r.bs)+' <span style="opacity:.5">('+r.bsN+')</span>':dim('—')}</td><td class="r">${r.cob===null?dim('—'):(r.cob*100).toFixed(0)+'%'}</td><td><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></td><td class="r">${r.pn} / ${r.pr}</td><td class="r" style="color:${r.aY===null?'inherit':colA(r.aY)}">${r.aY===null?dim('—'):pf(r.aY)}</td></tr>`;}).join('')
+    +(rows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:700"><td></td><td>TIME</td><td class="r">${brl(T.meta)}</td><td class="r">${brl(T.rl)}</td><td class="r" style="font-size:10px">${brl(T.nv)} / ${brl(T.up)}</td><td class="r">${T.meta?pf(T.rl/T.meta):'—'}</td><td class="r">${brl(Tgap)}</td><td class="r">${brl(T.ea)}</td><td class="r">${brl(T.bs)}</td><td class="r">${Tcob===null?'—':(Tcob*100).toFixed(0)+'%'}</td><td></td><td class="r">${T.pn} / ${T.pr}</td><td></td></tr>`:'')
+    ||'<tr><td colspan="13" style="text-align:center;opacity:.6">Sem dados para os filtros selecionados</td></tr>';
+}
 function rTime(d){
+  rProducao(d);
   si('time-sl','Performance do Time Comercial · '+(F.mes?F.mes+' 2026':'Jan–'+MP[d.ytd_i-1]+' 2026'));
   const hl=Object.entries(d.byh).sort((a,b)=>b[1].fat_novo-a[1].fat_novo);
   const hm=hl.map(([h])=>{const mh=META_HUNTERS[h],mu=UPS_HUNTERS[h];if(F.mes){const mi=MESES.indexOf(F.mes);const novo=mh&&mi>=0?mh[mi]||0:0;const ups=mu&&mi>=0?mu[mi]||0:0;return novo+ups;}const novo=mh?mh.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;const ups=mu?mu.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;return novo+ups;});
