@@ -594,7 +594,7 @@ tbody td{padding:6px 10px;color:var(--text)}
     </div>
     <div class="cc">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div class="cc-title" style="font-size:11px">🏢 Lista Completa · Pipeline</div>
+        <div class="cc-title" style="font-size:11px" id="mdp-list-title">🏢 Lista Completa · Pipeline</div>
         <div style="font-size:9px;color:var(--text3)" id="mdp-leg">Base = possibilidade de assinatura · Em Assinatura = eminência de fechar · Perdido (Standby) não conta no potencial</div>
       </div>
       <div class="tw h300"><table><thead><tr><th>#</th><th>Empresa</th><th>Hunter</th><th>Categoria</th><th>Status</th><th class="r">Valor</th><th>Mês</th></tr></thead><tbody id="tb-mdp-list"></tbody></table></div>
@@ -1231,7 +1231,10 @@ function _renderEmAssModal(){
 
 // ── MODAL: PIPELINE (BASE + EM ASSINATURA) ──────────────────────────────────
 let _pipelineData=[];
+var _mdpCat=null;
+function mdpFiltrar(c){_mdpCat=(_mdpCat===c?null:c);_renderPipelineModal();}
 function openPipelineModal(){
+  _mdpCat=null;
   document.getElementById('modal-pipeline').style.display='block';
   document.body.style.overflow='hidden';
   _renderPipelineModal();
@@ -1256,13 +1259,17 @@ function _renderPipelineModal(){
     byCat[c].cnt++;byCat[c].fat+=(r.fat||0);byCat[c].emps.add(r.emp);
   });
   var cl=Object.entries(byCat).sort(function(a,b){return b[1].fat-a[1].fat;});
-  mk('ch-mdp-cat',{type:'doughnut',data:{labels:cl.map(function(x){return x[0];}),datasets:[{data:cl.map(function(x){return x[1].fat;}),backgroundColor:cl.map(function(x){return x[0]==='Perdido'?'#4a5878':(x[0]==='Base'?'#9775fa':'#ffd43b');}),borderColor:'#1c2030',borderWidth:2}]},options:Object.assign({},BASE,{scales:{},plugins:Object.assign({},BASE.plugins,{legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:8,font:{size:9}}}})})});
+  mk('ch-mdp-cat',{type:'doughnut',data:{labels:cl.map(function(x){return x[0];}),datasets:[{data:cl.map(function(x){return x[1].fat;}),backgroundColor:cl.map(function(x){return x[0]==='Perdido'?'#4a5878':(x[0]==='Base'?'#9775fa':'#ffd43b');}),borderColor:'#1c2030',borderWidth:2}]},options:Object.assign({},BASE,{scales:{},plugins:Object.assign({},BASE.plugins,{legend:{display:true,position:'bottom',labels:{color:'#8899bb',boxWidth:8,font:{size:9}}}}),onClick:function(e,els){if(els&&els.length)mdpFiltrar(cl[els[0].index][0]);}})});
   document.getElementById('tb-mdp-summary').innerHTML=cl.map(function(x,i){
     var c=x[0],v=x[1];
-    return '<tr><td>'+(i+1)+'</td><td><strong>'+c+'</strong></td><td class="r r-text"><strong>'+v.emps.size+'</strong></td><td class="r">'+v.cnt+'</td><td class="r">'+brl(v.fat)+'</td></tr>';
-  }).join('');
+    var sel=_mdpCat===c, dimmed=_mdpCat&&!sel;
+    return '<tr onclick="mdpFiltrar(\''+c+'\')" title="Clique para filtrar a lista abaixo (clique de novo para mostrar todas)" style="cursor:pointer;'+(sel?'background:rgba(79,127,255,.15);outline:1px solid var(--accent);':'')+(dimmed?'opacity:.45;':'')+'"><td>'+(i+1)+'</td><td><strong>'+c+'</strong>'+(sel?' <span class="tag tb" style="margin-left:4px">filtrado</span>':'')+'</td><td class="r r-text"><strong>'+v.emps.size+'</strong></td><td class="r">'+v.cnt+'</td><td class="r">'+brl(v.fat)+'</td></tr>';
+  }).join('')+'<tr onclick="mdpFiltrar(null)" style="cursor:pointer;'+(!_mdpCat?'background:rgba(79,127,255,.15);':'opacity:.7;')+'"><td></td><td colspan="4" style="font-size:10px">'+(_mdpCat?'↺ Mostrar todas as categorias':'Mostrando todas · clique numa categoria para filtrar')+'</td></tr>';
   var stMap={Base:'p','Em Assinatura':'y',Perdido:'r'};
-  var sorted=rows.slice().sort(function(a,b){
+  var _base=_mdpCat?rows.filter(function(r){return r.categoria===_mdpCat;}):rows;
+  var _tv=_base.reduce(function(t,r){return t+(r.fat||0);},0);
+  si('mdp-list-title','🏢 '+(_mdpCat?'Lista · '+_mdpCat:'Lista Completa · Pipeline')+' <span style="font-weight:400;opacity:.6">('+_base.length+' · '+brl(_tv)+')</span>');
+  var sorted=_base.slice().sort(function(a,b){
     var oa=a.categoria==='Perdido'?1:0, ob=b.categoria==='Perdido'?1:0;
     if(oa!==ob)return oa-ob;
     return (b.fat||0)-(a.fat||0);
