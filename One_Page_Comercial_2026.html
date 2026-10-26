@@ -185,6 +185,12 @@ tbody td{padding:6px 10px;color:var(--text)}
 @media(max-width:1200px){.kg-5{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.kg-5,.kg-4,.kg-3{grid-template-columns:repeat(2,1fr)}.g2,.g3,.g21,.g12{grid-template-columns:1fr}}
 
+.hc-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.hc-st{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.hc-s{background:var(--card2);border-radius:6px;padding:6px 8px;min-width:0}
+.hc-s span{display:block;font-size:8.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+.hc-s b{display:block;font-size:12.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-s i{display:block;font-style:normal;font-size:9px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -354,33 +360,20 @@ tbody td{padding:6px 10px;color:var(--text)}
 </div>
 
 <div class="panel" id="p-time">
-  <div class="sl" id="time-sl">Performance do Time Comercial · Mai 2026</div>
-  <div class="cc full" id="prod-box"><div class="cc-head"><div><div class="cc-title">🎯 Resultado do Hunter — Meta × Realizado × Material para fechar</div><div class="cc-sub" id="prod-sub">—</div></div></div>
-    <div class="kg kg-5" style="margin-bottom:10px">
-      <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl" id="pr1-lbl">🎯 Meta</div><div class="kc-val" id="pr1-val">—</div><div class="kc-sub" id="pr1-sub">—</div></div>
-      <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Realizado</div><div class="kc-val" id="pr2-val">—</div><div class="kc-sub" id="pr2-sub">—</div><div class="kc-bar"><div class="kc-fill" id="pr2-fill" style="width:0%;background:var(--green)"></div></div></div>
-      <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">📉 Gap p/ meta</div><div class="kc-val" id="pr3-val">—</div><div class="kc-sub" id="pr3-sub">—</div></div>
-      <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🧲 Pipeline disponível</div><div class="kc-val" id="pr4-val">—</div><div class="kc-sub" id="pr4-sub">—</div><span class="kc-badge up" id="pr4-badge">—</span></div>
-      <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Procurações</div><div class="kc-val" id="pr5-val">—</div><div class="kc-sub" id="pr5-sub">—</div></div>
-    </div>
-    <div class="tw h300"><table><thead><tr><th>#</th><th>Hunter</th><th class="r" id="th-prod-meta">Meta</th><th class="r">Realizado</th><th class="r">Novo / Upsell</th><th class="r">Ating.</th><th class="r">Gap</th><th class="r">Em Assinatura</th><th class="r">Base</th><th class="r">Cobertura</th><th>Material p/ meta</th><th class="r">Proc. N / R</th><th class="r">Ating. YTD</th></tr></thead><tbody id="tb-prod"></tbody></table></div>
-    <div style="font-size:9px;color:var(--text3);margin-top:6px">Cobertura = (Em Assinatura + Base) ÷ Gap. 🟢 Em Assinatura sozinho cobre o gap · 🟡 cobre só somando a Base · 🔴 pipeline menor que o gap. Pipeline = oportunidades abertas do hunter (qualquer mês); Standby/perdido não entra.</div>
-  </div>
-  <div class="kg kg-4">
-    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">👥 Hunters Ativos</div><div class="kc-val" id="t1-val">—</div><div class="kc-sub" id="t1-sub">—</div></div>
-    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🥇 Top Hunter</div><div class="kc-val" id="t2-val">—</div><div class="kc-sub" id="t2-sub">—</div><span class="kc-badge up" id="t2-badge">—</span></div>
-    <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Acima de 100%</div><div class="kc-val" id="t3-val">—</div><div class="kc-sub" id="t3-sub">—</div></div>
-    <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">⚠ Em Atenção (&lt;70%)</div><div class="kc-val" id="t4-val">—</div><div class="kc-sub" id="t4-sub">—</div></div>
+  <div class="sl" id="time-sl">Performance do Time Comercial</div>
+  <div class="kg kg-5">
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl" id="pr1-lbl">🎯 Meta</div><div class="kc-val" id="pr1-val">—</div><div class="kc-sub" id="pr1-sub">—</div></div>
+    <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Realizado</div><div class="kc-val" id="pr2-val">—</div><div class="kc-sub" id="pr2-sub">—</div><div class="kc-bar"><div class="kc-fill" id="pr2-fill" style="width:0%;background:var(--green)"></div></div><div class="kc-pct"><span id="pr2-pl">—</span><span id="pr2-pr">—</span></div></div>
+    <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">📉 Gap p/ meta</div><div class="kc-val" id="pr3-val">—</div><div class="kc-sub" id="pr3-sub">—</div></div>
+    <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🧲 Pipeline disponível</div><div class="kc-val" id="pr4-val">—</div><div class="kc-sub" id="pr4-sub">—</div><span class="kc-badge up" id="pr4-badge">—</span></div>
+    <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Procurações</div><div class="kc-val" id="pr5-val">—</div><div class="kc-sub" id="pr5-sub">—</div></div>
   </div>
   <div class="g2">
-    <div class="cc"><div class="cc-head"><div><div class="cc-title">🏆 Ranking Hunter — Meta × Realizado</div></div><div class="leg"><div class="li"><div class="ld" style="background:var(--teal)"></div>Fechado</div><div class="li"><div class="ld" style="background:var(--orange)"></div>Meta</div></div></div><div class="cw t"><canvas id="ch-time-rank"></canvas></div></div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">🏆 Ranking Hunter — Meta × Realizado</div><div class="cc-sub" id="time-rank-sub">—</div></div></div><div class="cw t"><canvas id="ch-time-rank"></canvas></div></div>
     <div class="cc"><div class="cc-head"><div><div class="cc-title">📦 Mix Novo × Upsell por Hunter</div></div></div><div class="cw t"><canvas id="ch-time-mix"></canvas></div></div>
   </div>
-  <div class="cc full"><div class="cc-head"><div><div class="cc-title">📊 Detalhamento Completo por Hunter</div></div></div>
-    <div class="tw h260"><table><thead><tr><th>#</th><th>Hunter</th><th class="r">Novo</th><th class="r">Upsell</th><th class="r" id="th-meta-ytd">Meta YTD</th><th class="r">Ating.</th><th class="r">Empresas</th><th class="r">Produtos</th><th>Progresso</th></tr></thead><tbody id="tb-hunters"></tbody></table></div>
-  </div>
-  <div class="cc"><div class="cc-head"><div><div class="cc-title">🃏 Cards Individuais · Hunters</div></div></div>
-    <div id="hunter-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:4px"></div>
+  <div class="cc"><div class="cc-head"><div><div class="cc-title">🃏 Hunters — Resultado e material para a meta</div><div class="cc-sub">🟢 Em Assinatura cobre o gap · 🟡 cobre só somando a Base · 🔴 pipeline menor que o gap · Pipeline = oportunidades abertas (qualquer mês), sem Standby</div></div></div>
+    <div id="hunter-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:4px"></div>
   </div>
 </div>
 
@@ -857,68 +850,64 @@ function rReceita(d){
   const pa=Object.entries(d.byprod).sort((a,b)=>b[1].fat-a[1].fat),tot=pa.reduce((s,[,v])=>s+v.fat,0);
   document.getElementById('tb-mix-prod').innerHTML=pa.map(([p,v])=>`<tr><td>${p}</td><td class="r">${v.cnt}</td><td class="r">${brlF(v.fat)}</td><td class="r">${tot>0?(v.fat/tot*100).toFixed(1):0}%</td></tr>`).join('');
 }
-function rProducao(d){
-  // Visão do MÊS por hunter: meta, realizado, gap, pipeline disponível, procurações. Respeita filtros.
+function hunterResultados(){
+  // Por hunter: meta, realizado (novo/upsell), gap, pipeline (EA/Base), procurações. Sem filtro de mês = ano consolidado.
   const TODAY_I=new Date().getMonth();
-  const mi=F.mes?MESES.indexOf(F.mes):TODAY_I, M=MESES[mi];
-  const MS=F.mes?new Set([F.mes]):new Set(MESES); // sem filtro de mês = consolidado do ano
+  const mi=F.mes?MESES.indexOf(F.mes):TODAY_I;
   const isNova=t=>t&&/^nov[oa]$/i.test(t.trim()), isReno=t=>t&&/renov/i.test(t);
   const normH=h=>h==='KATARYNI'?'KATARINY':h;
   const _isUps=r=>String(r.contrato||'').trim().toUpperCase()==='UPSELL';
-  const base=RECORDS.filter(r=>(!F.hunter||r.hunter===F.hunter)&&(!F.uf||r.uf===F.uf)&&(!F.produto||r.produto===F.produto));
-  const real=base.filter(r=>r.status==='ASSINADO'&&(!F.mes||r.mes_ass===F.mes));
-  const realYTD=base.filter(r=>r.status==='ASSINADO'&&MESES.indexOf(r.mes_ass)>=0&&MESES.indexOf(r.mes_ass)<=mi);
-  const emAss=base.filter(r=>r.status==='EM ASSINATURA'), bas=base.filter(r=>r.status==='BASE');
+  const src=RECORDS.filter(r=>(!F.hunter||r.hunter===F.hunter)&&(!F.uf||r.uf===F.uf)&&(!F.produto||r.produto===F.produto));
+  const real=src.filter(r=>r.status==='ASSINADO'&&(!F.mes||r.mes_ass===F.mes));
   const proc=(PROC_RECORDS||[]).filter(p=>(!F.hunter||normH(p.hunter)===F.hunter)&&(!F.mes||p.mes===F.mes));
   const rem=new Set((META_AJUSTE&&META_AJUSTE.removidos)||[]);
-  const metaM=h=>MESES.reduce((t,m,i)=>MS.has(m)?t+((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0):t,0);
-  const metaYTD=h=>{let t=0;for(let i=0;i<=mi;i++)t+=((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0);return t;};
-  const H={};const g=h=>H[h]||(H[h]={nv:0,up:0,ytd:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
-  real.forEach(r=>{const o=g(r.hunter);if(_isUps(r))o.up+=r.fat||0;else o.nv+=r.fat||0;});
-  realYTD.forEach(r=>{g(r.hunter).ytd+=r.fat||0;});
-  emAss.forEach(r=>{const o=g(r.hunter);o.ea+=r.fat||0;o.eaN++;});
-  bas.forEach(r=>{const o=g(r.hunter);o.bs+=r.fat||0;o.bsN++;});
+  const metaH=h=>MESES.reduce((t,m,i)=>(!F.mes||m===F.mes)?t+((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0):t,0);
+  const H={};const g=h=>H[h]||(H[h]={nv:0,up:0,nvE:new Set(),upE:new Set(),ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
+  real.forEach(r=>{const o=g(r.hunter);if(_isUps(r)){o.up+=r.fat||0;o.upE.add(r.empresa);}else{o.nv+=r.fat||0;o.nvE.add(r.empresa);}});
+  src.filter(r=>r.status==='EM ASSINATURA').forEach(r=>{const o=g(r.hunter);o.ea+=r.fat||0;o.eaN++;});
+  src.filter(r=>r.status==='BASE').forEach(r=>{const o=g(r.hunter);o.bs+=r.fat||0;o.bsN++;});
   proc.forEach(p=>{const h=normH(p.hunter);if(!h||h==='N/D')return;const o=g(h);if(isNova(p.tipo))o.pn++;else if(isReno(p.tipo))o.pr++;});
-  Object.keys(META_HUNTERS||{}).forEach(h=>{if(metaM(h)>0&&(!F.hunter||h===F.hunter))g(h);});
+  Object.keys(META_HUNTERS||{}).forEach(h=>{if(metaH(h)>0&&(!F.hunter||h===F.hunter))g(h);});
   const rows=Object.entries(H).filter(([h,v])=>h&&h!=='N/D'&&!['NATHALIA','NATALIA'].includes(h)&&!(rem.has(h)&&v.nv+v.up+v.pn+v.pr===0))
-    .map(([h,v])=>{const meta=metaM(h),rl=v.nv+v.up,gap=Math.max(meta-rl,0),pipe=v.ea+v.bs,cob=gap>0?pipe/gap:null,mY=metaYTD(h);
-      let st;if(meta<=0)st=['⚪','S/ meta','gr'];else if(rl>=meta)st=['✅','Meta batida','g'];else if(v.ea>=gap)st=['🟢','Em Assinatura cobre','g'];else if(pipe>=gap)st=['🟡','Depende da Base','y'];else st=['🔴','Falta material','r'];
-      return{h,meta,rl,gap,pipe,cob,st,aY:mY>0?v.ytd/mY:null,...v};})
-    .sort((a,b)=>b.meta-a.meta||b.rl-a.rl);
-  const T=rows.reduce((t,r)=>{['meta','rl','nv','up','ea','eaN','bs','bsN','pn','pr'].forEach(k=>t[k]+=r[k]);return t;},{meta:0,rl:0,nv:0,up:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
-  const Tgap=Math.max(T.meta-T.rl,0),Tcob=Tgap>0?(T.ea+T.bs)/Tgap:null;
-  const lbl=F.mes?MP[mi]+' 2026':'Consolidado 2026 (Jan–Dez) — filtre o Mês para ver um mês específico';
-  si('prod-sub',lbl+(F.hunter?' · '+F.hunter:'')+(F.uf?' · '+F.uf:'')+(F.produto?' · '+F.produto:'')+(F.uf?' · procurações não têm UF (mostradas sem esse filtro)':''));
-  si('pr1-lbl',F.mes?'🎯 Meta '+MP[mi]:'🎯 Meta anual 2026');si('th-prod-meta',F.mes?'Meta '+MP[mi]:'Meta anual');si('pr1-val',brl(T.meta));{const _n=rows.filter(r=>r.meta>0).length;si('pr1-sub',_n+(_n===1?' hunter':' hunters')+' com meta');}
-  si('pr2-val',brl(T.rl));si('pr2-sub','Novo: '+brl(T.nv)+' · Upsell: '+brl(T.up)+(T.meta>0?' · '+pf(T.rl/T.meta):''));sw('pr2-fill',T.meta>0?T.rl/T.meta*100:0);
-  si('pr3-val',Tgap>0?brl(Tgap):'Meta batida');si('pr3-sub',Tgap>0?rows.filter(r=>r.st[2]!=='g'&&r.meta>0).length+' hunters abaixo sem cobertura garantida':'Superou em '+brl(T.rl-T.meta));
-  si('pr4-val',brl(T.ea+T.bs));si('pr4-sub','Em Assinatura: '+brl(T.ea)+' ('+T.eaN+') · Base: '+brl(T.bs)+' ('+T.bsN+')');si('pr4-badge',Tcob===null?'Meta já batida':'Cobertura '+(Tcob*100).toFixed(0)+'% do gap');
-  si('pr5-val',T.pn+T.pr);si('pr5-sub','Novas: '+T.pn+' · Renovações: '+T.pr);
-  const dim=x=>`<span style="opacity:.35">${x}</span>`;
-  const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
-  document.getElementById('tb-prod').innerHTML=rows.map((r,i)=>{const a=r.meta>0?r.rl/r.meta:null;return`<tr><td>${i+1}</td><td><strong>${r.h}</strong></td><td class="r">${r.meta?brl(r.meta):dim('—')}</td><td class="r"><strong>${r.rl?brl(r.rl):dim('0')}</strong></td><td class="r" style="font-size:10px"><span class="g-text">${brl(r.nv)}</span> / <span class="p-text">${brl(r.up)}</span></td><td class="r"><strong style="color:${a===null?'inherit':colA(a)}">${a===null?dim('—'):pf(a)}</strong></td><td class="r">${r.gap?brl(r.gap):dim('—')}</td><td class="r">${r.ea?brl(r.ea)+' <span style="opacity:.5">('+r.eaN+')</span>':dim('—')}</td><td class="r">${r.bs?brl(r.bs)+' <span style="opacity:.5">('+r.bsN+')</span>':dim('—')}</td><td class="r">${r.cob===null?dim('—'):(r.cob*100).toFixed(0)+'%'}</td><td><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></td><td class="r">${r.pn} / ${r.pr}</td><td class="r" style="color:${r.aY===null?'inherit':colA(r.aY)}">${r.aY===null?dim('—'):pf(r.aY)}</td></tr>`;}).join('')
-    +(rows.length>1?`<tr style="border-top:2px solid var(--border);font-weight:700"><td></td><td>TIME</td><td class="r">${brl(T.meta)}</td><td class="r">${brl(T.rl)}</td><td class="r" style="font-size:10px">${brl(T.nv)} / ${brl(T.up)}</td><td class="r">${T.meta?pf(T.rl/T.meta):'—'}</td><td class="r">${brl(Tgap)}</td><td class="r">${brl(T.ea)}</td><td class="r">${brl(T.bs)}</td><td class="r">${Tcob===null?'—':(Tcob*100).toFixed(0)+'%'}</td><td></td><td class="r">${T.pn} / ${T.pr}</td><td></td></tr>`:'')
-    ||'<tr><td colspan="13" style="text-align:center;opacity:.6">Sem dados para os filtros selecionados</td></tr>';
+    .map(([h,v])=>{const meta=metaH(h),rl=v.nv+v.up,gap=Math.max(meta-rl,0),pipe=v.ea+v.bs,cob=gap>0?pipe/gap:null;
+      let st;if(meta<=0)st=['⚪','Sem meta','gr','var(--text3)'];else if(rl>=meta)st=['✅','Meta batida','g','var(--green)'];else if(v.ea>=gap)st=['🟢','Em Assinatura cobre','g','var(--green)'];else if(pipe>=gap)st=['🟡','Depende da Base','y','var(--yellow)'];else st=['🔴','Falta material','r','var(--red)'];
+      return{h,meta,rl,gap,pipe,cob,st,a:meta>0?rl/meta:null,...v};})
+    .sort((a,b)=>b.rl-a.rl||b.meta-a.meta);
+  return{rows,mi};
 }
 function rTime(d){
-  rProducao(d);
-  si('time-sl','Performance do Time Comercial · '+(F.mes?F.mes+' 2026':'Jan–'+MP[d.ytd_i-1]+' 2026'));
-  const hl=Object.entries(d.byh).sort((a,b)=>b[1].fat_novo-a[1].fat_novo);
-  const hm=hl.map(([h])=>{const mh=META_HUNTERS[h],mu=UPS_HUNTERS[h];if(F.mes){const mi=MESES.indexOf(F.mes);const novo=mh&&mi>=0?mh[mi]||0:0;const ups=mu&&mi>=0?mu[mi]||0:0;return novo+ups;}const novo=mh?mh.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;const ups=mu?mu.slice(0,d.ytd_i).reduce((s,v)=>s+v,0):0;return novo+ups;});
-  const at=hl.map(([,v],i)=>hm[i]>0?v.fat_novo/hm[i]:0);
-  const top=hl[0]||['—',{fat_novo:0}];
-  si('t1-val',hl.length);si('t1-sub',hl.filter(([h])=>META_HUNTERS[h]).length+' com meta definida');
-  si('t2-val',top[0]);si('t2-sub',brl(top[1].fat_novo)+' faturado novo');si('t2-badge',hm[0]>0?(at[0]*100).toFixed(0)+'% da meta':'');
-  si('t3-val',at.filter(a=>a>=1).length);si('t3-sub','Hunters ≥ 100% da meta');
-  si('t4-val',at.filter(a=>a>0&&a<0.7).length);si('t4-sub','Hunters < 70% da meta');
-  mk('ch-time-rank',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Meta YTD',data:hm,backgroundColor:'rgba(255,146,43,.3)',borderRadius:3},{label:'Novo',data:hl.map(([,v])=>v.fat_ass_novo||0),backgroundColor:'#20c997',borderRadius:3,stack:'f'},{label:'Upsell',data:hl.map(([,v])=>v.fat_ass_ups||0),backgroundColor:'#9775fa',borderRadius:3,stack:'f'}]},options:{...HORZ,scales:{x:{stacked:true,...GRID},y:{stacked:false,grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...HORZ.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>`${c.dataset.label}: ${brl(c.raw)}`}}}}});
-  mk('ch-time-mix',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Novo',data:hl.map(([,v])=>v.fat_ass_novo||0),backgroundColor:'#20c997',borderRadius:3,stack:'s'},{label:'Upsell',data:hl.map(([,v])=>v.fat_ass_ups||0),backgroundColor:'rgba(151,117,250,.6)',borderRadius:3,stack:'s'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{stacked:true,...GRID},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}}}}});
-  const _thMeta=document.getElementById('th-meta-ytd');if(_thMeta){_thMeta.textContent=F.mes?'Meta '+F.mes:'Meta YTD';}
-  document.getElementById('tb-hunters').innerHTML=hl.map(([h,v],i)=>{const mh=hm[i],a=mh>0?v.fat_novo/mh:0,col=a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';return`<tr><td>${i+1}</td><td><strong>${h}</strong></td><td class="r">${brlF(v.fat_ass_novo||0)}</td><td class="r b-text">${brl(v.fat_ass_ups||0)}</td><td class="r">${brl(mh)}</td><td class="r"><strong style="color:${col}">${mh>0?pf(a):'—'}</strong></td><td class="r">${v.emps.size}</td><td class="r">${v.prods.size}</td><td><div class="pbi"><span class="pbif" style="width:${Math.min(a*100,100).toFixed(0)}%;background:${col}"></span></div></td></tr>`;}).join('');
-  const _procSrc=F.mes?PROC_RECORDS.filter(p=>p.mes===F.mes):PROC_RECORDS;
-  const _isNova=t=>t&&/^nov[oa]$/i.test(t.trim());
-  const _bph={};_procSrc.filter(p=>_isNova(p.tipo)).forEach(p=>{_bph[p.hunter]=(_bph[p.hunter]||0)+1;});
-  document.getElementById('hunter-cards').innerHTML=HUNTERS_ORDER.map(({name:h,label},i)=>{const v=d.byh[h]||{fat_novo:0,fat_ass_novo:0,fat_ass_ups:0,fat_base:0,fat_pipe:0,emps:new Set()};const mh_h=META_HUNTERS[h],mu_h=UPS_HUNTERS[h];const _mi=F.mes?MESES.indexOf(F.mes):-1;const mh_novo=mh_h?(_mi>=0?mh_h[_mi]||0:mh_h.slice(0,d.ytd_i).reduce((s,x)=>s+x,0)):0;const mh_ups=mu_h?(_mi>=0?mu_h[_mi]||0:mu_h.slice(0,d.ytd_i).reduce((s,x)=>s+x,0)):0;const mh=mh_novo+mh_ups;const a=mh>0?v.fat_novo/mh:0;const col=a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';const pc=(_bph[h]||0)+(h==='KATARINY'?(_bph['KATARYNI']||0):0);return`<div class="kc" style="--kc:${col}"><div style="display:flex;align-items:center;justify-content:space-between"><div class="kc-lbl">${label}</div><span class="rn" style="font-size:10px;opacity:.6">${i+1}</span></div><div class="kc-val">${brl(v.fat_novo)}</div><div class="kc-sub">Novo: ${brl(v.fat_ass_novo||0)} · Ups: ${brl(v.fat_ass_ups||0)}</div><div class="kc-sub" style="font-size:9px;opacity:.65">Pipeline: ${brl(v.fat_pipe||0)} · Proc: ${pc}</div><div class="kc-bar"><div class="kc-fill" style="width:${Math.min(a*100,100).toFixed(0)}%;background:${col}"></div></div><div class="kc-pct"><span>Meta: ${brl(mh)}</span><span>${mh>0?pf(a):'S/meta'}</span></div></div>`;}).join('');
+  const {rows,mi}=hunterResultados();
+  const per=F.mes?MP[mi]+' 2026':'Consolidado 2026';
+  si('time-sl','Performance do Time Comercial · '+per+(F.hunter?' · '+F.hunter:'')+(F.uf?' · '+F.uf:'')+(F.produto?' · '+F.produto:''));
+  const T=rows.reduce((t,r)=>{['meta','rl','nv','up','ea','eaN','bs','bsN','pn','pr'].forEach(k=>t[k]+=r[k]);return t;},{meta:0,rl:0,nv:0,up:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
+  const Tgap=Math.max(T.meta-T.rl,0),Tcob=Tgap>0?(T.ea+T.bs)/Tgap:null;
+  const comMeta=rows.filter(r=>r.meta>0),acima=comMeta.filter(r=>r.a>=1).length,atenc=comMeta.filter(r=>r.st[2]==='r').length;
+  si('pr1-lbl',F.mes?'🎯 Meta '+MP[mi]:'🎯 Meta anual 2026');si('pr1-val',brl(T.meta));si('pr1-sub',comMeta.length+(comMeta.length===1?' hunter':' hunters')+' com meta · '+acima+' acima de 100%');
+  si('pr2-val',brl(T.rl));si('pr2-sub','Novo: '+brl(T.nv)+' · Upsell: '+brl(T.up));sw('pr2-fill',T.meta>0?T.rl/T.meta*100:0);si('pr2-pl',T.meta>0?pf(T.rl/T.meta)+' da meta':'—');si('pr2-pr',brl(T.meta));
+  si('pr3-val',Tgap>0?brl(Tgap):'Meta batida');si('pr3-sub',Tgap>0?atenc+(atenc===1?' hunter':' hunters')+' sem material suficiente':'Superou em '+brl(T.rl-T.meta));
+  si('pr4-val',brl(T.ea+T.bs));si('pr4-sub','Em Assinatura: '+brl(T.ea)+' ('+T.eaN+') · Base: '+brl(T.bs)+' ('+T.bsN+')');si('pr4-badge',Tcob===null?'Meta já batida':'Cobre '+(Tcob*100).toFixed(0)+'% do gap');
+  si('pr5-val',T.pn+T.pr);si('pr5-sub','Novas: '+T.pn+' · Renovações: '+T.pr);
+  // Ranking (mesma base dos cards)
+  const rk=rows.filter(r=>r.meta>0||r.rl>0);
+  si('time-rank-sub',F.mes?'Meta '+MP[mi]:'Meta anual 2026');
+  const _ch=document.getElementById('ch-time-rank');
+  mk('ch-time-rank',{type:'bar',data:{labels:rk.map(r=>r.h),datasets:[{label:F.mes?'Meta '+MP[mi]:'Meta anual',data:rk.map(r=>r.meta),backgroundColor:'rgba(255,146,43,.3)',borderRadius:3},{label:'Novo',data:rk.map(r=>r.nv),backgroundColor:'#20c997',borderRadius:3,stack:'f'},{label:'Upsell',data:rk.map(r=>r.up),backgroundColor:'#9775fa',borderRadius:3,stack:'f'}]},options:{...HORZ,scales:{x:{stacked:true,...GRID,ticks:{callback:v=>brl(v),color:'#4a5878'}},y:{stacked:false,grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...HORZ.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>`${c.dataset.label}: ${brl(c.raw)}`}}}}});
+  mk('ch-time-mix',{type:'bar',data:{labels:rk.map(r=>r.h),datasets:[{label:'Novo',data:rk.map(r=>r.nv),backgroundColor:'#20c997',borderRadius:3,stack:'s'},{label:'Upsell',data:rk.map(r=>r.up),backgroundColor:'rgba(151,117,250,.6)',borderRadius:3,stack:'s'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,animation:{duration:400},scales:{x:{stacked:true,...GRID,ticks:{callback:v=>brl(v),color:'#4a5878'}},y:{grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>`${c.dataset.label}: ${brl(c.raw)}`}}}}});
+  // Cards por hunter
+  const lab=h=>{const o=HUNTERS_ORDER.find(x=>x.name===h);return o?o.label:h.charAt(0)+h.slice(1).toLowerCase();};
+  const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
+  document.getElementById('hunter-cards').innerHTML=rows.map((r,i)=>`<div class="kc" style="--kc:${r.st[3]}">
+    <div class="hc-head"><div class="kc-lbl">${i+1}. ${lab(r.h)}</div><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></div>
+    <div class="kc-val">${brl(r.rl)}</div>
+    <div class="kc-bar"><div class="kc-fill" style="width:${Math.min((r.a||0)*100,100).toFixed(0)}%;background:${r.a===null?'var(--text3)':colA(r.a)}"></div></div>
+    <div class="kc-pct"><span>Meta ${r.meta?brl(r.meta):'—'}</span><span style="color:${r.a===null?'inherit':colA(r.a)};font-weight:700">${r.a===null?'S/ meta':pf(r.a)}</span></div>
+    <div class="hc-st">
+      <div class="hc-s"><span>🆕 Venda nova</span><b class="g-text">${brl(r.nv)}</b><i>${r.nvE.size} empresa${r.nvE.size!==1?'s':''}</i></div>
+      <div class="hc-s"><span>🔼 Upsell</span><b class="p-text">${brl(r.up)}</b><i>${r.upE.size} empresa${r.upE.size!==1?'s':''}</i></div>
+      <div class="hc-s"><span>📉 Gap</span><b style="color:${r.gap>0?'var(--red)':'var(--green)'}">${r.meta?(r.gap>0?brl(r.gap):'✓ 0'):'—'}</b><i>${r.cob===null?'&nbsp;':'pipeline cobre '+(r.cob*100).toFixed(0)+'%'}</i></div>
+      <div class="hc-s"><span>🧲 Pipeline</span><b>${brl(r.pipe)}</b><i>Assin. ${brl(r.ea)} · Base ${brl(r.bs)}</i></div>
+      <div class="hc-s" style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center"><span style="margin:0">📋 Procurações</span><b style="font-size:11px">${r.pn} novas · ${r.pr} renov.</b></div>
+    </div></div>`).join('')||'<div style="opacity:.6">Sem dados para os filtros selecionados</div>';
 }
 function rProc(d){
   // Helper: "NOVO"=nova, "RENOVAÇÃO"=reno — evita falso-positivo pois RENOVAÇÃO contém 'NOV'
