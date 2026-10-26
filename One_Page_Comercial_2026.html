@@ -355,15 +355,15 @@ tbody td{padding:6px 10px;color:var(--text)}
 
 <div class="panel" id="p-time">
   <div class="sl" id="time-sl">Performance do Time Comercial · Mai 2026</div>
-  <div class="cc full" id="prod-box"><div class="cc-head"><div><div class="cc-title">🎯 Mês do Hunter — Meta × Realizado × Material para fechar</div><div class="cc-sub" id="prod-sub">—</div></div></div>
+  <div class="cc full" id="prod-box"><div class="cc-head"><div><div class="cc-title">🎯 Resultado do Hunter — Meta × Realizado × Material para fechar</div><div class="cc-sub" id="prod-sub">—</div></div></div>
     <div class="kg kg-5" style="margin-bottom:10px">
-      <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">🎯 Meta do mês</div><div class="kc-val" id="pr1-val">—</div><div class="kc-sub" id="pr1-sub">—</div></div>
+      <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl" id="pr1-lbl">🎯 Meta</div><div class="kc-val" id="pr1-val">—</div><div class="kc-sub" id="pr1-sub">—</div></div>
       <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">✅ Realizado</div><div class="kc-val" id="pr2-val">—</div><div class="kc-sub" id="pr2-sub">—</div><div class="kc-bar"><div class="kc-fill" id="pr2-fill" style="width:0%;background:var(--green)"></div></div></div>
       <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">📉 Gap p/ meta</div><div class="kc-val" id="pr3-val">—</div><div class="kc-sub" id="pr3-sub">—</div></div>
       <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🧲 Pipeline disponível</div><div class="kc-val" id="pr4-val">—</div><div class="kc-sub" id="pr4-sub">—</div><span class="kc-badge up" id="pr4-badge">—</span></div>
       <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Procurações</div><div class="kc-val" id="pr5-val">—</div><div class="kc-sub" id="pr5-sub">—</div></div>
     </div>
-    <div class="tw h300"><table><thead><tr><th>#</th><th>Hunter</th><th class="r">Meta mês</th><th class="r">Realizado</th><th class="r">Novo / Upsell</th><th class="r">Ating.</th><th class="r">Gap</th><th class="r">Em Assinatura</th><th class="r">Base</th><th class="r">Cobertura</th><th>Material p/ meta</th><th class="r">Proc. N / R</th><th class="r">Ating. YTD</th></tr></thead><tbody id="tb-prod"></tbody></table></div>
+    <div class="tw h300"><table><thead><tr><th>#</th><th>Hunter</th><th class="r" id="th-prod-meta">Meta</th><th class="r">Realizado</th><th class="r">Novo / Upsell</th><th class="r">Ating.</th><th class="r">Gap</th><th class="r">Em Assinatura</th><th class="r">Base</th><th class="r">Cobertura</th><th>Material p/ meta</th><th class="r">Proc. N / R</th><th class="r">Ating. YTD</th></tr></thead><tbody id="tb-prod"></tbody></table></div>
     <div style="font-size:9px;color:var(--text3);margin-top:6px">Cobertura = (Em Assinatura + Base) ÷ Gap. 🟢 Em Assinatura sozinho cobre o gap · 🟡 cobre só somando a Base · 🔴 pipeline menor que o gap. Pipeline = oportunidades abertas do hunter (qualquer mês); Standby/perdido não entra.</div>
   </div>
   <div class="kg kg-4">
@@ -861,16 +861,17 @@ function rProducao(d){
   // Visão do MÊS por hunter: meta, realizado, gap, pipeline disponível, procurações. Respeita filtros.
   const TODAY_I=new Date().getMonth();
   const mi=F.mes?MESES.indexOf(F.mes):TODAY_I, M=MESES[mi];
+  const MS=F.mes?new Set([F.mes]):new Set(MESES); // sem filtro de mês = consolidado do ano
   const isNova=t=>t&&/^nov[oa]$/i.test(t.trim()), isReno=t=>t&&/renov/i.test(t);
   const normH=h=>h==='KATARYNI'?'KATARINY':h;
   const _isUps=r=>String(r.contrato||'').trim().toUpperCase()==='UPSELL';
   const base=RECORDS.filter(r=>(!F.hunter||r.hunter===F.hunter)&&(!F.uf||r.uf===F.uf)&&(!F.produto||r.produto===F.produto));
-  const real=base.filter(r=>r.status==='ASSINADO'&&r.mes_ass===M);
+  const real=base.filter(r=>r.status==='ASSINADO'&&(!F.mes||r.mes_ass===F.mes));
   const realYTD=base.filter(r=>r.status==='ASSINADO'&&MESES.indexOf(r.mes_ass)>=0&&MESES.indexOf(r.mes_ass)<=mi);
   const emAss=base.filter(r=>r.status==='EM ASSINATURA'), bas=base.filter(r=>r.status==='BASE');
-  const proc=(PROC_RECORDS||[]).filter(p=>(!F.hunter||normH(p.hunter)===F.hunter)&&p.mes===M);
+  const proc=(PROC_RECORDS||[]).filter(p=>(!F.hunter||normH(p.hunter)===F.hunter)&&(!F.mes||p.mes===F.mes));
   const rem=new Set((META_AJUSTE&&META_AJUSTE.removidos)||[]);
-  const metaM=h=>((META_HUNTERS[h]||[])[mi]||0)+((UPS_HUNTERS[h]||[])[mi]||0);
+  const metaM=h=>MESES.reduce((t,m,i)=>MS.has(m)?t+((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0):t,0);
   const metaYTD=h=>{let t=0;for(let i=0;i<=mi;i++)t+=((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0);return t;};
   const H={};const g=h=>H[h]||(H[h]={nv:0,up:0,ytd:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
   real.forEach(r=>{const o=g(r.hunter);if(_isUps(r))o.up+=r.fat||0;else o.nv+=r.fat||0;});
@@ -886,9 +887,9 @@ function rProducao(d){
     .sort((a,b)=>b.meta-a.meta||b.rl-a.rl);
   const T=rows.reduce((t,r)=>{['meta','rl','nv','up','ea','eaN','bs','bsN','pn','pr'].forEach(k=>t[k]+=r[k]);return t;},{meta:0,rl:0,nv:0,up:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0});
   const Tgap=Math.max(T.meta-T.rl,0),Tcob=Tgap>0?(T.ea+T.bs)/Tgap:null;
-  const lbl=MP[mi]+' 2026'+(F.mes?'':' (mês atual — use o filtro Mês para trocar)');
+  const lbl=F.mes?MP[mi]+' 2026':'Consolidado 2026 (Jan–Dez) — filtre o Mês para ver um mês específico';
   si('prod-sub',lbl+(F.hunter?' · '+F.hunter:'')+(F.uf?' · '+F.uf:'')+(F.produto?' · '+F.produto:'')+(F.uf?' · procurações não têm UF (mostradas sem esse filtro)':''));
-  si('pr1-val',brl(T.meta));{const _n=rows.filter(r=>r.meta>0).length;si('pr1-sub',_n+(_n===1?' hunter':' hunters')+' com meta');}
+  si('pr1-lbl',F.mes?'🎯 Meta '+MP[mi]:'🎯 Meta anual 2026');si('th-prod-meta',F.mes?'Meta '+MP[mi]:'Meta anual');si('pr1-val',brl(T.meta));{const _n=rows.filter(r=>r.meta>0).length;si('pr1-sub',_n+(_n===1?' hunter':' hunters')+' com meta');}
   si('pr2-val',brl(T.rl));si('pr2-sub','Novo: '+brl(T.nv)+' · Upsell: '+brl(T.up)+(T.meta>0?' · '+pf(T.rl/T.meta):''));sw('pr2-fill',T.meta>0?T.rl/T.meta*100:0);
   si('pr3-val',Tgap>0?brl(Tgap):'Meta batida');si('pr3-sub',Tgap>0?rows.filter(r=>r.st[2]!=='g'&&r.meta>0).length+' hunters abaixo sem cobertura garantida':'Superou em '+brl(T.rl-T.meta));
   si('pr4-val',brl(T.ea+T.bs));si('pr4-sub','Em Assinatura: '+brl(T.ea)+' ('+T.eaN+') · Base: '+brl(T.bs)+' ('+T.bsN+')');si('pr4-badge',Tcob===null?'Meta já batida':'Cobertura '+(Tcob*100).toFixed(0)+'% do gap');
