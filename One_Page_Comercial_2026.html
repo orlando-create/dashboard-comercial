@@ -171,7 +171,7 @@ tbody td{padding:6px 10px;color:var(--text)}
 
 
 /* ── MODAL SEM PROC ── */
-#modal-sem-proc,#modal-sem-valor,#modal-pipeline,#modal-emass{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;overflow-y:auto;padding:24px 16px}
+#modal-sem-proc,#modal-sem-valor,#modal-pipeline,#modal-emass,#modal-hunter{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;overflow-y:auto;padding:24px 16px}
 .modal-box{max-width:960px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
 .modal-hdr h2{font-size:15px;font-weight:800;color:var(--red)}
@@ -185,6 +185,10 @@ tbody td{padding:6px 10px;color:var(--text)}
 @media(max-width:1200px){.kg-5{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.kg-5,.kg-4,.kg-3{grid-template-columns:repeat(2,1fr)}.g2,.g3,.g21,.g12{grid-template-columns:1fr}}
 
+.hc-click{cursor:pointer}.hc-click:hover{border-color:var(--accent);transform:translateY(-2px)}
+#modal-hunter .modal-box{max-width:1180px}
+#modal-hunter .modal-hdr h2{color:var(--text)}
+.mh-row-sel td{background:rgba(79,127,255,.12)}
 .hc-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .hc-st{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .hc-s{background:var(--card2);border-radius:6px;padding:6px 8px;min-width:0}
@@ -541,6 +545,34 @@ tbody td{padding:6px 10px;color:var(--text)}
   </div>
 </div>
 
+<div id="modal-hunter" onclick="if(event.target===this)closeHunterModal()">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div><h2 id="mh-title">—</h2><p id="mh-sub">—</p></div>
+      <button class="modal-close" onclick="closeHunterModal()">✕ Fechar</button>
+    </div>
+    <div class="kg kg-5" style="margin-bottom:12px">
+      <div class="kc" id="mh-k1c"><div class="kc-lbl" id="mh-k1l">🎯 Realizado × Meta</div><div class="kc-val" id="mh-k1">—</div><div class="kc-sub" id="mh-k1s">—</div><div class="kc-bar"><div class="kc-fill" id="mh-k1f" style="width:0%"></div></div></div>
+      <div class="kc" style="--kc:var(--green)"><div class="kc-lbl">🆕 Venda nova</div><div class="kc-val g-text" id="mh-k2">—</div><div class="kc-sub" id="mh-k2s">—</div></div>
+      <div class="kc" style="--kc:var(--purple)"><div class="kc-lbl">🔼 Upsell</div><div class="kc-val p-text" id="mh-k3">—</div><div class="kc-sub" id="mh-k3s">—</div></div>
+      <div class="kc" style="--kc:var(--red)"><div class="kc-lbl">📉 Gap · 🧲 Pipeline</div><div class="kc-val" id="mh-k4">—</div><div class="kc-sub" id="mh-k4s">—</div></div>
+      <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">📋 Procurações</div><div class="kc-val" id="mh-k5">—</div><div class="kc-sub" id="mh-k5s">—</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="cc"><div class="cc-head"><div><div class="cc-title">📅 Mês a mês — Meta × Realizado</div><div class="cc-sub">Jan–Dez 2026</div></div></div><div style="position:relative;height:230px"><canvas id="ch-mh-mes"></canvas></div></div>
+      <div class="cc"><div class="cc-head"><div><div class="cc-title">📊 Resumo mensal</div></div></div>
+        <div class="tw" style="max-height:250px"><table><thead><tr><th>Mês</th><th class="r">Meta</th><th class="r">Novo</th><th class="r">Upsell</th><th class="r">Total</th><th class="r">Ating.</th><th class="r">Proc. N/R</th></tr></thead><tbody id="tb-mh-mes"></tbody></table></div></div>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="cc"><div class="cc-head"><div><div class="cc-title">✅ Contratos assinados</div><div class="cc-sub" id="mh-ass-sub">—</div></div></div>
+        <div class="tw h260"><table><thead><tr><th>Mês</th><th>Empresa</th><th>Produto</th><th>Tipo</th><th class="r">Valor</th></tr></thead><tbody id="tb-mh-ass"></tbody></table></div></div>
+      <div class="cc"><div class="cc-head"><div><div class="cc-title">🧲 Pipeline — material para fechar</div><div class="cc-sub" id="mh-pipe-sub">—</div></div></div>
+        <div class="tw h260"><table><thead><tr><th>Etapa</th><th>Empresa</th><th>Produto</th><th>Temp.</th><th>Mês</th><th class="r">Valor</th></tr></thead><tbody id="tb-mh-pipe"></tbody></table></div></div>
+    </div>
+    <div class="cc"><div class="cc-head"><div><div class="cc-title">📋 Procurações</div><div class="cc-sub" id="mh-proc-sub">—</div></div></div>
+      <div class="tw" style="max-height:200px"><table><thead><tr><th>Mês</th><th>Empresa</th><th>Tipo</th></tr></thead><tbody id="tb-mh-proc"></tbody></table></div></div>
+  </div>
+</div>
 <div id="modal-pipeline" onclick="if(event.target===this)closePipelineModal()">
   <div class="modal-box">
     <div class="modal-hdr">
@@ -741,6 +773,7 @@ function showTab(t){
   if(typeof closeProcModal==='function') closeProcModal();
   if(typeof closeSemValorModal==='function') closeSemValorModal();
   if(typeof closePipelineModal==='function') closePipelineModal();
+  if(typeof closeHunterModal==='function') closeHunterModal();
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
   document.querySelectorAll('.panel').forEach(e=>e.classList.remove('on'));
   document.querySelector('[data-t="'+t+'"]').classList.add('on');
@@ -896,8 +929,8 @@ function rTime(d){
   // Cards por hunter
   const lab=h=>{const o=HUNTERS_ORDER.find(x=>x.name===h);return o?o.label:h.charAt(0)+h.slice(1).toLowerCase();};
   const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
-  document.getElementById('hunter-cards').innerHTML=rows.map((r,i)=>`<div class="kc" style="--kc:${r.st[3]}">
-    <div class="hc-head"><div class="kc-lbl">${i+1}. ${lab(r.h)}</div><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></div>
+  document.getElementById('hunter-cards').innerHTML=rows.map((r,i)=>`<div class="kc hc-click" style="--kc:${r.st[3]}" onclick="openHunterModal('${r.h.replace(/'/g,"\\'")}')" title="Clique para ver detalhes">
+    <div class="hc-head"><div class="kc-lbl">${i+1}. ${lab(r.h)} <span style="opacity:.5;font-size:8px">↗ detalhes</span></div><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></div>
     <div class="kc-val">${brl(r.rl)}</div>
     <div class="kc-bar"><div class="kc-fill" style="width:${Math.min((r.a||0)*100,100).toFixed(0)}%;background:${r.a===null?'var(--text3)':colA(r.a)}"></div></div>
     <div class="kc-pct"><span>Meta ${r.meta?brl(r.meta):'—'}</span><span style="color:${r.a===null?'inherit':colA(r.a)};font-weight:700">${r.a===null?'S/ meta':pf(r.a)}</span></div>
@@ -908,6 +941,55 @@ function rTime(d){
       <div class="hc-s"><span>🧲 Pipeline</span><b>${brl(r.pipe)}</b><i>Assin. ${brl(r.ea)} · Base ${brl(r.bs)}</i></div>
       <div class="hc-s" style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center"><span style="margin:0">📋 Procurações</span><b style="font-size:11px">${r.pn} novas · ${r.pr} renov.</b></div>
     </div></div>`).join('')||'<div style="opacity:.6">Sem dados para os filtros selecionados</div>';
+}
+let _mhHunter=null;
+function openHunterModal(h){_mhHunter=h;document.getElementById('modal-hunter').style.display='block';document.body.style.overflow='hidden';_renderHunterModal();}
+function closeHunterModal(){const m=document.getElementById('modal-hunter');if(m)m.style.display='none';document.body.style.overflow='';_mhHunter=null;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHunterModal();});
+function _renderHunterModal(){
+  const h=_mhHunter;if(!h)return;
+  const {rows,mi}=hunterResultados();
+  const r=rows.find(x=>x.h===h)||{h,meta:0,rl:0,nv:0,up:0,nvE:new Set(),upE:new Set(),gap:0,pipe:0,ea:0,eaN:0,bs:0,bsN:0,pn:0,pr:0,cob:null,a:null,st:['⚪','Sem meta','gr','var(--text3)']};
+  const lab=(HUNTERS_ORDER.find(x=>x.name===h)||{}).label||h;
+  const per=F.mes?MP[mi]+' 2026':'Consolidado 2026';
+  const isNova=t=>t&&/^nov[oa]$/i.test(t.trim()), isReno=t=>t&&/renov/i.test(t);
+  const normH=x=>x==='KATARYNI'?'KATARINY':x;
+  const _isUps=x=>String(x.contrato||'').trim().toUpperCase()==='UPSELL';
+  const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
+  si('mh-title','👤 '+lab+' <span class="tag t'+r.st[2]+'" style="font-size:10px;vertical-align:middle">'+r.st[0]+' '+r.st[1]+'</span>');
+  si('mh-sub',per+(F.uf?' · '+F.uf:'')+(F.produto?' · '+F.produto:'')+' · clique fora ou ESC para fechar');
+  document.getElementById('mh-k1c').style.setProperty('--kc',r.st[3]);
+  si('mh-k1l',F.mes?'🎯 Realizado × Meta '+MP[mi]:'🎯 Realizado × Meta anual');
+  si('mh-k1',brl(r.rl));si('mh-k1s','Meta '+(r.meta?brl(r.meta):'—')+' · '+(r.a===null?'sem meta':pf(r.a)));
+  const f=document.getElementById('mh-k1f');f.style.width=Math.min((r.a||0)*100,100)+'%';f.style.background=r.a===null?'var(--text3)':colA(r.a);
+  si('mh-k2',brl(r.nv));si('mh-k2s',r.nvE.size+' empresa'+(r.nvE.size!==1?'s':'')+' · ticket '+brl(r.nvE.size?r.nv/r.nvE.size:0));
+  si('mh-k3',brl(r.up));si('mh-k3s',r.upE.size+' empresa'+(r.upE.size!==1?'s':'')+' · ticket '+brl(r.upE.size?r.up/r.upE.size:0));
+  si('mh-k4',r.meta?(r.gap>0?brl(r.gap):'✓ 0'):'—');si('mh-k4s','Pipeline '+brl(r.pipe)+(r.cob!==null?' · cobre '+(r.cob*100).toFixed(0)+'% do gap':'')+'<br>Assin. '+brl(r.ea)+' ('+r.eaN+') · Base '+brl(r.bs)+' ('+r.bsN+')');
+  si('mh-k5',r.pn+r.pr);si('mh-k5s','Novas: '+r.pn+' · Renovações: '+r.pr);
+  // Mês a mês (ano todo, respeita UF/produto)
+  const src=RECORDS.filter(x=>x.hunter===h&&(!F.uf||x.uf===F.uf)&&(!F.produto||x.produto===F.produto));
+  const procAll=(PROC_RECORDS||[]).filter(p=>normH(p.hunter)===h);
+  const bm=MESES.map((m,i)=>{const ass=src.filter(x=>x.status==='ASSINADO'&&x.mes_ass===m);const nv=ass.filter(x=>!_isUps(x)).reduce((t,x)=>t+(x.fat||0),0),up=ass.filter(_isUps).reduce((t,x)=>t+(x.fat||0),0);
+    const meta=((META_HUNTERS[h]||[])[i]||0)+((UPS_HUNTERS[h]||[])[i]||0);const pp=procAll.filter(p=>p.mes===m);return{m,i,meta,nv,up,tot:nv+up,pn:pp.filter(p=>isNova(p.tipo)).length,pr:pp.filter(p=>isReno(p.tipo)).length};});
+  mk('ch-mh-mes',{type:'bar',data:{labels:MP,datasets:[{label:'Meta',data:bm.map(x=>x.meta),backgroundColor:'rgba(255,146,43,.3)',borderRadius:3,order:3},{label:'Novo',data:bm.map(x=>x.nv),backgroundColor:'#20c997',borderRadius:3,stack:'r',order:2},{label:'Upsell',data:bm.map(x=>x.up),backgroundColor:'#9775fa',borderRadius:3,stack:'r',order:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},scales:{x:{...GRID,ticks:{color:'#8899bb',font:{size:10}}},y:{...GRID,ticks:{callback:v=>brl(v),color:'#4a5878'}}},plugins:{...BASE.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>c.dataset.label+': '+brl(c.raw)}}}}});
+  const TT=bm.reduce((t,x)=>{t.meta+=x.meta;t.nv+=x.nv;t.up+=x.up;t.tot+=x.tot;t.pn+=x.pn;t.pr+=x.pr;return t;},{meta:0,nv:0,up:0,tot:0,pn:0,pr:0});
+  const dim=x=>'<span style="opacity:.35">'+x+'</span>';
+  const _hoje=new Date().getMonth();document.getElementById('tb-mh-mes').innerHTML=bm.map(x=>{const a=(x.meta>0&&!(x.i>_hoje&&!x.tot))?x.tot/x.meta:null;return`<tr class="${F.mes===x.m?'mh-row-sel':''}"><td><strong>${MP[x.i]}</strong></td><td class="r">${x.meta?brl(x.meta):dim('—')}</td><td class="r g-text">${x.nv?brl(x.nv):dim('—')}</td><td class="r p-text">${x.up?brl(x.up):dim('—')}</td><td class="r"><strong>${x.tot?brl(x.tot):dim('0')}</strong></td><td class="r" style="color:${a===null?'inherit':colA(a)};font-weight:700">${a===null?dim('—'):pf(a)}</td><td class="r">${x.pn} / ${x.pr}</td></tr>`;}).join('')
+    +`<tr style="border-top:2px solid var(--border);font-weight:700"><td>Ano</td><td class="r">${brl(TT.meta)}</td><td class="r">${brl(TT.nv)}</td><td class="r">${brl(TT.up)}</td><td class="r">${brl(TT.tot)}</td><td class="r">${TT.meta?pf(TT.tot/TT.meta):'—'}</td><td class="r">${TT.pn} / ${TT.pr}</td></tr>`;
+  // Contratos assinados no período
+  const ass=src.filter(x=>x.status==='ASSINADO'&&(!F.mes||x.mes_ass===F.mes)).sort((a,b)=>MESES.indexOf(b.mes_ass)-MESES.indexOf(a.mes_ass)||(b.fat||0)-(a.fat||0));
+  si('mh-ass-sub',per+' · '+ass.length+' linha'+(ass.length!==1?'s':'')+' · '+brl(ass.reduce((t,x)=>t+(x.fat||0),0)));
+  document.getElementById('tb-mh-ass').innerHTML=ass.map(x=>`<tr><td class="b-text">${x.mes_ass||'—'}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x.empresa}"><strong>${x.empresa}</strong></td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x.produto||''}">${x.produto||'—'}</td><td><span class="tag t${_isUps(x)?'p':'g'}">${_isUps(x)?'UPSELL':'NOVO'}</span></td><td class="r">${x.fat?brlF(x.fat):dim('sem valor')}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;opacity:.6">Nenhum contrato no período</td></tr>';
+  // Pipeline aberto (qualquer mês)
+  const pipe=src.filter(x=>x.status==='EM ASSINATURA'||x.status==='BASE').sort((a,b)=>(a.status==='EM ASSINATURA'?0:1)-(b.status==='EM ASSINATURA'?0:1)||(b.fat||0)-(a.fat||0));
+  const stb=src.filter(x=>x.status==='STANDBY');
+  si('mh-pipe-sub',pipe.length+' oportunidade'+(pipe.length!==1?'s':'')+' · '+brl(r.pipe)+(stb.length?' · '+stb.length+' em Standby (perdido, não contado)':''));
+  const TC={'QUENTE':'r','MORNO':'y','MORNA':'y','FRIA':'b','FRIO':'b'};
+  document.getElementById('tb-mh-pipe').innerHTML=pipe.map(x=>`<tr><td><span class="tag t${x.status==='EM ASSINATURA'?'y':'p'}">${x.status==='EM ASSINATURA'?'Em Assinatura':'Base'}</span></td><td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x.empresa}"><strong>${x.empresa}</strong></td><td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x.produto||''}">${x.produto||'—'}</td><td>${x.temp?'<span class="tag t'+(TC[String(x.temp).toUpperCase()]||'gr')+'">'+x.temp+'</span>':'—'}</td><td class="b-text">${x.mes_ass||x.mes||'—'}</td><td class="r">${x.fat?brlF(x.fat):dim('—')}</td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;opacity:.6">Sem oportunidades abertas</td></tr>';
+  // Procurações do período
+  const proc=procAll.filter(p=>!F.mes||p.mes===F.mes).sort((a,b)=>MESES.indexOf(b.mes)-MESES.indexOf(a.mes));
+  si('mh-proc-sub',per+' · '+proc.length+' procuraç'+(proc.length!==1?'ões':'ão'));
+  document.getElementById('tb-mh-proc').innerHTML=proc.map(p=>`<tr><td class="b-text">${p.mes||'—'}</td><td><strong>${p.empresa}</strong></td><td><span class="tag t${isNova(p.tipo)?'g':isReno(p.tipo)?'b':'gr'}">${p.tipo||'—'}</span></td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;opacity:.6">Nenhuma procuração no período</td></tr>';
 }
 function rProc(d){
   // Helper: "NOVO"=nova, "RENOVAÇÃO"=reno — evita falso-positivo pois RENOVAÇÃO contém 'NOV'
