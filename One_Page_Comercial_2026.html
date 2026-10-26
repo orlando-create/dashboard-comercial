@@ -929,7 +929,8 @@ function rTime(d){
   // Cards por hunter
   const lab=h=>{const o=HUNTERS_ORDER.find(x=>x.name===h);return o?o.label:h.charAt(0)+h.slice(1).toLowerCase();};
   const colA=a=>a>=1?'var(--green)':a>=0.7?'var(--yellow)':'var(--red)';
-  document.getElementById('hunter-cards').innerHTML=rows.map((r,i)=>`<div class="kc hc-click" style="--kc:${r.st[3]}" onclick="openHunterModal('${r.h.replace(/'/g,"\\'")}')" title="Clique para ver detalhes">
+  // Cards: oculta quem não tem meta, nem venda, nem pipeline (só procurações) — totais acima continuam completos
+  document.getElementById('hunter-cards').innerHTML=rows.filter(r=>r.meta>0||r.rl>0||r.pipe>0).map((r,i)=>`<div class="kc hc-click" style="--kc:${r.st[3]}" onclick="openHunterModal('${r.h.replace(/'/g,"\\'")}')" title="Clique para ver detalhes">
     <div class="hc-head"><div class="kc-lbl">${i+1}. ${lab(r.h)} <span style="opacity:.5;font-size:8px">↗ detalhes</span></div><span class="tag t${r.st[2]}">${r.st[0]} ${r.st[1]}</span></div>
     <div class="kc-val">${brl(r.rl)}</div>
     <div class="kc-bar"><div class="kc-fill" style="width:${Math.min((r.a||0)*100,100).toFixed(0)}%;background:${r.a===null?'var(--text3)':colA(r.a)}"></div></div>
