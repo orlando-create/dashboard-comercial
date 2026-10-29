@@ -407,7 +407,7 @@ tbody td{padding:6px 10px;color:var(--text)}
   <div class="kg kg-5">
     <div class="kc" style="--kc:var(--teal)"><div class="kc-lbl">🏢 Empresas Únicas</div><div class="kc-val" id="c1-val">—</div><div class="kc-sub" id="c1-sub">—</div></div>
     <div class="kc" style="--kc:var(--accent)"><div class="kc-lbl">🆕 Empresas Novas</div><div class="kc-val" id="c2-val">—</div><div class="kc-sub" id="c2-sub">—</div><span class="kc-badge neu" id="c2-badge">—</span></div>
-    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">♻ Base (Upsell)</div><div class="kc-val" id="c3-val">—</div><div class="kc-sub" id="c3-sub">—</div><span class="kc-badge warn" id="c3-badge">—</span></div>
+    <div class="kc" style="--kc:var(--orange)"><div class="kc-lbl">♻ Empresas com Upsell</div><div class="kc-val" id="c3-val">—</div><div class="kc-sub" id="c3-sub">—</div><span class="kc-badge warn" id="c3-badge">—</span></div>
     <div class="kc" style="--kc:var(--blue)"><div class="kc-lbl">💵 Receita/Empresa</div><div class="kc-val" id="c4-val">—</div><div class="kc-sub" id="c4-sub">—</div></div>
     <div class="kc" style="--kc:var(--purple)"><div class="kc-lbl">📦 Produtos/Empresa</div><div class="kc-val" id="c5-val">—</div><div class="kc-sub" id="c5-sub">—</div><span class="kc-badge warn">Cross-sell index</span></div>
   </div>
@@ -684,6 +684,7 @@ function agg(recs){
   const emps_novo=new Set(ass.map(r=>r.empresa)),emps_base=new Set(base.map(r=>r.empresa)),emps_fech=new Set(fech.map(r=>r.empresa));
   // Empresas de contrato NOVO de fato (exclui quem tem qualquer linha UPSELL) — usado no card "Receita Nova"
   const emps_ass_novo=new Set(ass.filter(r=>!_isUps(r)).map(r=>r.empresa));
+  const emps_ass_ups=new Set(ass.filter(_isUps).map(r=>r.empresa)); // empresas com UPSELL assinado no filtro atual
   // Pipeline (forecast) = Base (possibilidade de assinatura) + Em Assinatura (eminência de fechar).
   // STANDBY é perdido — não entra no potencial do pipeline, é reportado à parte.
   const emAssinatura=recs.filter(r=>r.status==='EM ASSINATURA');
@@ -767,7 +768,7 @@ function agg(recs){
   const emps_ass_com_valor=new Set(Object.entries(_emp_fat_map).filter(([,v])=>v>0).map(([e])=>e));
   const ticket_real=emps_ass_com_valor.size>0?fat_novo/emps_ass_com_valor.size:0;
   const receita_estimada_pot=emps_ass_sem_valor.size*ticket_real;
-  return{recs,fat_novo,fat_base,fat_total,fat_pipe,fat_ass_novo,fat_ass_ups,fat_base_novo,fat_base_ups,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,emps_ass_novo:emps_ass_novo.size,fat_em_assinatura,fat_standby,emps_em_assinatura:emps_em_assinatura.size,emps_standby:emps_standby.size,emps_pipeline_total:emps_pipeline_total.size,opp_pipeline,base_recs:base,emass_recs:emAssinatura,standby_recs:standby,emps_abordadas:emps_abordadas.size,emps_conv:emps_conv.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,meta_mes,ups_mes,ups_ytd,ups_anual,novo_anual,novo_mes,meta_total_ytd,meta_total_anual,emps_ass_sem_valor:emps_ass_sem_valor.size,emps_ass_com_valor:emps_ass_com_valor.size,receita_estimada_pot,ticket_real,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
+  return{recs,fat_novo,fat_base,fat_total,fat_pipe,fat_ass_novo,fat_ass_ups,fat_base_novo,fat_base_ups,cred,emps_novo:emps_novo.size,emps_base:emps_base.size,emps_fech:emps_fech.size,emps_ass_novo:emps_ass_novo.size,emps_ass_ups:emps_ass_ups.size,fat_em_assinatura,fat_standby,emps_em_assinatura:emps_em_assinatura.size,emps_standby:emps_standby.size,emps_pipeline_total:emps_pipeline_total.size,opp_pipeline,base_recs:base,emass_recs:emAssinatura,standby_recs:standby,emps_abordadas:emps_abordadas.size,emps_conv:emps_conv.size,fat_parc,conv,ticket,mrr:fat_novo/Math.max(ytd_i,1),bym,ytd_i,meta_m,meta_ytd,meta_anual,meta_mes,ups_mes,ups_ytd,ups_anual,novo_anual,novo_mes,meta_total_ytd,meta_total_anual,emps_ass_sem_valor:emps_ass_sem_valor.size,emps_ass_com_valor:emps_ass_com_valor.size,receita_estimada_pot,ticket_real,ating,ating_ytd_total,ating_anual,byh,byprod,byuf,byparc,bytemp,empprod,top_cli,xd,apas,apas_fat,apas_cred,apas_emps_set,apas_byh,apas_emps};
 }
 function showTab(t){
   if(typeof closeProcModal==='function') closeProcModal();
@@ -1023,8 +1024,9 @@ function rProc(d){
 function rClientes(d){
   const emps=Object.entries(d.empprod),tot_e=emps.length,xsi=tot_e>0?emps.reduce((s,[,v])=>s+v.prods.size,0)/tot_e:0;
   si('c1-val',d.emps_fech);si('c1-sub','Total sem duplicatas');
-  si('c2-val',d.emps_novo);si('c2-sub','Primeiro contrato 2026');si('c2-badge',d.emps_fech>0?(d.emps_novo/d.emps_fech*100).toFixed(0)+'%':'');
-  si('c3-val',d.emps_base);si('c3-sub','Expansão de contratos');si('c3-badge',d.emps_fech>0?(d.emps_base/d.emps_fech*100).toFixed(0)+'%':'');
+  // Regra (28/10/2026): Empresas Novas = so contrato NOVO assinado (Upsell nao conta). Tudo respeita os filtros do topo.
+  si('c2-val',d.emps_ass_novo);si('c2-sub','Contrato novo assinado (sem Upsell)');si('c2-badge',d.emps_fech>0?(d.emps_ass_novo/d.emps_fech*100).toFixed(0)+'%':'');
+  si('c3-val',d.emps_ass_ups);si('c3-sub','Empresas com Upsell assinado');si('c3-badge',d.emps_fech>0?(d.emps_ass_ups/d.emps_fech*100).toFixed(0)+'%':'');
   si('c4-val',brl(d.ticket));si('c4-sub','Média por empresa');
   si('c5-val',xsi.toFixed(1)+'×');si('c5-sub','Produtos médios por empresa');
   const sorted=emps.sort((a,b)=>b[1].fat-a[1].fat),tot_f=sorted.reduce((s,[,v])=>s+v.fat,0);
