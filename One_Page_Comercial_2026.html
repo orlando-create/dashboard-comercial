@@ -742,8 +742,8 @@ function agg(recs){
   const bytemp={};
   pipe.forEach(r=>{if(!bytemp[r.temp])bytemp[r.temp]={fat:0,cnt:0};bytemp[r.temp].fat+=r.fat;bytemp[r.temp].cnt++;});
   const empprod={};
-  fech.forEach(r=>{if(!empprod[r.empresa])empprod[r.empresa]={fat:0,prods:new Set(),hunter:r.hunter,uf:r.uf,status:r.status};empprod[r.empresa].fat+=r.fat;empprod[r.empresa].prods.add(r.produto);});
-  const top_cli=Object.entries(empprod).sort((a,b)=>b[1].fat-a[1].fat).slice(0,15).map(([e,v])=>({emp:e,fat:v.fat,n_prods:v.prods.size,hunter:v.hunter,uf:v.uf,status:v.status}));
+  fech.forEach(r=>{if(!empprod[r.empresa])empprod[r.empresa]={fat:0,prods:new Set(),hunter:r.hunter,uf:r.uf,status:r.status,ctr:new Set()};empprod[r.empresa].fat+=r.fat;empprod[r.empresa].prods.add(r.produto);empprod[r.empresa].ctr.add(_isUps(r)?'UPSELL':'NOVO');});
+  const top_cli=Object.entries(empprod).sort((a,b)=>b[1].fat-a[1].fat).slice(0,15).map(([e,v])=>({emp:e,fat:v.fat,n_prods:v.prods.size,hunter:v.hunter,uf:v.uf,status:v.status,ctr:[...v.ctr].sort((x,y)=>x==='NOVO'?-1:1)}));
   const xd={};Object.values(empprod).forEach(v=>{const n=v.prods.size;xd[n]=(xd[n]||0)+1;});
   const apas=recs.filter(r=>r.is_apas);
   const apas_fech=apas.filter(r=>r.status!=='STANDBY');
@@ -859,7 +859,7 @@ function rExec(d){
   const _chEl=document.getElementById('ch-exec-hunters');
   if(_chEl)_chEl.style.height=(hl.length*46+60)+'px';
   mk('ch-exec-hunters',{type:'bar',data:{labels:hl.map(([h])=>h),datasets:[{label:'Meta YTD',data:hm,backgroundColor:'rgba(255,146,43,.3)',borderRadius:3},{label:'Novo',data:hl.map(([,v])=>v.fat_ass_novo||0),backgroundColor:'#20c997',borderRadius:3,stack:'f'},{label:'Upsell',data:hl.map(([,v])=>v.fat_ass_ups||0),backgroundColor:'#9775fa',borderRadius:3,stack:'f'}]},options:{...HORZ,scales:{x:{stacked:true,...GRID},y:{stacked:false,grid:{display:false},ticks:{color:'#8899bb',font:{size:10}}}},plugins:{...HORZ.plugins,legend:{display:true,position:'top',labels:{color:'#8899bb',boxWidth:10}},tooltip:{...TTP,callbacks:{label:c=>c.dataset.label+': '+brl(c.raw)}}}}});
-  document.getElementById('tb-top-cli').innerHTML=d.top_cli.map((c,i)=>`<tr><td><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.emp}">${c.emp}</td><td>${c.uf}</td><td class="r">${brlF(c.fat)}</td><td><span class="tag t${c.status==='ASSINADO'?'g':'p'}">${c.status==='ASSINADO'?'NOVO':'BASE'}</span></td></tr>`).join('');
+  document.getElementById('tb-top-cli').innerHTML=d.top_cli.map((c,i)=>`<tr><td><span class="rn${i<3?' '+['g','s','b'][i]:''}">${i+1}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.emp}">${c.emp}</td><td>${c.uf}</td><td class="r">${brlF(c.fat)}</td><td>${(c.ctr&&c.ctr.length?c.ctr:['NOVO']).map(t=>`<span class="tag t${t==='UPSELL'?'p':'g'}" style="margin-right:3px">${t}</span>`).join('')}</td></tr>`).join('');
 }
 function rReceita(d){
   const pp=d.fat_total>0?d.fat_parc/d.fat_total:0;
